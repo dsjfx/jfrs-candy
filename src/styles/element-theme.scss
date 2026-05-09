@@ -1,0 +1,32 @@
+:root {
+  /* 主要颜色 */
+  --el-color-primary: #059669;
+  --el-color-primary-light-3: #37ab87;
+  --el-color-primary-light-5: #69c0a5;
+  --el-color-primary-light-7: #9bd5c3;
+  --el-color-primary-light-8: #cdeae1;
+  --el-color-primary-light-9: #e6f5f0;
+  --el-color-primary-dark-2: #047854;
+
+  /* 成功颜色 */
+  --el-color-success: #67c23a;
+  /* 警告颜色 */
+  --el-color-warning: #e6a23c;
+  /* 危险颜色 */
+  --el-color-danger: #f56c6c;
+  /* 信息颜色 */
+  --el-color-info: #909399;
+
+  /* 字体 */
+  --el-font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+
+  /* 圆角 */
+  --el-border-radius-base: 4px;
+  --el-border-radius-small: 2px;
+  --el-border-radius-round: 20px;
+  --el-border-radius-circle: 100%;
+
+  /* 按钮 */
+  --el-button-font-weight: 500;
+  --el-button-border-radius: var(--el-border-radius-base);
+}

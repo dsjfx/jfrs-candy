@@ -1,0 +1,25 @@
+@use "sass:map";
+@use "sass:list";
+@use "sass:math";
+@use "sass:string";
+@use "sass:color";
+/**
+ * 主题颜色
+**/
+@function get_color($map, $name) {
+  @return map.get($map, $name);
+}
+
+/**
+ * 背景颜色
+**/
+@function get_bg($map, $name) {
+  @return map.get($map, $name);
+}
+
+/**
+ * 文字颜色
+**/
+@function get_text($map, $name) {
+  @return map.get($map, $name);
+}

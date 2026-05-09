@@ -1,0 +1,550 @@
+<template>
+  <div class="container">
+
+    <!-- 左侧文章列表 -->
+    <aside class="sidebar">
+        <div class="search-box">
+            <input type="text" placeholder="搜索文章..." id="searchInput">
+            <FaIcon :icon="faSearch" />
+        </div>
+        <div class="articles-list">
+            <h3>最新文章</h3>
+            <article class="article-preview">
+                <time datetime="2023-10-15">2023.10.15</time>
+                <h4>如何保持极简主义生活与工作平衡</h4>
+                <p>探讨在数字时代如何简化工作流程，减少干扰...</p >
+            </article>
+            <article class="article-preview">
+                <time datetime="2023-10-10">2023.10.10</time>
+                <h4>现代CSS布局的实用技巧</h4>
+                <p>Flexbox、Grid和容器查询的实际应用案例...</p >
+            </article>
+            <article class="article-preview">
+                <time datetime="2023-10-05">2023.10.05</time>
+                <h4>为什么写作是思考的最佳工具</h4>
+                <p>写作不仅是表达，更是理清思维的过程...</p >
+            </article>
+        </div>
+        <!-- <div class="tags">
+            <h3>标签</h3>
+            <div class="tag-cloud">
+                <span class="tag">极简主义</span>
+                <span class="tag">技术</span>
+                <span class="tag">生活</span>
+                <span class="tag">写作</span>
+                <span class="tag">设计</span>
+            </div>
+        </div> -->
+    </aside>
+
+    <!-- 右侧文章内容 -->
+    <article class="content">
+        <header class="article-header">
+            <time datetime="2023-10-15">2023年10月15日 • 阅读时间 5分钟</time>
+            <h1>如何保持极简主义生活与工作平衡</h1>
+            <div class="meta">
+                <span class="category">生活哲学</span>
+                <span class="word-count">约 1200 字</span>
+            </div>
+        </header>
+
+        <!-- 文章目录 -->
+        <nav class="toc" id="toc">
+            <h3>
+              <FaIcon :icon="faList" />
+              目录
+            </h3>
+            <ol>
+                <li>什么是真正的极简主义</li>
+                <li>数字断舍离实践</li>
+                <li>工作空间的简化</li>
+                <li>持续维护的习惯</li>
+            </ol>
+        </nav>
+
+        <!-- 文章正文 -->
+        <div class="article-body">
+            <p class="intro">在信息爆炸的时代，极简主义不仅是一种设计风格，更是一种生存策略。本文将分享如何在生活与工作中找到简化之道。</p >
+
+            <h2 id="section1">1. 什么是真正的极简主义</h2>
+            <p>极简主义不是单纯地减少物品，而是有意识地保留最重要的事物，消除干扰。它适用于物理空间、数字环境以及思维方式。</p >
+
+            <blockquote>
+                “简单是复杂的最终形式。” —— 列奥纳多·达·芬奇
+            </blockquote>
+
+            <h2 id="section2">2. 数字断舍离实践</h2>
+            <p>每天我们花费数小时在数字设备上。以下是一些实践建议：</p >
+            <ul>
+                <li>关闭非必要通知</li>
+                <li>使用专注模式应用</li>
+                <li>定期清理订阅和收藏</li>
+            </ul>
+
+            <h2 id="section3">3. 工作空间的简化</h2>
+            <p>物理环境直接影响效率。一个简洁的工作桌应只包含：</p >
+            <ol>
+                <li>当前任务所需物品</li>
+                <li>一件提升心情的物品（如植物）</li>
+                <li>必要的工作设备</li>
+            </ol>
+
+            <!-- 代码示例 -->
+            <h3>CSS 极简重置示例</h3>
+            <pre><code class="language-css">
+/* 极简CSS重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
+
+:root {
+  --bg-primary: #ffffff;
+  --text-primary: #2c3e50;
+  --accent-color: #e74c3c;
+}
+            </code></pre>
+
+            <h2 id="section4">4. 持续维护的习惯</h2>
+            <p>极简主义需要定期维护。建议每周花15分钟：</p >
+            <table>
+                <tr>
+                    <th>周一</th>
+                    <th>周三</th>
+                    <th>周五</th>
+                </tr>
+                <tr>
+                    <td>清理邮箱</td>
+                    <td>整理书签</td>
+                    <td>归档文件</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 文章脚注 -->
+        <footer class="article-footer">
+            <div class="tags">
+                #极简主义
+                #生产力
+                #生活方式
+            </div>
+            <div class="share">
+                <span>分享：</span>
+                <FaIcon :icon="faTwitter" />
+                <FaIcon :icon="faWeibo" />
+                <FaIcon :icon="faLink" />
+            </div>
+        </footer>
+    </article>
+
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+// import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faSearch, faList, faLink } from '@fortawesome/free-solid-svg-icons'
+import { faTwitter, faWeibo } from '@fortawesome/free-brands-svg-icons'
+import { ElMessage } from 'element-plus'
+
+// 标签数据
+const tags = ref<string[]>(['极简主义', '技术', '生活', '写作', '设计'])
+
+// 标签类型映射
+const getTagType = (tag: string) => {
+  const tagTypes = {
+    '极简主义': 'success',
+    '技术': 'info',
+    '生活': 'warning',
+    '写作': '',
+    '设计': 'danger'
+  }
+  return tagTypes[tag] || ''
+}
+
+// const fasearch = computed(() => faSearch)
+// const falist = computed(() => faList)
+// const fatwitter = computed(() => faTwitter)
+// const faweibo = computed(() => faWeibo)
+// const falink = computed(() => faLink)
+
+// 事件处理
+const handleLike = () => {
+  ElMessage.success('感谢点赞！')
+}
+
+const handleShare = () => {
+  ElMessage.info('分享功能开发中...')
+}
+
+const handleClap = () => {
+  ElMessage.success('👏 感谢支持！')
+}
+
+const filterByTag = (tag) => {
+  ElMessage.info(`正在筛选标签: ${tag}`)
+  // 这里可以添加实际的筛选逻辑
+}
+</script>
+
+<style scoped lang="scss">
+
+/* 主布局 */
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 2rem;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 3rem;
+
+  /* 侧边栏 */
+  .sidebar{
+    position: sticky;
+    top: 5rem;
+    height: fit-content;
+
+    .search-box {
+      position: relative;
+      margin-bottom: 2rem;
+
+      input {
+        width: 100%;
+        padding: 0.8rem 1rem 0.8rem 2.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 0.9rem;
+        transition: var(--transition);
+      }
+
+      input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+      }
+
+      svg {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+      }
+    }
+
+    .articles-list {
+      h3 {
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+      }
+
+      .article-preview {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid rgba(var(--primary-color-rgb, 5, 150, 105), 0.1);
+
+        &:last-child {
+          border-bottom: none;
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+
+        time {
+          margin-bottom: 0.5rem;
+          font-size: 0.85rem;
+          color: var(--text-muted);
+          display: block;
+        }
+
+        h4 {
+          font-size: 1rem;
+          margin-bottom: 0.5rem;
+
+          a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+
+            &:hover {
+              color: var(--accent-color);
+            }
+          }
+        }
+
+        p {
+          font-size: 0.9rem;
+          color: var(--text-secondary);
+          line-height: 1.5;
+        }
+      }
+    }
+  }
+
+  // .tags {
+  //   h3 {
+  //     margin-bottom: 1rem;
+  //     font-size: 1rem;
+  //     text-transform: uppercase;
+  //     letter-spacing: 0.5px;
+  //     color: var(--text-muted);
+  //   }
+
+  //   .tag-cloud {
+  //     display: flex;
+  //     flex-wrap: wrap;
+  //     gap: 0.5rem;
+
+  //     .tag {
+  //       cursor: pointer;
+  //       background: var(--bg-secondary);
+  //       color: var(--text-secondary);
+  //       padding: 0.3rem 0.8rem;
+  //       border-radius: 20px;
+  //       font-size: 0.85rem;
+  //       transition: var(--transition);
+
+  //       &:hover {
+  //         background: var(--accent-color);
+  //         color: white;
+  //       }
+  //     }
+  //   }
+  // }
+
+  /* 文章内容 */
+  .content {
+    max-width: 800px;
+    margin: 0 auto;
+
+    .article-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+
+      time {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+      }
+
+      h1 {
+        margin-bottom: 1rem;
+        font-family: 'Source Serif Pro', serif;
+        font-size: 2.5rem;
+        line-height: 1.2;
+        color: var(--text-primary);
+      }
+
+      .meta {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+
+        .category {
+          padding: 0.2rem 0.8rem;
+          background: var(--accent-color);
+          border-radius: 4px;
+          color: white;
+        }
+      }
+    }
+
+    .toc {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: var(--bg-secondary);
+      border-left: 3px solid var(--accent-color);
+      border-radius: 8px;
+
+      h3 {
+        margin-bottom: 1rem;
+        font-size: 1rem;
+        color: var(--text-primary);
+
+        svg {
+          margin-right: 0.5rem;
+          color: var(--accent-color);
+        }
+      }
+
+      ol {
+        padding-left: 0;
+        list-style: none;
+
+        li {
+          margin-bottom: 0.7rem;
+          padding-left: 0;
+        }
+      }
+
+      a {
+        padding: 0.3rem 0;
+        display: block;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: var(--transition);
+        font-size: 0.95rem;
+
+        &:hover {
+          color: var(--accent-color);
+          transform: translateX(5px);
+        }
+      }
+    }
+
+    .article-body {
+      font-family: 'Source Serif Pro', serif;
+      font-size: 1.125rem;
+      line-height: 1.8;
+
+      & > * {
+        margin-bottom: 1.5rem;
+      }
+
+      .intro {
+        margin-bottom: 2rem !important;
+        padding-left: 1rem;
+        border-left: 3px solid var(--accent-color);
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+      }
+
+      h2 {
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border-color);
+        font-family: 'Inter', sans-serif;
+        font-size: 1.8rem;
+        color: var(--text-primary);
+      }
+
+      h3 {
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 1.3rem;
+      }
+
+      blockquote {
+        margin: 1.5rem 0;
+        padding: 1rem 1.5rem;
+        background: var(--bg-secondary);
+        border-left: 4px solid var(--accent-color);
+        border-radius: 0 8px 8px 0;
+        color: var(--text-secondary);
+        font-style: italic;
+      }
+
+      ul, ol {
+        margin: 1rem 0;
+        padding-left: 2rem;
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+      }
+
+      pre {
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        padding: 1.5rem;
+        background: var(--code-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+
+        code {
+          font-family: 'Courier New', monospace;
+          font-size: 0.95rem;
+          color: var(--text-primary);
+        }
+
+        .language-css {
+          display: block;
+        }
+      }
+
+      table {
+        width: 100%;
+        margin: 1.5rem 0;
+        border-collapse: collapse;
+
+        th, td {
+          padding: 0.8rem;
+          border: 1px solid var(--border-color);
+          text-align: left;
+        }
+
+        th {
+          background: var(--bg-secondary);
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .article-footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+
+    .tags {
+      margin-bottom: 1rem;
+
+      a {
+        margin-right: 0.5rem;
+        padding: 0.3rem 0.8rem;
+        background: var(--bg-secondary);
+        border-radius: 4px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: var(--transition);
+
+        &:hover {
+          background: var(--accent-color);
+          color: white;
+        }
+      }
+    }
+
+    .share {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+
+        a {
+          color: var(--text-secondary);
+          font-size: 1.2rem;
+          transition: var(--transition);
+
+          &:hover {
+            color: var(--accent-color);
+          }
+        }
+      }
+    }
+  }
+}
+
+
+</style>

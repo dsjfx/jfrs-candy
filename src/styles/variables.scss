@@ -1,0 +1,148 @@
+// @use 'tokens' as tk;
+@use 'functions' as fk;
+
+// ^^^^^^^^^^^^^^^^ 颜色 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+// 单一数据源定义
+
+$base-color-j1: #059669;
+$base-color-j2: #50b696;
+$base-color-j3: #05875f;
+$base-color-j4: #10B981;
+$base-color-j9: #8b1a1a;
+$base-color-j10: #cd2626;
+
+$base-color-d1: #67c23a;
+$base-color-d2: #e6a23c;
+$base-color-d3: #f56c6c;
+$base-color-d4: #909399;
+
+$base-color-k1: #047857;
+
+$base-bg-j1: #ffffff;
+$base-bg-j2: #f8f9fa;
+$base-bg-j3: #f9fafb;
+
+$base-text-j1: #2c3e50;
+$base-text-j2: #9ca3af;
+$base-text-j5: #1f2937;
+$base-text-j6: #6b7280;
+$base-text-j7: #9ca3af;
+
+$base-border-j1: #eaeaea;
+$base-border-j2: #e5e7eb;
+$base-border-j3: #dcdfe6;
+
+// 颜色
+$color-tokens: (
+  'primary': $base-color-j1,
+  'secondary': $base-color-j2,
+  'deputy': $base-color-j9,
+  'success': $base-color-d1,
+  'warning': $base-color-d2,
+  'danger': $base-color-d3,
+  'info': $base-color-d4
+);
+
+$bg-tokens: (
+  'primary': $base-bg-j1,
+  'secondary': $base-bg-j2,
+  'card': $base-bg-j1
+);
+
+$text-tokens: (
+  'primary': $base-text-j1,
+  'secondary': #7f8c8d,
+  'muted': #95a5a6,
+  'footer': #95a5a6
+);
+
+
+:root {
+
+  // 主题颜色
+  @each $name, $value in $color-tokens {
+    --color-#{$name}: #{$value};
+  }
+
+  //背景颜色
+  @each $name, $value in $bg-tokens {
+    --bg-#{$name}: #{$value};
+  }
+
+  // 文字颜色
+  @each $name, $value in $text-tokens {
+    --text-#{$name}: #{$value};
+  }
+  
+  --accent-color: #{$base-color-j1};
+  --deputy-color: #e74c3c;
+  --border-color: #eaeaea;
+  --shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  --code-bg: #f8f9fa;
+  --transition: all 0.3s ease;
+  
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f5f7fa;
+  --color-border: #dcdfe6;
+  --color-text: #303133;
+  --color-text-secondary: #606266;
+  
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.14);
+  
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  
+  --header-height: 64px;
+  --sidebar-width: 280px;
+
+  --header-height-mobile: 50px;
+}
+
+//
+$primary-color: fk.get_color($color-tokens, 'primary');
+$primary-light: $base-color-j4;
+$primary-dark: $base-color-k1;
+$success-color: fk.get_color($color-tokens, 'success');
+$warning-color: fk.get_color($color-tokens, 'warning');
+$danger-color: fk.get_color($color-tokens, 'danger');
+$info-color: fk.get_color($color-tokens, 'info');
+
+$bg-color: $base-bg-j1;
+$bg-color-secondary: #f5f7fa;
+$border-color: #dcdfe6;
+
+$text-color: #303133;
+$text-color-secondary: #606266;
+$text-primary: $base-text-j5;
+$text-secondary: $base-text-j6;
+$text-light: $base-text-j7;
+
+$card-bg: $base-bg-j1;
+
+
+// ^^^^^^^^^^^^^^^^  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+$shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.1);
+$shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 4px 8px rgba(0, 0, 0, 0.12);
+$shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.14);
+$shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+
+$header-height: 64px;
+$sidebar-width: 280px;
+
+// :export {
+//   primaryColor: $primary-color;
+//   successColor: $success-color;
+//   warningColor: $warning-color;
+//   dangerColor: $danger-color;
+//   infoColor: $info-color;
+// }
