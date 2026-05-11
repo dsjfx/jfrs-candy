@@ -39,12 +39,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/article/TagsPage.vue'),
       },
       // {
-      //   path: 'about',
-      //   name: 'About',
-      //   component: () => import('@/views/about/About.vue'),
-      // },
-    ],
-  },
+        //   path: 'about',
+        //   name: 'About',
+        //   component: () => import('@/views/about/About.vue'),
+        // },
+      ],
+    },
   {
     path: '/articles',
     component: MainLayout,
@@ -72,6 +72,17 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/photo/Photos.vue'),
       },
     ],
+  },
+  {
+    path: '/archive',
+    component: MainLayout,
+    children: [
+      {
+        path: '',
+        name: 'Archive',
+        component: () => import('@/views/article/Archive.vue'),
+      }
+    ]
   },
   {
     path: '/about',

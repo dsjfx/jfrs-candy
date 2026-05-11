@@ -1,4 +1,4 @@
-import { getAdjacentBlogs, getBlogs, getBolgById, getRelatedBlogs } from './articles'
+import { getAdjacentBlogs, getArchive, getArchiveMore, getBlogs, getBolgById, getRelatedBlogs } from './articles'
 import { getComments } from './comments'
 import api from './request'
 
@@ -11,6 +11,10 @@ export const articleApi = {
   getRelatedArticles: getRelatedBlogs,
 
   getAdjacentArticles: getAdjacentBlogs,
+
+  getArticleArchive:  getArchive,
+
+  getArticleArchiveMore: getArchiveMore,
 
   // createArticle(data: any) {
   //   return api.post('/articles', data)

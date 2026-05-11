@@ -3,7 +3,7 @@ import { defineStore } from 'pinia'
 import { articleApi } from '@/api/';
 import mockArticle from '@/mock/mockArticle';
 import type { Adjacent, PageResult } from '@/types/api';
-import type { Article, Category } from '@/types/article'
+import type { ArchiveYear, Article, Category } from '@/types/article'
 import { defaultAdjacent, defaultPageResult } from '@/utils/cabinet';
 
 export const useArticleStore = defineStore('article', () => {
@@ -13,6 +13,51 @@ export const useArticleStore = defineStore('article', () => {
   const article = ref<Article>({} as Article)
   const relatedArticles = ref<Article[]>([] as Article[])
   const adjacentArticle = ref<Adjacent<Article>>(defaultAdjacent<Article>())
+
+  // Archive related state
+  const archiveYears = ref([] as ArchiveYear[])
+  const archiveLoading = ref(false)
+  const archiveNoMore = ref(false)
+
+  const fetchArchive = async (opts = { year: undefined as number | undefined, month: undefined as number | undefined, limit: 3 }) => {
+    archiveLoading.value = true
+    try {
+      const data = await articleApi.getArticleArchive(opts)
+      if (data && data.data) {
+        // ensure years sorted desc
+        archiveYears.value = (data.data.years || []).sort((a: any, b: any) => b.year - a.year)
+      }
+    } catch (err) {
+      console.error('fetchArchive error', err)
+      throw new Error('获取归档失败')
+    } finally {
+      archiveLoading.value = false
+    }
+  }
+
+  const loadMoreArchiveYears = async ({ startYear, limit = 2 }: { startYear?: number; limit?: number } = {}) => {
+    if (archiveLoading.value || archiveNoMore.value) return
+    archiveLoading.value = true
+    try {
+      const data = await articleApi.getArticleArchiveMore({ startYear, limit })
+      if (data && data.data && data.data.years && data.data.years.length) {
+        const returned = (data.data.years || []).sort((a: any, b: any) => b.year - a.year)
+        // dedupe by year to avoid duplicates when backend returns overlapping ranges
+        const existing = new Set(archiveYears.value.map((y: any) => y.year))
+        const toAdd = returned.filter((y: any) => !existing.has(y.year))
+        if (toAdd.length) {
+          archiveYears.value = archiveYears.value.concat(toAdd)
+        }
+      } else {
+        archiveNoMore.value = true
+      }
+    } catch (err) {
+      console.error('loadMoreArchiveYears error', err)
+      throw new Error('加载更多归档失败')
+    } finally {
+      archiveLoading.value = false
+    }
+  }
 
   /**
    * 获取分页博客数据
@@ -87,11 +132,17 @@ export const useArticleStore = defineStore('article', () => {
     article,
     relatedArticles,
     adjacentArticle,
-
     fetchArticles,
     fetchArticleById,
     fetchRelatedArticles,
     fetchAdjacentArticles,
+
+    // archive
+    archiveYears,
+    archiveLoading,
+    archiveNoMore,
+    fetchArchive,
+    loadMoreArchiveYears,
   }
 });
 

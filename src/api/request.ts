@@ -31,6 +31,15 @@ class Request {
           config.headers.Authorization = `Bearer ${token}`
         }
 
+        // 添加默认参数
+        config.params = {
+          ...config.params,
+          timestamp: Date.now(), // 时间戳防缓存
+          version: '1.0',        // API版本
+          platform: 'web',        // 平台标识
+          subject: 'article',
+        };
+
         return config
       },
       (error) => {

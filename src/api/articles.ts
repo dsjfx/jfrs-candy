@@ -1,5 +1,5 @@
 import http from './request'
-import type { Article } from '@/types/article'
+import type { ArchiveResponse, Article, ladyArticleParams } from '@/types/article'
 import type { Adjacent, PageParams, PageResult, ResponseData } from '@/types/api'
 import mockArticle, { getArticleDetail } from '@/mock/mockArticle'
 import ResponseFactory from '@/utils/responseFactory'
@@ -62,6 +62,35 @@ export const getAdjacentBlogs = async (articleId: string): Promise<ResponseData<
   const response = await http.get(makeUrl(`/adjacent/${articleId}`))
   if (response.data) {
     result = response.data as ResponseData<Adjacent<Article>>
+  }
+
+  return result
+}
+
+export const getArchive = async ({ year, month, limit = 5 }: 
+  { year?: number; month?: number, limit?: number }): Promise<ResponseData<ArchiveResponse>> => {
+  let result = ResponseFactory.success<ArchiveResponse>({} as ArchiveResponse)
+  
+  const response = await http.get(makeUrl(`/archive`), { year, month, limit })
+  if (response.data) {
+    result = response.data as ResponseData<ArchiveResponse>
+  }
+
+  return result
+}
+
+export const getArchiveMore = async (
+  { 
+   years, 
+   startYear, 
+   endYear, 
+   limit = 5
+  }:ladyArticleParams): Promise<ResponseData<ArchiveResponse>> => {
+  let result = ResponseFactory.success<ArchiveResponse>({} as ArchiveResponse)
+  
+  const response = await http.get(makeUrl(`/archive/more`), { years, startYear, endYear, limit })
+  if (response.data) {
+    result = response.data as ResponseData<ArchiveResponse>
   }
 
   return result

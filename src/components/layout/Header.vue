@@ -176,7 +176,8 @@ const navItems = [
     matchPaths: ['/articles'],
     icon: Document
   },
-  { path: '/photos', name: '图片', icon: Picture },
+  // { path: '/photos', name: '图片', icon: Picture },
+  { path: '/archive', name: '归档', icon: Folder },
   { path: '/about', name: '关于', icon: User }
 ]
 
