@@ -1,4 +1,5 @@
 import { getAdjacentBlogs, getArchive, getArchiveMore, getBlogs, getBolgById, getRelatedBlogs } from './articles'
+import { getUser } from './auth'
 import { getComments } from './comments'
 import api from './request'
 
@@ -43,12 +44,14 @@ export const tagApi = {
 
 // 用户相关API
 export const userApi = {
-  getProfile() {
-    return api.get('/user/profile')
-  },
-  login(data: { username: string; password: string }) {
-    return api.post('/auth/login', data)
-  },
+  getUserProfile: getUser,
+  
+  // getProfile() {
+  //   return api.get('/user/profile')
+  // },
+  // login(data: { username: string; password: string }) {
+  //   return api.post('/auth/login', data)
+  // },
 }
 
 // 评论相关 API

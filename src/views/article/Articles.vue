@@ -48,10 +48,26 @@
       </div> -->
     </div>
 
-    <!-- 分页控件 -->
-    <Paging v-if="!isLoading && !isEmpty" :current="current" :page-size="pageSize" :total="pageData.pagination.total"
-      :showIcons="true" :showText="true" :showPageSize="false" :showInfo="false" :showJump="false"
-      :pageSizeOptions="[5, 10, 20, 50]" @page-change="handlePageChange" @page-size-change="handlePageSizeChange" />
+    <!-- 搜索提示 + 分页控件 -->
+    <div v-if="!isLoading && !isEmpty" class="pagination-row">
+      <!-- 方式 A: 旧的 pill（保留为注释以便比较） -->
+      <!--
+      <div class="search-pill" v-if="searchQuery">
+        当前搜索：<strong>{{ searchQuery }}</strong>
+        <button class="pill-clear" @click="clearSearch">清除</button>
+      </div>
+      -->
+
+      <!-- 方式 B: 可关闭的 Tag（推荐） -->
+      <div v-if="searchQuery" class="search-tag">
+        <span class="tag-label">搜索：</span>
+        <button class="tag" @click="clearSearch">{{ searchQuery }} ×</button>
+      </div>
+
+      <Paging :current="current" :page-size="pageSize" :total="pageData.pagination.total" :showIcons="true"
+        :showText="true" :showPageSize="false" :showInfo="false" :showJump="false" :pageSizeOptions="[5, 10, 20, 50]"
+        @page-change="handlePageChange" @page-size-change="handlePageSizeChange" />
+    </div>
 
     <!-- 底部信息 -->
     <footer class="blog-footer">
@@ -61,7 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import ArticleCard from '@/components/articles/ArticleCard.vue'
@@ -73,6 +89,7 @@ import Paging from '../../components/page/Paging.vue'
 import type { Article } from '@/types/article'
 import { useArticleStore } from '@/stores/article'
 import useLoading from '@/composables/useLoading'
+import useDebouncedRef from '@/composables/useDebouncedRef'
 import cabinet from '@/utils/cabinet'
 
 const router = useRouter()
@@ -175,16 +192,17 @@ const getCategoryColor = (category: string) => {
 const fetchArticles = async () => {
   startLoading()
 
-  await cabinet.delay(2000)
+  // await cabinet.delay(2000)
   // 设置延迟显示旋转加载器
-  // spinnerTimer = window.setTimeout(() => {
-  //   showSpinner.value = true
-  // }, 2000)
+  spinnerTimer = window.setTimeout(() => {
+    showSpinner.value = true
+  }, 2000)
 
   try {
     await articleStore.fetchArticles({
       current: current.value,
-      size: pageSize.value
+      size: pageSize.value,
+      search: searchQuery.value || undefined
     })
   } catch (err) {
     console.error('加载文章失败:', err)
@@ -192,16 +210,27 @@ const fetchArticles = async () => {
     // hasError.value = true
   } finally {
     stopLoading()
-    // showSpinner.value = false
-    // if (spinnerTimer) {
-    //   clearTimeout(spinnerTimer)
-    // }
+    showSpinner.value = false
+    if (spinnerTimer) {
+      clearTimeout(spinnerTimer)
+    }
   }
 }
 
+// use debounced ref for search input
+const debouncedSearch = useDebouncedRef(searchQuery, 300)
+
+// when debounced search changes, perform search
+watch(debouncedSearch, async (val, oldVal) => {
+  if (val !== oldVal) {
+    current.value = 1
+    await fetchArticles()
+  }
+})
+
 const handleSearch = () => {
-  // current.value = 1
-  // distributePhotos()
+  // input is bound to searchQuery; debounced watcher will call fetchArticles
+  current.value = 1
 }
 
 const handleTagClick = (tag: string) => {
@@ -212,7 +241,7 @@ const handleTagClick = (tag: string) => {
 const handleReadMore = (article: Article) => {
   console.log('阅读更多:', article.title)
   // 跳转到文章详情页
-  // router.push(`/article/${article.id}`)
+  router.push(`/articles/${article.id}`)
 }
 
 const handleArticleClick = (article: Article) => {
@@ -231,16 +260,28 @@ const handleArticleClick = (article: Article) => {
 //   }
 // }
 
-const handlePageChange = (page: number) => {
+const handlePageChange = async (page: number) => {
   if (page >= 1 && page <= totalPages.value && page !== current.value) {
     current.value = page
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    // fetch considering search
+    try {
+      await articleStore.fetchArticles({ current: page, size: pageSize.value, search: searchQuery.value })
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch (err) {
+      console.error('切换页失败', err)
+    }
   }
 }
 
 const handlePageSizeChange = (size: number) => {
   pageSize.value = size
   current.value = 1
+}
+
+const clearSearch = () => {
+  searchQuery.value = ''
+  current.value = 1
+  fetchArticles()
 }
 
 // 生命周期
@@ -405,6 +446,52 @@ $breakpoint-mobile: 768px;
   margin-top: 40px;
   text-align: center;
   padding: 20px;
+}
+
+.pagination-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.search-pill {
+  background: rgba(0, 0, 0, 0.03);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .pill-clear {
+    background: transparent;
+    border: none;
+    color: var(--color-primary);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+}
+
+.search-tag {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .tag {
+    padding: 6px 10px;
+    background: var(--color-primary);
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer
+  }
+
+  .tag-label {
+    color: #666
+  }
 }
 
 .load-more-btn {

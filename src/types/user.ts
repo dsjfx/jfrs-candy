@@ -18,8 +18,8 @@ export interface UserInfo {
   username: string
   email: string
   avatar: string
-  roles: string[]
-  permissions: string[]
+  roles?: string[]
+  permissions?: string[]
 }
 
 export interface LoginParams {
@@ -33,4 +33,8 @@ export interface Author {
   nickname: string
   avatar: string
   isAdmin?: boolean
+}
+
+export interface UserParam {
+  id: number
 }

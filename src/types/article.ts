@@ -96,6 +96,10 @@ export interface Tag {
   name: string
   slug?: string
   articleCount: number | 0
+  BlogTag?: {
+    blogId: number
+    tagId: number
+  }
 }
 
 export interface ArchivePost {

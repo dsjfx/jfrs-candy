@@ -13,7 +13,7 @@
       <main class="archive-main" ref="mainRef">
         <el-timeline :mode="mode">
           <template v-for="year in visibleYears" :key="year.year">
-            <el-timeline-item :timestamp="`${year.year}`">
+            <el-timeline-item :timestamp="`${year.year}`" :color="timeColor">
               <div :id="`year-${year.year}`" class="year-block">
                 <div class="year-card">
                   <div class="year-header">
@@ -88,6 +88,7 @@ import type { TimelineProps } from 'element-plus'
 const articleStore = useArticleStore()
 const isLoading = articleStore.archiveLoading
 const years = computed(() => (articleStore.archiveYears || []) as ArchiveYear[])
+const timeColor = ref<string>('#059669')
 
 // UI state
 const isMobile = ref(false)
@@ -106,6 +107,8 @@ let observer: IntersectionObserver | null = null
 let loadingMore = false
 
 const fetchArchive = async () => {
+  // reset archive flags (do not clear loaded years by default)
+  articleStore.resetArchiveState({ clearYears: false })
   await articleStore.fetchArchive({ year: undefined, month: undefined, limit: INITIAL_YEARS })
   // initialize expanded states
   years.value.forEach((y, yi) => {
@@ -130,13 +133,13 @@ const setupObserver = () => {
 
         loadingMore = true
 
-        const startYear = lastYear ? lastYear - 3 : undefined
+        const startYear = lastYear ? lastYear - INITIAL_YEARS : undefined
         if (!startYear) {
           loadingMore = false
           return
         }
 
-        articleStore.loadMoreArchiveYears({ startYear, limit: 2 }).then(() => {
+        articleStore.loadMoreArchiveYears({ startYear, limit: (INITIAL_YEARS - 1) }).then(() => {
           const newLen = (articleStore.archiveYears as any[]).length
           const added = Math.max(0, newLen - prevLen)
           if (added > 0) {
@@ -198,20 +201,29 @@ const scrollToYear = (yearNum: number) => {
 function handleResize() {
   const mobile = window.innerWidth <= 900
   isMobile.value = mobile
-  mode.value = mobile ? 'left' : 'alternate'
+  mode.value = mobile ? 'start' : 'alternate'
 }
 </script>
 
 <style scoped lang="scss">
+$breakpoint-mobile: 768px;
+
 .archive-container {
-  max-width: 900px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
-  display: block;
+  flex: 1;
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: 10px;
+  }
 
   h1 {
-    text-align: center;
     margin-bottom: 24px;
+    font-size: 2.5rem;
+    font-weight: 300;
+    color: #333;
+    text-align: center;
   }
 
   .year-title {
@@ -222,15 +234,15 @@ function handleResize() {
   // layout for sidebar + main
   .archive-layout {
     display: flex;
-    gap: 24px;
+    gap: 2rem;
   }
 
   .archive-main {
     flex: 1 1 0;
     min-width: 0;
     max-height: calc(100vh - 160px);
+    padding: 0 10px;
     overflow: auto;
-    padding-right: 8px;
   }
 
   .archive-sidebar {

@@ -18,6 +18,54 @@ export async function markdownToHtml(markdown: string, options?: Config): Promis
   }
 }
 
+// 统计文字数量（不包括 HTML 标签）
+export function getDisplayWordCount(htmlContent: string): number {
+  const plainText = getPlainText(htmlContent);
+    
+  // 普通展示用这个就够了
+  return plainText.length;
+}
+
+function getPlainText(html: string): string {
+  // 创建临时元素提取纯文本
+  const temp = document.createElement('div');
+  temp.innerHTML = html;
+  return temp.textContent || temp.innerText || '';
+}
+
+// Medium 风格的阅读时间估算
+export function getReadTimeMedium(htmlContent: string, wpm: number): string {
+  // 1. 基础字数
+  const plainText = getPlainText(htmlContent);
+  let adjustedWordCount = plainText.length;
+  
+  // 2. 图片调整（每张图 +10 秒 ≈ 50 字视觉开销）
+  const imageCount = (htmlContent.match(/<img/g) || []).length;
+  adjustedWordCount += imageCount * 50;
+  
+  // 3. 代码块调整（用户会放慢）
+  const codeCount = (htmlContent.match(/<pre>/g) || []).length;
+  adjustedWordCount += codeCount * 80;
+  
+  // 4. 标题调整（小标题帮助加快阅读，减少计数）
+  const headingCount = (htmlContent.match(/<h[2-3]>/g) || []).length;
+  adjustedWordCount -= headingCount * 20;
+  
+  // 5. 计算分钟数
+  let minutes = Math.ceil(adjustedWordCount / wpm);
+  
+  // 6. 人性化边界
+  minutes = Math.max(1, Math.min(minutes, 60)); // 最多 1 小时
+  
+  return formatReadTime(minutes || 0);
+}
+
+function formatReadTime(minutes: number): string {
+  if (minutes < 1) return '小于 1 分钟';
+  if (minutes === 1) return '1 分钟';
+  return `${minutes} 分钟`;
+}
+
 /**
  * 默认分页数据
  * @returns 分页数据
@@ -77,6 +125,7 @@ export const formatDate2 = (dateStr: string) => {
 const MAP_URL: Record<string, string> = {
   'A': '/jdmk/blog',
   'C': '/jdmk/comment',
+  'U': '/jdmk/auth',
 }
 
 export function accessUrl(code: string, url: string) {

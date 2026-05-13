@@ -20,6 +20,8 @@ export const useArticleStore = defineStore('article', () => {
   const archiveNoMore = ref(false)
 
   const fetchArchive = async (opts = { year: undefined as number | undefined, month: undefined as number | undefined, limit: 3 }) => {
+    // reset no-more flag on initial fetch so lazy-loading can proceed after reloads
+    archiveNoMore.value = false
     archiveLoading.value = true
     try {
       const data = await articleApi.getArticleArchive(opts)
@@ -32,6 +34,18 @@ export const useArticleStore = defineStore('article', () => {
       throw new Error('获取归档失败')
     } finally {
       archiveLoading.value = false
+    }
+  }
+
+  /**
+   * Reset archive related state.
+   * @param options.clearYears - whether to clear the currently loaded years array (default false)
+   */
+  const resetArchiveState = (options: { clearYears?: boolean } = {}) => {
+    archiveNoMore.value = false
+    archiveLoading.value = false
+    if (options.clearYears) {
+      archiveYears.value = []
     }
   }
 
@@ -63,12 +77,25 @@ export const useArticleStore = defineStore('article', () => {
    * 获取分页博客数据
    * @param payload 
    */
-  const fetchArticles = async (payload = { current: 1, size: 10 }) => {
-    const current: number = payload.current
-    const size: number = payload.size
+  const fetchArticles = async (payload: 
+    { 
+    current?: number; 
+    size?: number; 
+    search?: string 
+    } = 
+    { 
+      current: 1, 
+      size: 10 
+    }
+  ) => {
+    const current: number = payload.current ?? 1
+    const size: number = payload.size ?? 10
+    const search: string | undefined = payload.search
 
     try {
-      const data = await articleApi.getArticles({ current, size })
+      const params: any = { current, size }
+      if (search) params.search = search
+      const data = await articleApi.getArticles(params)
 
       if (data && data.data) {
         pageData.value = data.data
@@ -143,6 +170,7 @@ export const useArticleStore = defineStore('article', () => {
     archiveNoMore,
     fetchArchive,
     loadMoreArchiveYears,
+    resetArchiveState,
   }
 });
 

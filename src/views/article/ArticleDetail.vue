@@ -16,6 +16,12 @@
       <!-- 文章头部 -->
       <div class="article-header">
 
+        <!-- 返回按钮 -->
+        <button class="back-button" @click="handleBack" aria-label="返回上一页">
+          <FaIcon :icon="faArrowLeftIcon" />
+          <span>返回</span>
+        </button>
+
         <!-- 面包屑导航 -->
         <nav v-if="showBreadcrumb" class="breadcrumb">
           <router-link to="/" class="breadcrumb-item">首页</router-link>
@@ -259,6 +265,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import { useRoute, useRouter } from 'vue-router'
 import { useLoading } from '@/composables/useLoading'
 import ArticleDetailSkeleton from '@/components/core/ArticleDetailSkeleton.vue'
@@ -406,6 +413,18 @@ const fetchArticle = async () => {
     setError(errorMessage)
   }
 }
+
+const handleBack = () => {
+  // prefer history back, fallback to articles list
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push({ name: 'Articles' })
+  }
+}
+
+// fontawesome icon for template
+const faArrowLeftIcon = faArrowLeft
 
 // 提取文章标题（用于目录）
 const extractHeadings = () => {
@@ -685,6 +704,27 @@ $breakpoint-mobile: 768px;
     margin-bottom: 2rem;
     padding: 2rem;
     background: $card-bg;
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: transparent;
+      border: 1px solid $border-color;
+      color: $text-secondary;
+      cursor: pointer;
+      margin-bottom: 12px;
+
+      span {
+        font-size: 0.9rem;
+      }
+
+      &:hover {
+        border: 1px solid var(--color-primary);
+      }
+    }
 
     @media (max-width: $breakpoint-mobile) {
       padding: 0;
