@@ -4,6 +4,14 @@
       <div class="copyright">
         &copy; {{ currentYear }} {{ appTitle }}
       </div>
+      <!-- <div class="footer-beian">
+        <a href="https://beian.miit.gov.cn/" target="_blank">
+          苏ICP备2026029057号-1
+        </a>
+        <a href="http://www.beian.gov.cn/" target="_blank">
+          浙公网安备 xxxxxxxxxxxxxx号
+        </a>
+      </div> -->
       <div class="footer-links">
         <router-link to="/about" class="footer-link">关于</router-link>
         <span class="separator">|</span>
@@ -52,6 +60,11 @@ $breakpoint-mobile: 768px;
   .copyright {
     display: flex;
     justify-content: center;
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+  }
+
+  .footer-beian {
     color: var(--color-text-secondary);
     font-size: 0.875rem;
   }
