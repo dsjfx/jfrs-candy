@@ -10,6 +10,11 @@ export interface User {
   followers?: number | 0
   isAdmin?: boolean
   isLoggedIn?: boolean
+  location?: string
+  motto?: string
+  job?: string
+  hobbies?: string[]
+  social?: SocialLinks
 }
 
 
@@ -37,4 +42,31 @@ export interface Author {
 
 export interface UserParam {
   id: number
+}
+
+export interface SocialLinks {
+  github?: string
+  githubQr?: string
+  github_qr?: string
+
+  weibo?: string
+  weiboQr?: string
+  weibo_qr?: string
+
+  qq?: string
+  qqQr?: string
+  qq_qr?: string
+
+  twitter?: string
+  twitterQr?: string
+  twitter_qr?: string
+
+  wechat?: string
+  wechatQr?: string
+  wechat_qr?: string
+
+  linkedin?: string
+  email?: string
+  homepage?: string
+  [key: string]: string | undefined
 }

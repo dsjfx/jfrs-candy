@@ -14,81 +14,127 @@
       <!-- 关于简介 -->
       <section class="about-intro">
         <div class="intro-content">
-          <h2 class="section-title">我们的故事</h2>
+          <h2 class="section-title">关于我</h2>
           <p class="section-text">
-            我们是一个热爱生活、热爱摄影的团队。在这个快节奏的时代，我们希望通过镜头捕捉那些容易被忽视的美好瞬间，
-            用图片讲述故事，用文字记录情感。每一张照片背后都有一个独特的故事，每一个故事都值得被看见。
+            {{ author.bio }}
           </p>
-          <p class="section-text">
+          <!-- <p class="section-text">
             自2018年创立以来，我们走遍了山川湖海，记录下了无数动人的瞬间。从繁华都市到静谧乡村，
             从日出东方到星辰大海，我们用镜头诉说着这个世界的美好。
-          </p>
+          </p> -->
         </div>
         <div class="intro-image">
           <img src="https://picsum.photos/600/400?random=101" alt="关于我们" loading="lazy" />
         </div>
       </section>
 
-      <!-- 团队理念 -->
+      <!-- 个人信息 / 爱好 / 社交 -->
       <section class="philosophy-section">
-        <h2 class="section-title">我们的理念</h2>
+        <h2 class="section-title">个人档案</h2>
         <div class="philosophy-grid">
+          <!-- 个人信息：居住地 / 座右铭 / 工作 -->
           <div class="philosophy-card">
             <div class="icon-wrapper">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                <circle cx="12" cy="9" r="2.5" />
               </svg>
             </div>
-            <h3>真实记录</h3>
-            <p>我们不追求完美的构图，只追求真实的瞬间。最动人的画面往往来自于最真实的生活。</p>
+            <h3>个人信息</h3>
+            <ul class="info-list">
+              <li><strong>居住地：</strong>{{ author.location || '某地' }}</li>
+              <li><strong>座右铭：</strong>{{ author.motto || '拥抱好奇，持续学习' }}</li>
+              <li><strong>深耕：</strong>{{ author.job || '前端工程师 / 内容创作者' }}</li>
+            </ul>
           </div>
 
+          <!-- 爱好 -->
           <div class="philosophy-card">
             <div class="icon-wrapper">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path
-                  d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3" />
+                  d="M20.84 4.61a5 5 0 00-7.07 0L12 6.38l-1.77-1.77a5 5 0 10-7.07 7.07L12 21.07l8.84-8.99a5 5 0 000-7.47z" />
               </svg>
             </div>
-            <h3>情感连接</h3>
-            <p>每一张照片都应该能够唤起共鸣，连接人与人之间的情感，让美好传递更远。</p>
+            <h3>兴趣爱好</h3>
+            <div class="hobbies">
+              <ul v-if="author.hobbies && author.hobbies.length">
+                <li v-for="(h, i) in author.hobbies" :key="i">{{ h }}</li>
+              </ul>
+              <p v-else>摄影 · 旅行 · 阅读 · 编程 · 咖啡</p>
+            </div>
           </div>
 
+          <!-- 社交账号 -->
           <div class="philosophy-card">
             <div class="icon-wrapper">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 8v4l3 3" />
+                <path d="M21 8V7a2 2 0 00-2-2h-3.5" />
+                <rect x="3" y="7" width="18" height="13" rx="2" ry="2" />
+                <path d="M7 11h0" />
               </svg>
             </div>
-            <h3>持续分享</h3>
-            <p>我们相信分享的力量。通过持续的分享，让更多人看到世界的多样性和美好。</p>
+            <h3>社交账号</h3>
+            <div class="socials">
+              <ul>
+                <li v-if="author.social?.github" class="social-row">
+                  <FaIcon :icon="faGithub" />
+                  <span class="social-label">GitHub</span>
+                  <a :href="getAccountHref('github', author.social.github)" target="_blank" rel="noopener"
+                    class="social-link">
+                    {{ /^https?:\/\//.test(author.social.github) ? author.social.github : `@${author.social.github}` }}
+                  </a>
+                  <button class="tiny-btn" @click="copyToClipboard(author.social.github)">复制</button>
+                  <button v-if="author.social?.githubQr || author.social?.github_qr" class="tiny-btn"
+                    @click="openQr('github')">二维码</button>
+                </li>
+
+                <li v-if="author.social?.weibo" class="social-row">
+                  <FaIcon :icon="faWeibo" />
+                  <span class="social-label">Weibo</span>
+                  <a :href="getAccountHref('weibo', author.social.weibo)" target="_blank" rel="noopener"
+                    class="social-link">
+                    {{ /^https?:\/\//.test(author.social.weibo) ? author.social.weibo : `@${author.social.weibo}` }}
+                  </a>
+                  <button class="tiny-btn" @click="copyToClipboard(author.social.weibo)">复制</button>
+                  <button v-if="author.social?.weiboQr || author.social?.weibo_qr" class="tiny-btn"
+                    @click="openQr('weibo')">二维码</button>
+                </li>
+
+                <li v-if="author.social?.qq" class="social-row">
+                  <FaIcon :icon="faQq" />
+                  <span class="social-label">QQ</span>
+                  <a :href="getAccountHref('qq', author.social.qq)" target="_blank" rel="noopener" class="social-link">
+                    {{ /^https?:\/\//.test(author.social.qq) ? author.social.qq : author.social.qq }}
+                  </a>
+                  <button class="tiny-btn" @click="copyToClipboard(author.social.qq)">复制</button>
+                  <button v-if="author.social?.qqQr || author.social?.qq_qr" class="tiny-btn"
+                    @click="openQr('qq')">二维码</button>
+                </li>
+              </ul>
+
+              <!-- fallback 静态链接（当 author.social 未提供时显示） -->
+              <div v-if="!author.social || Object.keys(author.social).length === 0" class="social-fallback">
+                <a href="https://github.com/" target="_blank" rel="noopener">GitHub</a>
+                <a href="https://weibo.com/" target="_blank" rel="noopener">Weibo</a>
+                <a href="https://qzone.qq.com/" target="_blank" rel="noopener">QQ</a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- 数据统计 -->
-      <!-- <section class="stats-section">
-        <h2 class="section-title">数字背后</h2>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <div class="stat-number" ref="photoCount">0</div>
-            <div class="stat-label">精选图片</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number" ref="storyCount">0</div>
-            <div class="stat-label">故事记录</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number" ref="countryCount">0</div>
-            <div class="stat-label">踏足国家</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-number" ref="memberCount">0</div>
-            <div class="stat-label">团队成员</div>
-          </div>
+
+      <el-dialog v-model="showQrDialog" title="二维码" width="360px">
+        <div style="text-align:center">
+          <img v-if="qrImageUrl" :src="qrImageUrl" alt="QR" style="max-width:100%;height:auto" />
+          <p v-else>暂无二维码</p>
         </div>
-      </section> -->
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="showQrDialog = false">关闭</el-button>
+        </span>
+      </el-dialog>
+
     </div>
 
   </div>
@@ -96,67 +142,89 @@
 
 <script setup lang="ts">
 import { userApi } from '@/api'
+import { useLoading } from '@/composables/useLoading';
+import type { User } from '@/types/user'
 import { ref, onMounted, reactive } from 'vue'
 
-// 表单数据
-const form = reactive({
-  name: '',
-  email: '',
-  message: ''
-})
+const {
+  // isLoading, 
+  startLoading,
+  stopLoading
+} = useLoading();
 
-const isSubmitting = ref(false)
+const author = ref<User>({} as User)
 
-// 统计数字的引用
-const photoCount = ref<HTMLElement>()
-const storyCount = ref<HTMLElement>()
-const countryCount = ref<HTMLElement>()
-const memberCount = ref<HTMLElement>()
+const getUser = async () => {
+  startLoading();
 
-// 处理表单提交
-const handleSubmit = async () => {
-  isSubmitting.value = true
-
-  // 模拟API调用
-  await new Promise(resolve => setTimeout(resolve, 1500))
-
-  alert('感谢您的消息！我们会尽快回复您。')
-
-  // 重置表单
-  form.name = ''
-  form.email = ''
-  form.message = ''
-  isSubmitting.value = false
-}
-
-// 数字增长动画
-const animateCounter = (element: HTMLElement, target: number, duration: number = 2000) => {
-  const start = 0
-  const increment = target / (duration / 16) // 60fps
-  let current = start
-
-  const timer = setInterval(() => {
-    current += increment
-    if (current >= target) {
-      current = target
-      clearInterval(timer)
+  try {
+    const res = await userApi.getUserProfile({ id: 10 });
+    if (res.success) {
+      const user: User = res.data;
+      author.value = user;
     }
-    element.textContent = Math.floor(current).toString()
-  }, 16)
+  } catch (error) {
+    console.error('获取用户信息失败：', error);
+  } finally {
+    stopLoading();
+  }
 }
 
 // 初始化页面
 onMounted(async () => {
-  await userApi.getUserProfile({ id: 10 })
+  await getUser();
 
-  // 初始化数字动画
-  setTimeout(() => {
-    if (photoCount.value) animateCounter(photoCount.value, 3567)
-    if (storyCount.value) animateCounter(storyCount.value, 1234)
-    if (countryCount.value) animateCounter(countryCount.value, 42)
-    if (memberCount.value) animateCounter(memberCount.value, 8)
-  }, 500)
 })
+import { ElMessage } from 'element-plus'
+import { faGithub, faWeibo, faQq, faTwitter } from '@fortawesome/free-brands-svg-icons'
+
+const showQrDialog = ref(false)
+const qrImageUrl = ref('')
+
+const copyToClipboard = async (text: string) => {
+  try {
+    if (!text) {
+      ElMessage.warning('无可复制内容')
+      return
+    }
+    await navigator.clipboard.writeText(text)
+    ElMessage.success('已复制到剪贴板')
+  } catch (err) {
+    console.error('复制失败', err)
+    ElMessage.error('复制失败，请手动复制')
+  }
+}
+
+const getAccountHref = (type: string, val: string) => {
+  if (!val) return '#'
+  if (/^https?:\/\//.test(val)) return val
+  switch (type) {
+    case 'github':
+      return `https://github.com/${val}`
+    case 'weibo':
+      return `https://weibo.com/${val}`
+    case 'qq':
+      return `https://qzone.qq.com/${val}`
+    case 'twitter':
+      return `https://twitter.com/${val}`
+    default:
+      return val
+  }
+}
+
+const openQr = (type: string) => {
+  const social = author.value.social || {}
+  // prefer explicit QR field e.g. wechatQr, githubQr
+  const key = `${type}Qr`
+  const url = social[key] || social[`${type}Qr`] || ''
+  if (url) {
+    qrImageUrl.value = url
+    showQrDialog.value = true
+  } else {
+    ElMessage.info('当前账号未提供二维码')
+  }
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -339,46 +407,86 @@ onMounted(async () => {
         font-size: 1rem;
       }
     }
-  }
-}
 
-// 数据统计
-.stats-section {
-  margin-bottom: 100px;
+    .info-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      text-align: left;
 
-  .section-title {
-    text-align: center;
-    font-size: 2.5rem;
-    color: #2c3e50;
-    margin-bottom: 60px;
-    font-weight: 300;
-  }
-
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 30px;
-
-    .stat-item {
-      text-align: center;
-      padding: 30px;
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-
-      .stat-number {
-        font-size: 3rem;
-        font-weight: 700;
-        color: #3498db;
-        margin-bottom: 10px;
-        font-family: 'Arial', sans-serif;
-      }
-
-      .stat-label {
-        font-size: 1.1rem;
+      li {
+        margin-bottom: 8px;
         color: #4a5568;
-        font-weight: 500;
+        font-size: 1rem;
       }
+    }
+
+    .hobbies ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        display: inline-block;
+        margin-right: 10px;
+        background: rgba(52, 152, 219, 0.08);
+        padding: 6px 10px;
+        border-radius: 12px;
+        color: #2c3e50;
+        font-size: 0.95rem;
+      }
+    }
+
+    .socials {
+      text-align: center;
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 12px 0;
+
+        li {
+          margin-bottom: 8px;
+        }
+      }
+
+      .social-fallback a {
+        display: inline-block;
+        margin: 6px 8px;
+        padding: 6px 12px;
+        background: rgba(155, 89, 182, 0.08);
+        border-radius: 8px;
+        color: #6b46c1;
+        text-decoration: none;
+      }
+    }
+
+    .social-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .social-label {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-right: 6px;
+    }
+
+    .social-link {
+      color: #4a5568;
+      text-decoration: none;
+      margin-right: 6px;
+    }
+
+    .tiny-btn {
+      background: transparent;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
     }
   }
 }

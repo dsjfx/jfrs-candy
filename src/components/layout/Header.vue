@@ -3,11 +3,11 @@
     <div class="header-container">
       <div class="header-content">
         <div class="logo" @click="router.push('/')">
-          <img src="@/assets/img/tg.png" />
-          <h1>{{ appTitle }}</h1>
+          <el-avatar :src="avatarUrl" size="48" />
+          <h1 class="site-title">{{ appTitle }}</h1>
         </div>
 
-        <div class="slogan">{{ appSlogan }}</div>
+        <div class="slogan artistic">{{ appSlogan }}</div>
 
         <nav class="nav">
           <ul class="nav-list">
@@ -141,6 +141,8 @@ const themeStore = useThemeStore()
 
 const appTitle = import.meta.env.VITE_APP_TITLE || '个人博客'
 const appSlogan = import.meta.env.VITE_APP_SLOGAN
+// temporary avatar url
+const avatarUrl = 'https://picsum.photos/200/200?random=10'
 
 const mobileMenuVisible = ref(false)
 const showLoginDialog = ref(false)
@@ -320,6 +322,7 @@ $breakpoint-mobile: 768px;
   align-items: center;
   gap: 5px;
   cursor: pointer;
+  padding-left: 8px;
 
   img {
     width: auto;
@@ -335,8 +338,8 @@ $breakpoint-mobile: 768px;
 
   h1 {
     margin: 0;
-    padding-left: 0px;
-    font-size: 2.5rem;
+    padding-left: 8px;
+    font-size: 1.8rem;
     font-weight: 800;
     // vertical-align: middle;
     color: var(--color-primary);
@@ -353,12 +356,21 @@ $breakpoint-mobile: 768px;
 
 .slogan {
   padding-top: 10px;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bolder;
   color: rgba($base-color-j9, 0.7);
 
   @media (max-width: $breakpoint-mobile) {
     font-size: 14px;
+  }
+
+  &.artistic {
+    transform: rotate(-4deg);
+    display: inline-block;
+    margin-left: 8px;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.04), 2px 2px 6px rgba(0, 0, 0, 0.06);
+    // color: var(--color-primary);
   }
 }
 
