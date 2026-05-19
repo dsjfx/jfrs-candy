@@ -6,6 +6,7 @@
 //   bio: string
 //   createdAt: string
 // }
+import type { User } from './user'
 
 // export interface Category {
 //   id: number
@@ -39,6 +40,7 @@
 //   category: Category | null
 //   tags: Tag[]
 // }
+import type { Category, Tag, Article } from './article'
 
 // export interface Pagination<T> {
 //   data: T[]
@@ -61,3 +63,5 @@ export interface NavItem<T = any> {
   matchPaths?: [string]
   icon: T
 }
+
+export type { User, Category, Tag, Article }

@@ -7,10 +7,10 @@
         </div>
         <div class="footer-beian">
           <a v-if="icpLicense" href="https://beian.miit.gov.cn/" target="_blank">
-            苏ICP备2026029057号-1
+            {{ icpLicense }}
           </a>
           <a v-if="publicSecurityLicense" href="http://www.beian.gov.cn/" target="_blank">
-            浙公网安备 xxxxxxxxxxxxxx号
+            {{ publicSecurityLicense }}
           </a>
         </div>
       </div>
@@ -100,9 +100,9 @@ $breakpoint-mobile: 768px;
   grid-template-columns: 1fr 300px;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+  // max-width: 1200px;
+  margin: 0 20px;
+  // padding: 0 20px;
   color: var(--text-footer);
   font-size: 0.9rem;
 }
@@ -187,11 +187,15 @@ $breakpoint-mobile: 768px;
 
 .back-to-top {
   margin-left: 12px;
-  background: transparent;
-  border: 1px solid rgba(0, 0, 0, 0.06);
   padding: 6px 8px;
+  background: transparent;
+  border: 1px solid rgba(5, 150, 105, 0.2);
   border-radius: 6px;
   cursor: pointer;
+
+  &:hover {
+    border: 1px solid rgba(5, 150, 105, 0.4);
+  }
 }
 
 // .footer-links {

@@ -4,7 +4,11 @@
       <div class="header-content">
         <div class="logo" @click="router.push('/')">
           <el-avatar :src="avatarUrl" size="48" />
-          <h1 class="site-title">{{ appTitle }}</h1>
+          <h1 class="site-title">
+            <span class="title-candy">{{ mainTitle }}</span>
+            <span class="title-divider">·</span>
+            <span class="title-diary">{{ slaveTitle }}</span>
+          </h1>
         </div>
 
         <div class="slogan artistic">{{ appSlogan }}</div>
@@ -139,7 +143,8 @@ const router = useRouter()
 const blogStore = useBlogStore()
 const themeStore = useThemeStore()
 
-const appTitle = import.meta.env.VITE_APP_TITLE || '个人博客'
+const mainTitle = import.meta.env.VITE_APP_MAIN_TITLE || '糖果'
+const slaveTitle = import.meta.env.VITE_APP_SLAVE_TITLE || '记录'
 const appSlogan = import.meta.env.VITE_APP_SLOGAN
 // temporary avatar url
 const avatarUrl = 'https://picsum.photos/200/200?random=10'
@@ -201,12 +206,12 @@ const handleLogin = async () => {
       })
 
       // 保存 token
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token)
+      if (response.data.accessToken) {
+        localStorage.setItem('token', response.data.accessToken)
 
         // 保存用户信息
-        if (response.data.user) {
-          blogStore.user = response.data.user
+        if (response.data.userInfo) {
+          blogStore.user = response.data.userInfo
         }
 
         // 记住密码功能
@@ -294,9 +299,9 @@ $breakpoint-mobile: 768px;
   backdrop-filter: blur(10px);
 
   .header-container {
-    max-width: 1200px;
-    min-height: 70px;
-    margin: 0 auto;
+    // max-width: 1300px;
+    // min-height: 70px;
+    margin: 0 20px;
     // padding: 0 20px;
 
     @media (max-width: $breakpoint-mobile) {
@@ -346,10 +351,24 @@ $breakpoint-mobile: 768px;
     background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
     background-clip: text;
     -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    // -webkit-text-fill-color: transparent;
 
     @media (max-width: $breakpoint-mobile) {
       font-size: 1.5rem;
+    }
+
+    .title-candy {
+      color: var(--color-primary)
+    }
+
+    .title-divider {
+      color: var(--color-deputy);
+      margin: 0 8px;
+      font-weight: 800;
+    }
+
+    .title-diary {
+      color: var(--color-secondary);
     }
   }
 }

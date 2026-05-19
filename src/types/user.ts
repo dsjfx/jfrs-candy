@@ -3,7 +3,7 @@ export interface User {
   username: string
   nickname: string
   avatar?: string
-  createdAt: string
+  createdAt?: string
   email?: string
   bio?: string
   articlesCount?: number | 0
@@ -21,6 +21,7 @@ export interface User {
 export interface UserInfo {
   id: number
   username: string
+  nickname: string
   email: string
   avatar: string
   roles?: string[]
@@ -31,6 +32,14 @@ export interface LoginParams {
   username: string
   password: string
   rememberMe?: boolean
+}
+
+export interface LoginResponse {
+  accessToken: string
+  refreshToken: string
+  expiresIn: number
+  tokenType: string
+  userInfo: UserInfo
 }
 
 export interface Author {

@@ -1,5 +1,5 @@
 import { getAdjacentBlogs, getArchive, getArchiveMore, getBlogs, getBolgById, getRelatedBlogs } from './articles'
-import { getUser } from './auth'
+import { getUser, login } from './auth'
 import { getComments } from './comments'
 import api from './request'
 
@@ -13,7 +13,7 @@ export const articleApi = {
 
   getAdjacentArticles: getAdjacentBlogs,
 
-  getArticleArchive:  getArchive,
+  getArticleArchive: getArchive,
 
   getArticleArchiveMore: getArchiveMore,
 
@@ -45,7 +45,9 @@ export const tagApi = {
 // 用户相关API
 export const userApi = {
   getUserProfile: getUser,
-  
+
+  login: login,
+
   // getProfile() {
   //   return api.get('/user/profile')
   // },
