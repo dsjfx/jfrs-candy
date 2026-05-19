@@ -3,7 +3,7 @@
     <div class="header-container">
       <div class="header-content">
         <div class="logo" @click="router.push('/')">
-          <el-avatar :src="avatarUrl" size="48" />
+          <el-avatar :src="avatar" size="48" />
           <h1 class="site-title">
             <span class="title-candy">{{ mainTitle }}</span>
             <span class="title-divider">·</span>
@@ -127,27 +127,30 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useBlogStore, useThemeStore } from '@/stores'
 import {
   House, Document, Folder, PriceTag, Picture, User, Menu,
   Sunny, Moon, Lock
 } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import { userApi } from '@/api'
 import { ElMessage } from 'element-plus'
 import { faGithub, faWeibo, faQq } from '@fortawesome/free-brands-svg-icons'
+import { userApi } from '@/api'
+import { useBlogStore, useThemeStore } from '@/stores'
+import { useUserStore } from '@/stores/user'
 
 const router = useRouter()
 const blogStore = useBlogStore()
 const themeStore = useThemeStore()
+const userStore = useUserStore()
 
 const mainTitle = import.meta.env.VITE_APP_MAIN_TITLE || '糖果'
 const slaveTitle = import.meta.env.VITE_APP_SLAVE_TITLE || '记录'
 const appSlogan = import.meta.env.VITE_APP_SLOGAN
-// temporary avatar url
-const avatarUrl = 'https://picsum.photos/200/200?random=10'
+// avatar url
+const avatar = ref<string>('https://picsum.photos/200/200?random=10')
+const userId = ref<number>(10)
 
 const mobileMenuVisible = ref(false)
 const showLoginDialog = ref(false)
@@ -282,8 +285,24 @@ const loadSavedUsername = () => {
   }
 }
 
-// 组件挂载时加载保存的用户名
-loadSavedUsername()
+const fetchSimpleUser = async (id: number) => {
+  try {
+    await userStore.getSimpleUser({ id })
+    if (userStore.simpleUser?.avatar) {
+      // avatar.value = userStore.simpleUser?.avatar
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+onMounted(async () => {
+  await fetchSimpleUser(userId.value)
+
+  // 组件挂载时加载保存的用户名
+  loadSavedUsername()
+})
+
 </script>
 
 <style scoped lang="scss">

@@ -1,5 +1,5 @@
 import { getAdjacentBlogs, getArchive, getArchiveMore, getBlogs, getBolgById, getRelatedBlogs } from './articles'
-import { getUser, login } from './auth'
+import { getSimpleUserinfo, getUser, login } from './auth'
 import { getComments } from './comments'
 import api from './request'
 
@@ -48,12 +48,8 @@ export const userApi = {
 
   login: login,
 
-  // getProfile() {
-  //   return api.get('/user/profile')
-  // },
-  // login(data: { username: string; password: string }) {
-  //   return api.post('/auth/login', data)
-  // },
+  getSimpleUser: getSimpleUserinfo,
+
 }
 
 // 评论相关 API

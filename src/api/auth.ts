@@ -1,6 +1,6 @@
 import { http } from "./request"
 import type { ResponseData } from "@/types/api"
-import type { LoginParams, LoginResponse, User, UserInfo, UserParam } from "@/types/user"
+import type { LoginParams, LoginResponse, SimpleUser, User, UserInfo, UserParam } from "@/types/user"
 import { accessUrl } from "@/utils/cabinet"
 import ResponseFactory from "@/utils/responseFactory"
 
@@ -9,27 +9,27 @@ function makeUrl(url: string) {
   return accessUrl('U', url)
 }
 
-export function loginApi(username: string, password: string) {
-  const token = ''
+// export function loginApi(username: string, password: string) {
+//   const token = ''
 
-  return {
-    token
-  }
-}
+//   return {
+//     token
+//   }
+// }
 
-export function getUserInfoApi() {
-  const info = {
-    id: 1,
-    username: '',
-    nickname: '',
-    email: '',
-    avatar: '',
-    roles: [],
-    permissions: []
-  } as UserInfo
+// export function getUserInfoApi() {
+//   const info = {
+//     id: 1,
+//     username: '',
+//     nickname: '',
+//     email: '',
+//     avatar: '',
+//     roles: [],
+//     permissions: []
+//   } as UserInfo
 
-  return info
-}
+//   return info
+// }
 
 export async function getUser(param: UserParam = { id: 10 }): Promise<ResponseData<User>> {
   let result = ResponseFactory.success<User>({} as User)
@@ -51,4 +51,16 @@ export async function login(param: LoginParams): Promise<ResponseData<LoginRespo
   }
 
   return result;
+}
+
+export async function getSimpleUserinfo(param: UserParam = { id: 10 }):
+  Promise<ResponseData<SimpleUser>> {
+  let data = ResponseFactory.success<SimpleUser>({} as SimpleUser)
+
+  const response = await http.get(makeUrl(`/avatar`), param)
+  if (response.data) {
+    data = response.data as ResponseData<SimpleUser>
+  }
+
+  return data
 }

@@ -1,11 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { UserInfo } from '@/types/user'
-import { loginApi, getUserInfoApi } from '@/api/auth'
+import type { User, SimpleUser, UserInfo, UserParam } from '@/types/user'
+// import { loginApi, getUserInfoApi } from '@/api/auth'
+import { userApi } from '@/api'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref<string>('')
+  const user = ref<User | null>(null)
   const userInfo = ref<UserInfo | null>(null)
+  const simpleUser = ref<SimpleUser>()
 
   const isLogin = computed(() => !!token.value)
 
@@ -20,9 +23,9 @@ export const useUserStore = defineStore('user', () => {
 
   const login = async (username: string, password: string) => {
     try {
-      const data = await loginApi(username, password)
-      setToken(data.token)
-      await getUserInfo()
+      const data = await userApi.login({ username, password })
+      setToken(data.data.accessToken)
+      await getUserInfo({ id: 10 })
       return true
     } catch (error) {
       return false
@@ -35,12 +38,34 @@ export const useUserStore = defineStore('user', () => {
     localStorage.removeItem('token')
   }
 
-  const getUserInfo = async () => {
+  const getUserInfo = async (param: UserParam) => {
     try {
-      const data = await getUserInfoApi()
-      setUserInfo(data)
+      const data = await userApi.getUserProfile(param)
+      if (data && data.data) {
+        let _data = data.data
+        user.value = _data
+        setUserInfo({
+          id: _data.id,
+          username: _data.username,
+          nickname: _data.nickname,
+          email: _data.email || '',
+          avatar: _data.avatar || '',
+        })
+      }
     } catch (error) {
       logout()
+    }
+  }
+
+  const getSimpleUser = async (param: UserParam) => {
+    try {
+      const res = await userApi.getSimpleUser(param)
+      if (res && res.data) {
+        console.log(res.data)
+        simpleUser.value = res.data
+      }
+    } catch (error) {
+      console.log(error)
     }
   }
 
@@ -49,7 +74,7 @@ export const useUserStore = defineStore('user', () => {
     const localToken = localStorage.getItem('token')
     if (localToken) {
       token.value = localToken
-      getUserInfo()
+      getUserInfo({ id: 10 })
     }
   }
 
@@ -68,13 +93,17 @@ export const useUserStore = defineStore('user', () => {
 
   return {
     token,
+    user,
     userInfo,
     isLogin,
+    simpleUser,
+
     setToken,
     setUserInfo,
     login,
     logout,
     getUserInfo,
-    init
+    init,
+    getSimpleUser,
   }
 })

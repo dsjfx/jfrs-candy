@@ -53,6 +53,12 @@ export interface UserParam {
   id: number
 }
 
+export interface SimpleUser {
+  avatar?: string,
+  icpLicense?: string,
+  publicSecurityLicense?: string
+}
+
 export interface SocialLinks {
   github?: string
   githubQr?: string

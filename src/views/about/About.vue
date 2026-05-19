@@ -141,10 +141,15 @@
 </template>
 
 <script setup lang="ts">
-import { userApi } from '@/api'
-import { useLoading } from '@/composables/useLoading';
-import type { User } from '@/types/user'
 import { ref, onMounted, reactive } from 'vue'
+import { ElMessage } from 'element-plus'
+import { faGithub, faWeibo, faQq, faTwitter } from '@fortawesome/free-brands-svg-icons'
+import { useLoading } from '@/composables/useLoading';
+// import { userApi } from '@/api'
+import type { User } from '@/types/user'
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
 
 const {
   // isLoading, 
@@ -153,15 +158,18 @@ const {
 } = useLoading();
 
 const author = ref<User>({} as User)
+const showQrDialog = ref(false)
+const qrImageUrl = ref('')
+
 
 const getUser = async () => {
   startLoading();
 
   try {
-    const res = await userApi.getUserProfile({ id: 10 });
-    if (res.success) {
-      const user: User = res.data;
-      author.value = user;
+    await userStore.getUserInfo({ id: 10 });
+    if (userStore.user) {
+      // const user: User = userStore.user;
+      author.value = userStore.user;
     }
   } catch (error) {
     console.error('获取用户信息失败：', error);
@@ -173,13 +181,7 @@ const getUser = async () => {
 // 初始化页面
 onMounted(async () => {
   await getUser();
-
 })
-import { ElMessage } from 'element-plus'
-import { faGithub, faWeibo, faQq, faTwitter } from '@fortawesome/free-brands-svg-icons'
-
-const showQrDialog = ref(false)
-const qrImageUrl = ref('')
 
 const copyToClipboard = async (text: string) => {
   try {

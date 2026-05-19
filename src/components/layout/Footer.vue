@@ -42,6 +42,9 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons'
 import { faGithub, faWeibo } from '@fortawesome/free-brands-svg-icons'
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
 
 const navLinks = [
   { label: '关于', to: '/about' },
@@ -54,15 +57,38 @@ const social = [
   { icon: faWeibo, href: 'https://weibo.com/' }
 ]
 
-const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
-
 const showBackToTop = ref(false)
+const userId = ref<number>(10)
+const icpLicense = ref<string | null>();
+const publicSecurityLicense = ref<string | null>();
+
+const appTitle = import.meta.env.VITE_APP_FOOT_TITLE || '个人博客'
+const currentYear = new Date().getFullYear()
+
+const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
 const handleScroll = () => {
   showBackToTop.value = window.scrollY > 300
 }
 
-onMounted(() => {
+const fetchSimpleUser = async (id: number) => {
+  try {
+    await userStore.getSimpleUser({ id })
+    let simpleUser = userStore.simpleUser
+    if (simpleUser?.icpLicense) {
+      icpLicense.value = simpleUser.icpLicense
+    }
+    if (simpleUser?.publicSecurityLicense) {
+      publicSecurityLicense.value = simpleUser.publicSecurityLicense
+    }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+onMounted(async () => {
+  await fetchSimpleUser(userId.value)
+
   window.addEventListener('scroll', handleScroll, { passive: true })
   // initialize
   handleScroll()
@@ -72,13 +98,6 @@ onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
 })
 
-
-const appTitle = import.meta.env.VITE_APP_FOOT_TITLE || '个人博客'
-const currentYear = new Date().getFullYear()
-
-const icpLicense = ref<string | null>('苏ICP备2026029057号-1');
-const publicSecurityLicense = ref<string | null>('');
-
 </script>
 
 <style scoped lang="scss">
@@ -86,7 +105,7 @@ $breakpoint-mobile: 768px;
 
 .footer {
   margin-top: 40px;
-  padding: 15px 0;
+  padding: 10px 0;
   background-color: var(--color-bg-secondary);
   border-top: 1px solid var(--color-border);
 
