@@ -35,9 +35,8 @@ class Request {
         config.params = {
           ...config.params,
           timestamp: Date.now(), // 时间戳防缓存
-          version: '1.0',        // API版本
-          platform: 'web',        // 平台标识
-          subject: 'article',
+          version: import.meta.env.VITE_APP_VERSION,        // API版本
+          subject: import.meta.env.VITE_CONS_SUBJECT,       // 平台标识
         };
 
         return config
