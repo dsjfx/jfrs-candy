@@ -39,7 +39,7 @@ export default defineConfig({
   build: {
     // 生产构建优化
     target: 'es2015', // 使用ES2015+以获得更好的Tree-shaking
-    minify: 'terser', // 压缩时进一步移除死代码
+    minify: 'esbuild', // 压缩时进一步移除死代码
     rollupOptions: {
       output: {
         chunkFileNames: 'assets/js/[name]-[hash].js',
