@@ -337,7 +337,7 @@ $breakpoint-mobile: 768px;
   height: var(--header-height);
 
   @media (max-width: $breakpoint-mobile) {
-    heigth: var(--header-height-mobile);
+    height: var(--header-height-mobile);
   }
 }
 
