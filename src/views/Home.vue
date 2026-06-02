@@ -5,8 +5,16 @@
     <aside class="sidebar">
       <!-- 搜索框 -->
       <div class="search-box">
-        <input v-model="searchQuery" type="text" placeholder="搜索文章..." id="searchInput">
-        <FaIcon :icon="faSearch" />
+        <button class="search-left" type="button"
+          @click="() => { searchInputRef?.focus(); loadHomeArticles(searchQuery) }" aria-label="搜索">
+          <FaIcon :icon="faSearch" />
+        </button>
+        <input ref="searchInputRef" v-model="searchQuery" type="text" placeholder="搜索文章..." id="searchInput">
+        <div class="search-right">
+          <LoadingSpinner v-if="searchLoading" size="small" variant="primary" />
+          <button v-else-if="searchQuery" class="clear-btn" type="button"
+            @click="() => { searchQuery = ''; searchInputRef?.focus(); }" aria-label="清除搜索">×</button>
+        </div>
       </div>
 
       <!-- 最新文章列表 -->
@@ -71,13 +79,13 @@
         </ol>
       </nav>
 
-      <!-- 文章正文 -->
-      <div v-if="heroArticle?.content" class="article-content">
-        <!-- Safe render article HTML and expose inner root via ref -->
-        <SafeHtmlRenderer :html="heroArticle.content || ''" ref="contentRef" />
-      </div>
-      <div v-else class="article-body">
-        <SafeHtmlRenderer :html="homeContent" ref="contentRef" />
+      <!-- 文章正文: use a stable container to avoid remounting and layout flicker -->
+      <div class="article-content article-container" :class="{ 'is-loading': searchLoading }">
+        <div class="article-content-inner" :aria-busy="searchLoading">
+          <!-- Safe render article HTML and expose inner root via ref -->
+          <SafeHtmlRenderer :html="heroArticle?.content || homeContent" ref="contentRef" />
+          <!-- <SafeHtmlToVNodes :html="heroArticle?.content || homeContent" ref="contentRef" /> -->
+        </div>
       </div>
 
       <!-- centered reactions -->
@@ -135,6 +143,8 @@ import { useArticleStore } from '@/stores/article'
 import type { Article, Tag } from '@/types/article'
 import useDebouncedRef from '@/composables/useDebouncedRef'
 import SafeHtmlRenderer from '@/components/core/SafeHtmlRenderer.vue'
+import SafeHtmlToVNodes from '@/components/core/SafeHtmlToVNodes.vue'
+import LoadingSpinner from '@/components/core/LoadingSpinner.vue'
 import { homeContent, mockLatestArticles, mockCatalog, mockTags } from '@/mock/mockHome'
 import { formatDate, getDisplayWordCount, getReadTimeMedium } from '@/utils/cabinet'
 import {
@@ -208,11 +218,14 @@ const filterByTag = (tag: number) => {
 const articleStore = useArticleStore()
 const heroArticle = ref<Article | null>(null)
 const latestArticles = ref<Article[]>([])
+const searchInputRef = ref<HTMLInputElement | null>(null)
+const searchLoading = ref(false)
 const searchQuery = ref('')
 const debouncedSearch = useDebouncedRef(searchQuery, DEBOUNCED_INPUT_DELAY)
 const router = useRouter()
 
 const loadHomeArticles = async (search?: string) => {
+  searchLoading.value = true
   try {
     // fetch 5 latest articles
     await articleStore.fetchArticles({ current: 1, size: 5, search })
@@ -234,6 +247,8 @@ const loadHomeArticles = async (search?: string) => {
     }
   } catch (err) {
     console.error('loadHomeArticles error', err)
+  } finally {
+    searchLoading.value = false
   }
 }
 
@@ -297,7 +312,7 @@ $radius: $radius-sm;
 
 /* 主布局 */
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 2rem auto;
   padding: 0 2rem;
   display: grid;
@@ -314,21 +329,35 @@ $radius: $radius-sm;
       position: relative;
       margin-bottom: 2rem;
 
+      // search input
       input {
         width: 100%;
-        padding: 0.8rem 1rem 0.8rem 2.5rem;
-        border: 1px solid var(--border-color);
+        padding: 0.8rem 2.8rem 0.8rem 2.8rem; // room for left and right controls
+        border: 1px solid rgba(5, 150, 105, 0.12); // subtle green border
         border-radius: 8px;
-        background: var(--bg-secondary);
+        background: #ffffff;
         color: var(--text-primary);
-        font-size: 0.9rem;
-        transition: var(--transition);
+        font-size: 0.95rem;
+        transition: border-color 180ms ease, box-shadow 180ms ease, transform 120ms ease;
       }
 
+      // hover state
+      &:hover input {
+        border-color: rgba(5, 150, 105, 0.22);
+        transform: translateY(-1px);
+      }
+
+      // focus state
       input:focus {
         outline: none;
         border-color: var(--accent-color);
-        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        box-shadow: 0 8px 20px rgba(5, 150, 105, 0.12);
+      }
+
+      // placeholder styling
+      input::placeholder {
+        color: #97a6a1;
+        opacity: 1;
       }
 
       svg {
@@ -337,7 +366,57 @@ $radius: $radius-sm;
         top: 50%;
         transform: translateY(-50%);
         color: var(--text-muted);
+        transition: color 160ms ease, transform 120ms ease;
+        pointer-events: none;
+        /* keep clicks on input */
       }
+
+      // icon color changes on hover/focus
+      &:hover svg,
+      input:focus+svg {
+        color: var(--accent-color);
+        transform: translateY(-50%) scale(1.06);
+      }
+    }
+
+    .search-left {
+      position: absolute;
+      left: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      padding: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+
+    .search-right {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .clear-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--text-muted);
+      padding: 4px 6px;
+      border-radius: 6px;
+    }
+
+    .clear-btn:hover {
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--accent-color);
     }
 
     .articles-list {
@@ -395,6 +474,24 @@ $radius: $radius-sm;
   .content {
     max-width: 800px;
     margin: 0 auto;
+
+    .article-container {
+      max-width: 800px;
+      width: 100%;
+      transition: opacity 200ms ease, transform 160ms ease;
+      will-change: opacity, transform;
+    }
+
+    .article-content-inner {
+      transition: opacity 160ms ease, transform 160ms ease;
+      min-height: 120px;
+      /* keep space during content swap to reduce layout jumps */
+    }
+
+    .article-container.is-loading .article-content-inner {
+      opacity: 0.96;
+      transform: translateY(2px);
+    }
 
     .article-header {
       margin-bottom: 2rem;
