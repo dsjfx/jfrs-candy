@@ -4,10 +4,10 @@
     <section class="hero-section">
       <div class="hero-content">
         <h1 class="hero-title">关于我</h1>
-        <p class="hero-subtitle">技术爱好者 & 内容创作者</p >
+        <p class="hero-subtitle">技术爱好者 & 内容创作者</p>
       </div>
     </section>
-    
+
     <!-- 个人信息 -->
     <section class="profile-section">
       <div class="container">
@@ -16,59 +16,45 @@
             <el-avatar :size="120" :src="user?.avatar || defaultAvatar" />
             <div class="profile-info">
               <h2 class="profile-name">{{ user?.username || '博主' }}</h2>
-              <p class="profile-bio">{{ user?.bio || '热爱技术，热爱生活' }}</p >
+              <p class="profile-bio">{{ user?.bio || '热爱技术，热爱生活' }}</p>
               <div class="profile-social">
-                <a
-                  v-for="link in socialLinks"
-                  :key="link.name"
-                  :href="link.url"
-                  target="_blank"
-                  class="social-link"
-                  :title="link.name"
-                >
+                <a v-for="link in socialLinks" :key="link.name" :href="link.url" target="_blank" class="social-link"
+                  :title="link.name">
                   <el-icon :size="24">
                     <component :is="link.icon" />
                   </el-icon>
-                </a >
+                </a>
               </div>
             </div>
           </div>
         </div>
       </div>
     </section>
-    
+
     <!-- 技能与专长 -->
     <section class="skills-section">
       <div class="container">
         <h2 class="section-title">技能与专长</h2>
         <div class="skills-grid">
-          <div
-            v-for="skill in skills"
-            :key="skill.name"
-            class="skill-card"
-          >
+          <div v-for="skill in skills" :key="skill.name" class="skill-card">
             <div class="skill-icon">
               <el-icon :size="40">
                 <component :is="skill.icon" />
               </el-icon>
             </div>
             <h3 class="skill-name">{{ skill.name }}</h3>
-            <p class="skill-description">{{ skill.description }}</p >
+            <p class="skill-description">{{ skill.description }}</p>
           </div>
         </div>
       </div>
     </section>
-    
+
     <!-- 工作经历 -->
     <section class="experience-section">
       <div class="container">
         <h2 class="section-title">工作经历</h2>
         <div class="timeline">
-          <div
-            v-for="exp in experiences"
-            :key="exp.company"
-            class="timeline-item"
-          >
+          <div v-for="exp in experiences" :key="exp.company" class="timeline-item">
             <div class="timeline-dot"></div>
             <div class="timeline-content">
               <div class="timeline-header">
@@ -76,41 +62,41 @@
                 <span class="timeline-period">{{ exp.period }}</span>
               </div>
               <div class="timeline-company">{{ exp.company }}</div>
-              <p class="timeline-description">{{ exp.description }}</p >
+              <p class="timeline-description">{{ exp.description }}</p>
             </div>
           </div>
         </div>
       </div>
     </section>
-    
+
     <!-- 联系方式 -->
     <section class="contact-section">
       <div class="container">
         <h2 class="section-title">联系我</h2>
         <div class="contact-grid">
           <div class="contact-card">
-            <el-icon :size="32" class="contact-icon"><Message /></el-icon>
+            <el-icon :size="32" class="contact-icon">
+              <Message />
+            </el-icon>
             <h3 class="contact-title">邮箱</h3>
-            <p class="contact-value">{{ contactInfo.email }}</p >
+            <p class="contact-value">{{ contactInfo.email }}</p>
           </div>
           <div class="contact-card">
-            <el-icon :size="32" class="contact-icon"><Location /></el-icon>
+            <el-icon :size="32" class="contact-icon">
+              <Location />
+            </el-icon>
             <h3 class="contact-title">地址</h3>
-            <p class="contact-value">{{ contactInfo.location }}</p >
+            <p class="contact-value">{{ contactInfo.location }}</p>
           </div>
           <div class="contact-card">
-            <el-icon :size="32" class="contact-icon"><Link /></el-icon>
+            <el-icon :size="32" class="contact-icon">
+              <Link />
+            </el-icon>
             <h3 class="contact-title">社交媒体</h3>
             <div class="contact-social">
-              <a
-                v-for="link in socialLinks"
-                :key="link.name"
-                :href="link.url"
-                target="_blank"
-                class="social-link"
-              >
+              <a v-for="link in socialLinks" :key="link.name" :href="link.url" target="_blank" class="social-link">
                 {{ link.name }}
-              </a >
+              </a>
             </div>
           </div>
         </div>
@@ -121,12 +107,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useBlogStore } from '@/stores'
+import { useUserStore } from '@/stores/user'
 import { Printer, Brush, Box, Cpu, Message, Location, Link } from '@element-plus/icons-vue'
 
-const blogStore = useBlogStore()
+const userStore = useUserStore()
 
-const user = computed(() => blogStore.user)
+const user = computed(() => userStore.user)
 
 const defaultAvatar = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
 
@@ -178,31 +164,31 @@ const contactInfo = {
     padding: 80px 0 60px;
     background: linear-gradient(135deg, var(--color-primary), #66b1ff);
     color: white;
-    
+
     .hero-content {
       max-width: 800px;
       margin: 0 auto;
       padding: 0 20px;
     }
-    
+
     .hero-title {
       font-size: 3.5rem;
       font-weight: 700;
       margin-bottom: 16px;
     }
-    
+
     .hero-subtitle {
       font-size: 1.5rem;
       opacity: 0.9;
     }
   }
-  
+
   .container {
     max-width: 1000px;
     margin: 0 auto;
     padding: 0 20px;
   }
-  
+
   .section-title {
     font-size: 2rem;
     font-weight: 700;
@@ -214,7 +200,7 @@ const contactInfo = {
 
 .profile-section {
   padding: 60px 0;
-  
+
   .profile-card {
     background-color: var(--color-bg);
     border-radius: var(--radius-lg);
@@ -222,40 +208,40 @@ const contactInfo = {
     padding: 40px;
     margin-top: -40px;
   }
-  
+
   .profile-header {
     display: flex;
     align-items: center;
     gap: 32px;
-    
+
     @media (max-width: 768px) {
       flex-direction: column;
       text-align: center;
       gap: 24px;
     }
   }
-  
+
   .profile-info {
     flex: 1;
-    
+
     .profile-name {
       font-size: 2rem;
       font-weight: 700;
       margin-bottom: 12px;
       color: var(--color-text);
     }
-    
+
     .profile-bio {
       font-size: 1.125rem;
       color: var(--color-text-secondary);
       line-height: 1.6;
       margin-bottom: 20px;
     }
-    
+
     .profile-social {
       display: flex;
       gap: 16px;
-      
+
       .social-link {
         display: inline-flex;
         align-items: center;
@@ -266,7 +252,7 @@ const contactInfo = {
         background-color: var(--color-bg-secondary);
         color: var(--color-text);
         transition: all 0.3s;
-        
+
         &:hover {
           background-color: var(--color-primary);
           color: white;
@@ -280,13 +266,13 @@ const contactInfo = {
 .skills-section {
   padding: 60px 0;
   background-color: var(--color-bg-secondary);
-  
+
   .skills-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 32px;
   }
-  
+
   .skill-card {
     background-color: var(--color-bg);
     border-radius: var(--radius-lg);
@@ -294,12 +280,12 @@ const contactInfo = {
     text-align: center;
     box-shadow: var(--shadow-sm);
     transition: all 0.3s;
-    
+
     &:hover {
       transform: translateY(-4px);
       box-shadow: var(--shadow-md);
     }
-    
+
     .skill-icon {
       display: inline-flex;
       align-items: center;
@@ -309,19 +295,19 @@ const contactInfo = {
       background: linear-gradient(135deg, var(--color-primary), #66b1ff);
       border-radius: 50%;
       margin-bottom: 24px;
-      
+
       .el-icon {
         color: white;
       }
     }
-    
+
     .skill-name {
       font-size: 1.25rem;
       font-weight: 600;
       margin-bottom: 12px;
       color: var(--color-text);
     }
-    
+
     .skill-description {
       font-size: 0.875rem;
       color: var(--color-text-secondary);
@@ -332,12 +318,12 @@ const contactInfo = {
 
 .experience-section {
   padding: 60px 0;
-  
+
   .timeline {
     position: relative;
     max-width: 800px;
     margin: 0 auto;
-    
+
     &::before {
       content: '';
       position: absolute;
@@ -346,26 +332,26 @@ const contactInfo = {
       bottom: 0;
       width: 2px;
       background-color: var(--color-border);
-      
+
       @media (max-width: 768px) {
         left: 20px;
       }
     }
   }
-  
+
   .timeline-item {
     position: relative;
     padding-left: 80px;
     margin-bottom: 48px;
-    
+
     &:last-child {
       margin-bottom: 0;
     }
-    
+
     @media (max-width: 768px) {
       padding-left: 60px;
     }
-    
+
     .timeline-dot {
       position: absolute;
       left: 24px;
@@ -375,18 +361,18 @@ const contactInfo = {
       border-radius: 50%;
       background-color: var(--color-primary);
       border: 3px solid var(--color-bg);
-      
+
       @media (max-width: 768px) {
         left: 14px;
       }
     }
-    
+
     .timeline-content {
       background-color: var(--color-bg);
       border-radius: var(--radius-lg);
       padding: 24px;
       box-shadow: var(--shadow-sm);
-      
+
       .timeline-header {
         display: flex;
         justify-content: space-between;
@@ -394,14 +380,14 @@ const contactInfo = {
         margin-bottom: 12px;
         flex-wrap: wrap;
         gap: 8px;
-        
+
         .timeline-title {
           font-size: 1.25rem;
           font-weight: 600;
           margin: 0;
           color: var(--color-text);
         }
-        
+
         .timeline-period {
           font-size: 0.875rem;
           color: var(--color-primary);
@@ -410,14 +396,14 @@ const contactInfo = {
           border-radius: var(--radius-sm);
         }
       }
-      
+
       .timeline-company {
         font-size: 1.125rem;
         font-weight: 500;
         color: var(--color-text-secondary);
         margin-bottom: 12px;
       }
-      
+
       .timeline-description {
         margin: 0;
         color: var(--color-text);
@@ -430,7 +416,7 @@ const contactInfo = {
 .contact-section {
   padding: 60px 0;
   background-color: var(--color-bg-secondary);
-  
+
   .contact-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -438,7 +424,7 @@ const contactInfo = {
     max-width: 800px;
     margin: 0 auto;
   }
-  
+
   .contact-card {
     background-color: var(--color-bg);
     border-radius: var(--radius-lg);
@@ -446,40 +432,40 @@ const contactInfo = {
     text-align: center;
     box-shadow: var(--shadow-sm);
     transition: all 0.3s;
-    
+
     &:hover {
       transform: translateY(-4px);
       box-shadow: var(--shadow-md);
     }
-    
+
     .contact-icon {
       color: var(--color-primary);
       margin-bottom: 20px;
     }
-    
+
     .contact-title {
       font-size: 1.25rem;
       font-weight: 600;
       margin-bottom: 12px;
       color: var(--color-text);
     }
-    
+
     .contact-value {
       font-size: 1rem;
       color: var(--color-text-secondary);
       margin-bottom: 0;
     }
-    
+
     .contact-social {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      
+
       .social-link {
         color: var(--color-text-secondary);
         text-decoration: none;
         transition: color 0.3s;
-        
+
         &:hover {
           color: var(--color-primary);
         }
@@ -492,16 +478,16 @@ const contactInfo = {
   .about-page {
     .hero-section {
       padding: 60px 0 40px;
-      
+
       .hero-title {
         font-size: 2.5rem;
       }
-      
+
       .hero-subtitle {
         font-size: 1.25rem;
       }
     }
-    
+
     .section-title {
       font-size: 1.75rem;
       margin-bottom: 32px;

@@ -67,10 +67,10 @@ export const getAdjacentBlogs = async (articleId: string): Promise<ResponseData<
   return result
 }
 
-export const getArchive = async ({ year, month, limit = 5 }: 
+export const getArchive = async ({ year, month, limit = 5 }:
   { year?: number; month?: number, limit?: number }): Promise<ResponseData<ArchiveResponse>> => {
   let result = ResponseFactory.success<ArchiveResponse>({} as ArchiveResponse)
-  
+
   const response = await http.get(makeUrl(`/archive`), { year, month, limit })
   if (response.data) {
     result = response.data as ResponseData<ArchiveResponse>
@@ -80,17 +80,39 @@ export const getArchive = async ({ year, month, limit = 5 }:
 }
 
 export const getArchiveMore = async (
-  { 
-   years, 
-   startYear, 
-   endYear, 
-   limit = 5
-  }:ladyArticleParams): Promise<ResponseData<ArchiveResponse>> => {
+  {
+    years,
+    startYear,
+    endYear,
+    limit = 5
+  }: ladyArticleParams): Promise<ResponseData<ArchiveResponse>> => {
   let result = ResponseFactory.success<ArchiveResponse>({} as ArchiveResponse)
-  
+
   const response = await http.get(makeUrl(`/archive/more`), { years, startYear, endYear, limit })
   if (response.data) {
     result = response.data as ResponseData<ArchiveResponse>
+  }
+
+  return result
+}
+
+export const likeArticle = async ({ id }: { id: number }): Promise<ResponseData<null>> => {
+  let result = ResponseFactory.success<null>(null)
+
+  const response = await http.post(makeUrl(`/like`), { id })
+  if (response.data) {
+    result = response.data as ResponseData<null>
+  }
+
+  return result
+}
+
+export const dislikeArticle = async ({ id }: { id: number }): Promise<ResponseData<null>> => {
+  let result = ResponseFactory.success<null>(null)
+
+  const response = await http.post(makeUrl(`/dislike`), { id })
+  if (response.data) {
+    result = response.data as ResponseData<null>
   }
 
   return result

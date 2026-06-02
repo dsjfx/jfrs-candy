@@ -13,6 +13,7 @@ export interface Article {
   // 操作属性
   views?: number | 0
   likes?: number | 0
+  dislikes?: number | 0
   comments?: number | 0
 
   // 关联属性

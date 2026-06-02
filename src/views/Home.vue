@@ -3,10 +3,13 @@
 
     <!-- 左侧文章列表 -->
     <aside class="sidebar">
+      <!-- 搜索框 -->
       <div class="search-box">
         <input v-model="searchQuery" type="text" placeholder="搜索文章..." id="searchInput">
         <FaIcon :icon="faSearch" />
       </div>
+
+      <!-- 最新文章列表 -->
       <div class="articles-list">
         <h3>最新文章</h3>
         <template v-if="latestArticles.length">
@@ -37,6 +40,7 @@
           {{ formatDate(heroArticle.createdAt) }} • 阅读时间 {{ readTime }}
         </time>
         <time v-else datetime="2023-10-15">2023年10月15日 • 阅读时间 5分钟</time>
+        <!-- 文章标题 -->
         <h1>{{ heroArticle?.title || '如何保持极简主义生活与工作平衡' }}</h1>
         <div class="meta">
           <span class="category">{{ heroArticle?.category?.name || '生活哲学' }}</span>
@@ -68,95 +72,52 @@
       </nav>
 
       <!-- 文章正文 -->
-      <div v-if="heroArticle?.content" class="article-content" ref="contentRef">
-        <div v-html="heroArticle.content"></div>
+      <div v-if="heroArticle?.content" class="article-content">
+        <!-- Safe render article HTML and expose inner root via ref -->
+        <SafeHtmlRenderer :html="heroArticle.content || ''" ref="contentRef" />
       </div>
       <div v-else class="article-body">
-        <p class="intro">在信息爆炸的时代，极简主义不仅是一种设计风格，更是一种生存策略。本文将分享如何在生活与工作中找到简化之道。</p>
+        <SafeHtmlRenderer :html="homeContent" ref="contentRef" />
+      </div>
 
-        <h2 id="section1">1. 什么是真正的极简主义</h2>
-        <p>极简主义不是单纯地减少物品，而是有意识地保留最重要的事物，消除干扰。它适用于物理空间、数字环境以及思维方式。</p>
-
-        <blockquote>
-          “简单是复杂的最终形式。” —— 列奥纳多·达·芬奇
-        </blockquote>
-
-        <h2 id="section2">2. 数字断舍离实践</h2>
-        <p>每天我们花费数小时在数字设备上。以下是一些实践建议：</p>
-        <ul>
-          <li>关闭非必要通知</li>
-          <li>使用专注模式应用</li>
-          <li>定期清理订阅和收藏</li>
-        </ul>
-
-        <h2 id="section3">3. 工作空间的简化</h2>
-        <p>物理环境直接影响效率。一个简洁的工作桌应只包含：</p>
-        <ol>
-          <li>当前任务所需物品</li>
-          <li>一件提升心情的物品（如植物）</li>
-          <li>必要的工作设备</li>
-        </ol>
-
-        <!-- 代码示例 -->
-        <h3>CSS 极简重置示例</h3>
-        <pre><code class="language-css">
-        /* 极简CSS重置 */
-        * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        }
-
-        body {
-        font-family: 'Inter', sans-serif;
-        line-height: 1.6;
-        color: var(--text-primary);
-        background: var(--bg-primary);
-        }
-
-        :root {
-        --bg-primary: #ffffff;
-        --text-primary: #2c3e50;
-        --accent-color: #e74c3c;
-        }
-      </code></pre>
-
-        <h2 id="section4">4. 持续维护的习惯</h2>
-        <p>极简主义需要定期维护。建议每周花15分钟：</p>
-        <table>
-          <tr>
-            <th>周一</th>
-            <th>周三</th>
-            <th>周五</th>
-          </tr>
-          <tr>
-            <td>清理邮箱</td>
-            <td>整理书签</td>
-            <td>归档文件</td>
-          </tr>
-        </table>
+      <!-- centered reactions -->
+      <div class="article-reactions" role="group" aria-label="article reactions">
+        <button class="reaction-btn like-btn" @click="handleLike" aria-label="喜欢">
+          <FaIcon :icon="faThumbsUp" />
+          <span class="reaction-count" :class="{ bump: likeBump }">{{ (heroArticle?.likes ?? 0) }}</span>
+        </button>
+        <button class="reaction-btn dislike-btn" @click="handleDislike" aria-label="不喜欢">
+          <FaIcon :icon="faThumbsDown" />
+          <span class="reaction-count" :class="{ bump: dislikeBump }">{{ (heroArticle?.dislikes ?? 0) }}</span>
+        </button>
       </div>
 
       <!-- 文章脚注 -->
       <footer class="article-footer">
+        <!-- 标签 -->
         <div class="tags">
           <template v-if="heroArticle">
-            <span v-if="tags.length">标签:</span>
+            <span v-if="tags.length" class="tag-label">标签:</span>
             <span v-for="tag in tags" :key="tag.id" class="tag" @click="filterByTag(tag.id)">
               #{{ tag.name }}
             </span>
           </template>
           <template v-else>
             <span v-for="(tag, index) in mockTags" :key="index" class="tag">
-              #{{ tag }}
+              <span class="tag">
+                #{{ tag }}
+              </span>
             </span>
           </template>
         </div>
+
+        <!-- 分享 -->
         <div class="share">
           <span>分享：</span>
-          <FaIcon :icon="faTwitter" />
-          <FaIcon :icon="faWeibo" />
-          <FaIcon :icon="faLink" />
+          <FaIcon :icon="faTwitter" class="share-icon" @click="handleSharePlatform('Twitter')" />
+          <FaIcon :icon="faWeibo" class="share-icon" @click="handleSharePlatform('Weibo')" />
+          <FaIcon :icon="faQq" class="share-icon" @click="handleSharePlatform('QQ')" />
+
         </div>
       </footer>
     </article>
@@ -167,69 +128,75 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
-import { faSearch, faList, faLink } from '@fortawesome/free-solid-svg-icons'
-import { faTwitter, faWeibo } from '@fortawesome/free-brands-svg-icons'
+import { faSearch, faList, faLink, faThumbsUp, faThumbsDown } from '@fortawesome/free-solid-svg-icons'
+import { faTwitter, faWeibo, faQq } from '@fortawesome/free-brands-svg-icons'
 import { ElMessage } from 'element-plus'
 import { useArticleStore } from '@/stores/article'
 import type { Article, Tag } from '@/types/article'
-import { formatDate, getDisplayWordCount, getReadTimeMedium } from '@/utils/cabinet'
 import useDebouncedRef from '@/composables/useDebouncedRef'
+import SafeHtmlRenderer from '@/components/core/SafeHtmlRenderer.vue'
+import { homeContent, mockLatestArticles, mockCatalog, mockTags } from '@/mock/mockHome'
+import { formatDate, getDisplayWordCount, getReadTimeMedium } from '@/utils/cabinet'
+import {
+  DEBOUNCED_INPUT_DELAY,
+  DEFAULT_READ_TIME,
+  DEFAULT_WORD_COUNT
+} from '@/utils/constant'
 
-interface mocklatestArticle {
-  id: number
-  title: string
-  summary: string
-  createdAt: string
-}
-const mockLatestArticles: mocklatestArticle[] = [
-  {
-    id: 1,
-    title: '如何保持极简主义生活与工作平衡',
-    summary: '探讨在数字时代如何简化工作流程，减少干扰...',
-    createdAt: '2023-10-15T10:00:00Z'
-  },
-  {
-    id: 2,
-    title: '现代CSS布局的实用技巧',
-    summary: 'Flexbox、Grid和容器查询的实际应用案例...',
-    createdAt: '2023-10-10T14:30:00Z'
-  },
-  {
-    id: 3,
-    title: '为什么写作是思考的最佳工具',
-    summary: '写作不仅是表达，更是理清思维的过程...',
-    createdAt: '2023-10-05T09:15:00Z'
-  }
-]
-const mockCatalog = [
-  { id: 1, text: '什么是真正的极简主义', level: 2 },
-  { id: 2, text: '数字断舍离实践', level: 2 },
-  { id: 3, text: '工作空间的简化', level: 2 },
-  { id: 4, text: '持续维护的习惯', level: 2 }
-]
+// mock data (mockLatestArticles, mockCatalog, mockTags) imported from mockHome
 
-// 标签数据
-const mockTags = ref<string[]>(['极简主义', '技术', '生活', '写作', '设计'])
 const tags = ref<Tag[]>([])
-
-const wordCount = ref<number>(1200)
-const readTime = ref<string>('5分钟')
+const wordCount = ref<number>(DEFAULT_WORD_COUNT)
+const readTime = ref<string>(DEFAULT_READ_TIME)
 // 目录相关
 const headings = ref<Array<{ id: string, text: string, level: number }>>([])
 const activeHeading = ref('')
 const contentRef = ref<HTMLElement>()
+const likeBump = ref(false)
+const dislikeBump = ref(false)
 
 // 事件处理
-const handleLike = () => {
+const handleLike = async () => {
+  if (heroArticle.value?.id) {
+    try {
+      await articleStore.likeArticle({ id: heroArticle.value.id })
+    } catch (err) {
+      console.warn('like failed', err)
+    }
+    // optimistic local update so UI shows incremented value
+    if (typeof heroArticle.value.likes === 'number') {
+      heroArticle.value = { ...heroArticle.value, likes: (heroArticle.value.likes || 0) + 1 }
+    } else {
+      heroArticle.value = { ...heroArticle.value, likes: 1 }
+    }
+    // trigger bump animation
+    likeBump.value = true
+    setTimeout(() => (likeBump.value = false), 350)
+  }
   ElMessage.success('感谢点赞！')
 }
 
-const handleShare = () => {
-  ElMessage.info('分享功能开发中...')
+const handleDislike = async () => {
+  if (heroArticle.value?.id) {
+    try {
+      await articleStore.dislikeArticle({ id: heroArticle.value.id })
+    } catch (err) {
+      console.warn('dislike failed', err)
+    }
+    if (typeof heroArticle.value.dislikes === 'number') {
+      heroArticle.value = { ...heroArticle.value, dislikes: (heroArticle.value.dislikes || 0) + 1 }
+    } else {
+      heroArticle.value = { ...heroArticle.value, dislikes: 1 }
+    }
+    // trigger bump animation
+    dislikeBump.value = true
+    setTimeout(() => (dislikeBump.value = false), 350)
+  }
+  ElMessage.info('感谢反馈！')
 }
 
-const handleClap = () => {
-  ElMessage.success('👏 感谢支持！')
+const handleSharePlatform = (platform: string) => {
+  ElMessage.info(`${platform} 正在开发中`)
 }
 
 const filterByTag = (tag: number) => {
@@ -242,7 +209,7 @@ const articleStore = useArticleStore()
 const heroArticle = ref<Article | null>(null)
 const latestArticles = ref<Article[]>([])
 const searchQuery = ref('')
-const debouncedSearch = useDebouncedRef(searchQuery, 350)
+const debouncedSearch = useDebouncedRef(searchQuery, DEBOUNCED_INPUT_DELAY)
 const router = useRouter()
 
 const loadHomeArticles = async (search?: string) => {
@@ -275,7 +242,17 @@ const extractHeadings = () => {
   nextTick(() => {
     if (!contentRef.value) return
 
-    const headingElements = contentRef.value.querySelectorAll('h1, h2, h3, h4, h5, h6')
+    // contentRef may be the component instance (which exposes `root`) or an HTMLElement
+    // Resolve to the actual DOM element to query headings from
+    // @ts-ignore
+    const rootEl: HTMLElement | null = (contentRef.value.root && contentRef.value.root instanceof HTMLElement)
+      ? contentRef.value.root
+      : // @ts-ignore
+      (contentRef.value instanceof HTMLElement ? contentRef.value : null)
+
+    if (!rootEl) return
+
+    const headingElements = rootEl.querySelectorAll('h1, h2, h3, h4, h5, h6')
     headings.value = Array.from(headingElements).map((el, index) => {
       const id = el.id || `heading-${index}`
       el.id = id
@@ -410,37 +387,6 @@ $radius: $radius-sm;
           color: var(--text-secondary);
           line-height: 1.5;
         }
-      }
-    }
-  }
-
-  .tags {
-    h3 {
-      margin-bottom: 1rem;
-      font-size: 1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-    }
-
-    .tag-cloud {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-    }
-
-    .tag {
-      cursor: pointer;
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-      padding: 0.3rem 0.8rem;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      transition: var(--transition);
-
-      &:hover {
-        background: var(--accent-color);
-        color: white;
       }
     }
   }
@@ -786,14 +732,20 @@ $radius: $radius-sm;
     .tags {
       margin-bottom: 1rem;
 
-      a {
-        margin-right: 0.5rem;
-        padding: 0.3rem 0.8rem;
-        background: var(--bg-secondary);
-        border-radius: 4px;
-        color: var(--text-secondary);
-        text-decoration: none;
+      .tag-label {
         font-size: 0.9rem;
+        color: var(--text-muted);
+        margin-right: 8px;
+      }
+
+      .tag {
+        margin-left: 5px;
+        padding: 0.3rem 0.5rem;
+        background: var(--bg-secondary);
+        color: var(--text-secondary);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        cursor: pointer;
         transition: var(--transition);
 
         &:hover {
@@ -821,6 +773,85 @@ $radius: $radius-sm;
             color: var(--accent-color);
           }
         }
+      }
+    }
+
+    .share-icon {
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: color 0.2s, transform 0.12s;
+    }
+
+    .share-icon:hover {
+      color: var(--accent-color);
+      transform: translateY(-2px);
+    }
+  }
+
+  /* centered reactions */
+  .article-reactions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+
+    .reaction-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem;
+      border-radius: 8px;
+      font-size: 1.6rem;
+      /* slightly larger */
+      color: var(--text-secondary);
+      transition: transform 120ms ease, color 120ms ease, background 120ms ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        color: var(--accent-color);
+        background: rgba(var(--accent-color-rgb, 231, 76, 60), 0.06);
+      }
+    }
+
+    .like-btn,
+    .dislike-btn {
+      min-width: 64px;
+
+      .reaction-count {
+        margin-left: 0.5rem;
+        font-size: 1rem;
+        color: var(--text-secondary);
+        display: inline-block;
+        transform-origin: center;
+        transition: transform 220ms cubic-bezier(.2, .8, .2, 1), color 160ms;
+      }
+
+      /* bump animation */
+      @keyframes bump {
+        0% {
+          transform: scale(1);
+        }
+
+        30% {
+          transform: scale(1.25);
+        }
+
+        60% {
+          transform: scale(0.95);
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .reaction-count.bump {
+        animation: bump 340ms cubic-bezier(.2, .8, .2, 1) forwards;
+        color: var(--accent-color);
       }
     }
   }

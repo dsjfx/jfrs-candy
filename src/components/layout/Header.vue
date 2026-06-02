@@ -5,13 +5,11 @@
         <div class="logo" @click="router.push('/')">
           <el-avatar :src="avatar" size="48" />
           <h1 class="site-title">
-            <span class="title-candy">{{ mainTitle }}</span>
-            <span class="title-divider">·</span>
-            <span class="title-diary">{{ slaveTitle }}</span>
+            {{ appName }}
           </h1>
         </div>
 
-        <div class="slogan artistic">{{ appSlogan }}</div>
+        <img class="slogan artistic" src="@/assets/img/slogan1.png" alt="slogan" />
 
         <nav class="nav">
           <ul class="nav-list">
@@ -29,18 +27,18 @@
         <div class="header-actions">
           <el-button :icon="isDark ? 'Sunny' : 'Moon'" circle @click="toggleTheme"
             :title="isDark ? '切换到亮色模式' : '切换到暗色模式'" />
-          <el-button v-if="!blogStore.user" type="primary" @click="showLoginDialog = true">
+          <el-button v-if="!userStore.user" type="primary" @click="showLoginDialog = true">
             登录
           </el-button>
           <el-dropdown v-else>
             <div class="user-avatar">
-              <el-avatar :size="32" :src="blogStore.user?.avatar" />
-              <span class="username">{{ blogStore.user?.username }}</span>
+              <el-avatar :size="32" :src="userStore.user?.avatar" />
+              <span class="username">{{ userStore.user?.username }}</span>
             </div>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item>个人中心</el-dropdown-item>
-                <el-dropdown-item v-if="blogStore.user">我的文章</el-dropdown-item>
+                <el-dropdown-item v-if="userStore.user">我的文章</el-dropdown-item>
                 <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -137,20 +135,19 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import { faGithub, faWeibo, faQq } from '@fortawesome/free-brands-svg-icons'
 import { userApi } from '@/api'
-import { useBlogStore, useThemeStore } from '@/stores'
+import { useThemeStore } from '@/stores'
 import { useUserStore } from '@/stores/user'
+import { useAppName } from '@/composables/useAppName'
 
 const router = useRouter()
-const blogStore = useBlogStore()
 const themeStore = useThemeStore()
 const userStore = useUserStore()
 
-const mainTitle = import.meta.env.VITE_APP_MAIN_TITLE || '糖果'
-const slaveTitle = import.meta.env.VITE_APP_SLAVE_TITLE || '记录'
-const appSlogan = import.meta.env.VITE_APP_SLOGAN
+const { appName } = useAppName()
+const appSlogan = import.meta.env.VITE_APP_TITLE_SLOGAN || '记记录生活点滴'
+
 // avatar url
 const avatar = ref<string>('https://picsum.photos/200/200?random=10')
-const userId = ref<number>(10)
 
 const mobileMenuVisible = ref(false)
 const showLoginDialog = ref(false)
@@ -214,7 +211,7 @@ const handleLogin = async () => {
 
         // 保存用户信息
         if (response.data.userInfo) {
-          blogStore.user = response.data.userInfo
+          userStore.user = response.data.userInfo
         }
 
         // 记住密码功能
@@ -269,7 +266,7 @@ const logout = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('rememberMe')
   localStorage.removeItem('savedUsername')
-  blogStore.user = null
+  userStore.user = null
   ElMessage.success('已退出登录')
 }
 
@@ -285,9 +282,9 @@ const loadSavedUsername = () => {
   }
 }
 
-const fetchSimpleUser = async (id: number) => {
+const fetchSimpleUser = async () => {
   try {
-    await userStore.getSimpleUser({ id })
+    await userStore.getSimpleUser({})
     if (userStore.simpleUser?.avatar) {
       // avatar.value = userStore.simpleUser?.avatar
     }
@@ -297,7 +294,7 @@ const fetchSimpleUser = async (id: number) => {
 }
 
 onMounted(async () => {
-  await fetchSimpleUser(userId.value)
+  await fetchSimpleUser()
 
   // 组件挂载时加载保存的用户名
   loadSavedUsername()
@@ -393,7 +390,7 @@ $breakpoint-mobile: 768px;
 }
 
 .slogan {
-  padding-top: 10px;
+  // padding-top: 10px;
   font-size: 18px;
   font-weight: bolder;
   color: rgba($base-color-j9, 0.7);
@@ -403,7 +400,7 @@ $breakpoint-mobile: 768px;
   }
 
   &.artistic {
-    transform: rotate(-4deg);
+    transform: rotate(1deg);
     display: inline-block;
     margin-left: 8px;
     font-family: 'Georgia', 'Times New Roman', serif;

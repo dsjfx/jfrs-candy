@@ -50,7 +50,7 @@ export interface Author {
 }
 
 export interface UserParam {
-  id: number
+  id?: number
 }
 
 export interface SimpleUser {

@@ -53,11 +53,11 @@ export async function login(param: LoginParams): Promise<ResponseData<LoginRespo
   return result;
 }
 
-export async function getSimpleUserinfo(param: UserParam = { id: 10 }):
+export async function getSimpleUserinfo(param: UserParam):
   Promise<ResponseData<SimpleUser>> {
   let data = ResponseFactory.success<SimpleUser>({} as SimpleUser)
 
-  const response = await http.get(makeUrl(`/avatar`), param)
+  const response = await http.get(makeUrl(`/sys-avatar`), param)
   if (response.data) {
     data = response.data as ResponseData<SimpleUser>
   }

@@ -1,4 +1,13 @@
-import { getAdjacentBlogs, getArchive, getArchiveMore, getBlogs, getBolgById, getRelatedBlogs } from './articles'
+import {
+  getAdjacentBlogs,
+  getArchive,
+  getArchiveMore,
+  getBlogs,
+  getBolgById,
+  getRelatedBlogs,
+  likeArticle,
+  dislikeArticle,
+} from './articles'
 import { getSimpleUserinfo, getUser, login } from './auth'
 import { getComments } from './comments'
 import api from './request'
@@ -16,6 +25,10 @@ export const articleApi = {
   getArticleArchive: getArchive,
 
   getArticleArchiveMore: getArchiveMore,
+
+  likeArticle: likeArticle,
+
+  dislikeArticle: dislikeArticle,
 
   // createArticle(data: any) {
   //   return api.post('/articles', data)

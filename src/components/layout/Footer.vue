@@ -2,8 +2,15 @@
   <footer class="footer">
     <div class="footer-content">
       <div class="footer-left">
-        <div class="copyright">
-          &copy; {{ currentYear }} {{ appTitle }}
+        <div class="footer-copyright">
+          &copy; {{ currentYear }}
+          <span class="footer-title">
+            {{ appName }}
+          </span>
+          <span class="separator">|</span>
+          <span class="footer-slogan">
+            {{ appSlogan }}
+          </span>
         </div>
         <div class="footer-beian">
           <a v-if="icpLicense" href="https://beian.miit.gov.cn/" target="_blank">
@@ -14,18 +21,20 @@
           </a>
         </div>
       </div>
+
       <div class="footer-right">
+
+        <!-- <div class="footer-socials">
+          <a v-for="s in social" :key="s.href" :href="s.href" class="social-icon" target="_blank" rel="noopener">
+            <FaIcon :icon="s.icon" />
+          </a>
+        </div> -->
+
         <div class="footer-links">
           <template v-for="(link, idx) in navLinks" :key="link.to">
             <router-link :to="link.to" class="footer-link">{{ link.label }}</router-link>
             <span v-if="idx < navLinks.length - 1" class="separator">|</span>
           </template>
-        </div>
-
-        <div class="footer-socials">
-          <a v-for="s in social" :key="s.href" :href="s.href" class="social-icon" target="_blank" rel="noopener">
-            <FaIcon :icon="s.icon" />
-          </a>
         </div>
 
         <el-tooltip content="回到顶部" placement="top">
@@ -43,6 +52,7 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { faArrowUp } from '@fortawesome/free-solid-svg-icons'
 import { faGithub, faWeibo } from '@fortawesome/free-brands-svg-icons'
 import { useUserStore } from '@/stores/user'
+import { useAppName } from '@/composables/useAppName'
 
 const userStore = useUserStore()
 
@@ -58,11 +68,12 @@ const social = [
 ]
 
 const showBackToTop = ref(false)
-const userId = ref<number>(10)
+const userId = ref<number>(1)
 const icpLicense = ref<string | null>();
 const publicSecurityLicense = ref<string | null>();
 
-const appTitle = import.meta.env.VITE_APP_FOOT_TITLE || '个人博客'
+const { appName } = useAppName()
+const appSlogan = import.meta.env.VITE_APP_TITLE_SLOGAN || '记记录生活点滴'
 const currentYear = new Date().getFullYear()
 
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -71,9 +82,9 @@ const handleScroll = () => {
   showBackToTop.value = window.scrollY > 300
 }
 
-const fetchSimpleUser = async (id: number) => {
+const fetchSimpleUser = async () => {
   try {
-    await userStore.getSimpleUser({ id })
+    await userStore.getSimpleUser({})
     let simpleUser = userStore.simpleUser
     if (simpleUser?.icpLicense) {
       icpLicense.value = simpleUser.icpLicense
@@ -87,7 +98,7 @@ const fetchSimpleUser = async (id: number) => {
 }
 
 onMounted(async () => {
-  await fetchSimpleUser(userId.value)
+  await fetchSimpleUser()
 
   window.addEventListener('scroll', handleScroll, { passive: true })
   // initialize
@@ -131,15 +142,30 @@ $breakpoint-mobile: 768px;
   flex-direction: row;
   gap: 8px;
 
-  .copyright {
+  .footer-copyright {
     display: flex;
     justify-content: center;
     color: var(--color-text-secondary);
     font-size: 0.875rem;
+
+    .footer-title {
+      margin: 0 5px;
+    }
+
+    .footer-slogan {
+      margin-left: 5px;
+      color: var(--color-text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .separator {
+      margin: 0 5px;
+      color: var(--color-border);
+    }
   }
 
   .footer-beian {
-    margin-left: 10px;
+    margin-left: 20px;
     display: inline-block;
     font-size: 0.875rem;
 
@@ -163,6 +189,7 @@ $breakpoint-mobile: 768px;
     justify-content: center;
     align-items: center;
     gap: 12px;
+    margin-left: 10px;
 
     @media (max-width: $breakpoint-mobile) {
       display: none;
@@ -188,7 +215,7 @@ $breakpoint-mobile: 768px;
 .footer-socials {
   display: flex;
   gap: 8px;
-  margin-left: 12px;
+  margin-right: 10px;
 
   .social-icon {
     color: var(--color-text-secondary);
@@ -205,15 +232,32 @@ $breakpoint-mobile: 768px;
 }
 
 .back-to-top {
-  margin-left: 12px;
-  padding: 6px 8px;
-  background: transparent;
-  border: 1px solid rgba(5, 150, 105, 0.2);
-  border-radius: 6px;
+  position: fixed;
+  right: 1.5rem;
+  bottom: 3.5rem;
+  z-index: 1200;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 50%;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  transition: transform 180ms ease, opacity 180ms ease;
 
   &:hover {
-    border: 1px solid rgba(5, 150, 105, 0.4);
+    transform: translateY(-4px);
+  }
+
+  @media (max-width: 768px) {
+    right: 1rem;
+    bottom: 1rem;
+    width: 40px;
+    height: 40px;
   }
 }
 

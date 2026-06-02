@@ -9,12 +9,6 @@
           </Transition>
         </RouterView>
       </main>
-      <!-- <aside class="sidebar">
-        <AboutCard />
-        <CategoriesCard />
-        <TagsCard />
-        <RecentArticlesCard />
-      </aside> -->
     </div>
     <Footer />
   </div>
@@ -23,10 +17,6 @@
 <script setup lang="ts">
 import Header from '@/components/layout/Header.vue'
 import Footer from '@/components/layout/Footer.vue'
-import AboutCard from '@/components/sidebar/AboutCard.vue'
-import CategoriesCard from '@/components/sidebar/CategoriesCard.vue'
-import TagsCard from '@/components/sidebar/TagsCard.vue'
-import RecentArticlesCard from '@/components/sidebar/RecentArticlesCard.vue'
 </script>
 
 <style scoped lang="scss">
@@ -59,22 +49,4 @@ $breakpoint-mobile: 768px;
   min-width: 0;
   min-height: 50vh;
 }
-
-.sidebar {
-  width: 320px;
-  flex-shrink: 0;
-
-  &>* {
-    margin-bottom: 24px;
-  }
-}
-
-// @media (max-width: 992px) {
-//   .layout-container {
-//     flex-direction: column;
-//   }
-
-//   .sidebar {
-//     width: 100%;
-//   }
-// }</style>
+</style>

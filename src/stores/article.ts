@@ -77,15 +77,15 @@ export const useArticleStore = defineStore('article', () => {
    * 获取分页博客数据
    * @param payload 
    */
-  const fetchArticles = async (payload: 
-    { 
-    current?: number; 
-    size?: number; 
-    search?: string 
-    } = 
-    { 
-      current: 1, 
-      size: 10 
+  const fetchArticles = async (payload:
+    {
+      current?: number;
+      size?: number;
+      search?: string
+    } =
+    {
+      current: 1,
+      size: 10
     }
   ) => {
     const current: number = payload.current ?? 1
@@ -153,6 +153,37 @@ export const useArticleStore = defineStore('article', () => {
     }
   }
 
+  // Like / dislike actions (simple local update or API call if available)
+  const likeArticle = async (payload: { id: number }) => {
+    try {
+      // try calling API if available
+      if (articleApi && typeof articleApi.likeArticle === 'function') {
+        await articleApi.likeArticle(payload)
+      }
+    } catch (err) {
+      console.warn('likeArticle api failed or not implemented', err)
+    }
+
+    // optimistic local update if the current article matches
+    if (article.value && (article.value as any).id === payload.id) {
+      ; (article.value as any).likes = ((article.value as any).likes || 0) + 1
+    }
+  }
+
+  const dislikeArticle = async (payload: { id: number }) => {
+    try {
+      if (articleApi && typeof articleApi.dislikeArticle === 'function') {
+        await articleApi.dislikeArticle(payload)
+      }
+    } catch (err) {
+      console.warn('dislikeArticle api failed or not implemented', err)
+    }
+
+    if (article.value && (article.value as any).id === payload.id) {
+      ; (article.value as any).dislikes = ((article.value as any).dislikes || 0) + 1
+    }
+  }
+
   return {
     pageData,
     articles,
@@ -163,8 +194,9 @@ export const useArticleStore = defineStore('article', () => {
     fetchArticleById,
     fetchRelatedArticles,
     fetchAdjacentArticles,
+    likeArticle,
+    dislikeArticle,
 
-    // archive
     archiveYears,
     archiveLoading,
     archiveNoMore,
