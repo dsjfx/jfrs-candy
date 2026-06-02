@@ -166,7 +166,7 @@ const getUser = async () => {
   startLoading();
 
   try {
-    await userStore.getUserInfo({ id: 10 });
+    await userStore.getUserInfo({ id: 1 });
     if (userStore.user) {
       // const user: User = userStore.user;
       author.value = userStore.user;

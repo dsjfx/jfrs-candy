@@ -5,9 +5,10 @@
       <h1>{{ articleTitle }}</h1>
       <!-- 搜索 -->
       <div class="articles-bar">
-        <input v-model="searchQuery" type="text" placeholder="搜索文章..." @input="handleSearch" />
-        <FaIcon :icon="faSearch" />
-      </div>
+          <input ref="searchInputRef" v-model="searchQuery" type="text" placeholder="搜索文章..." @input="handleSearch" />
+          <FaIcon :icon="faSearch" />
+          <button v-if="searchQuery" class="clear-btn" type="button" @click="clearSearch" aria-label="清除搜索">×</button>
+        </div>
     </div>
 
     <div v-if="isLoading" class="loading-container">
@@ -219,6 +220,7 @@ const fetchArticles = async () => {
 
 // use debounced ref for search input
 const debouncedSearch = useDebouncedRef(searchQuery, 300)
+const searchInputRef = ref<HTMLInputElement | null>(null)
 
 // when debounced search changes, perform search
 watch(debouncedSearch, async (val, oldVal) => {
@@ -282,6 +284,8 @@ const clearSearch = () => {
   searchQuery.value = ''
   current.value = 1
   fetchArticles()
+  // focus input after clearing
+  if (searchInputRef.value) searchInputRef.value.focus()
 }
 
 // 生命周期
@@ -338,10 +342,10 @@ $breakpoint-mobile: 768px;
       width: 100%;
       padding: 0.8rem 1rem 0.8rem 2.5rem;
       font-size: 1rem;
-      border: 2px solid #e0e0e0;
+      border: 2px solid rgba(5,150,105,0.12); /* normal subtle green */
       border-radius: 25px;
       outline: none;
-      transition: border-color 0.3s ease;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
 
       @media (max-width: $breakpoint-mobile) {
         padding: 0.5rem 1rem 0.5rem 2.0rem;
@@ -351,12 +355,13 @@ $breakpoint-mobile: 768px;
       }
 
       &:hover {
-        border-color: $base-color-j1;
-        opacity: 0.4;
+        border-color: rgba(var(--accent-color-rgb, 5,150,105), 0.28); /* stronger green on hover */
       }
 
-      & input:focus {
-        border-color: $base-color-j1;
+      &:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 6px 18px rgba(var(--accent-color-rgb, 5,150,105), 0.10);
+        transform: translateY(-1px);
       }
 
       &::placeholder {
@@ -369,12 +374,46 @@ $breakpoint-mobile: 768px;
       left: 1rem;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--text-muted);
+      color: #7f8c8d; /* default icon color */
       cursor: pointer;
 
       @media (max-width: $breakpoint-mobile) {
         width: 12px;
       }
+    }
+
+    /* clear button inside search input */
+    .clear-btn,
+    .clear-bt {
+      position: absolute;
+      right: 0.6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      font-size: 1.1rem;
+      color: #666;
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.12s ease, color 0.12s ease;
+    }
+
+    .clear-btn:hover,
+    .clear-bt:hover {
+      background: rgba(var(--accent-color-rgb, 5,150,105), 0.08);
+      color: var(--accent-color);
+    }
+
+    /* icon color on hover/focus */
+    &:hover svg,
+    input:focus ~ svg {
+      color: var(--accent-color);
+      transform: translateY(-50%) scale(1.05);
     }
   }
 
