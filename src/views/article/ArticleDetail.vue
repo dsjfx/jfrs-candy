@@ -46,9 +46,7 @@
 
             <div v-if="showTime" class="meta-item">
               <span title="发布日期" class="meta-icon">
-                <el-icon>
-                  <Calendar />
-                </el-icon>
+                <FaIcon :icon="faCalendarIcon" />
               </span>
               <span>
                 <time :datetime="article.createdAt">{{ formatDate(article.createdAt) }}</time>
@@ -58,18 +56,14 @@
 
             <span v-if="showView" class="meta-item">
               <span title="阅读" class="meta-icon">
-                <el-icon>
-                  <View />
-                </el-icon>
+                <FaIcon :icon="faEyeIcon" />
               </span>
               {{ article.views || 0 }}
             </span>
 
             <span v-if="showComments" class="meta-item">
               <span title="评论" class="meta-icon">
-                <el-icon>
-                  <Comment />
-                </el-icon>
+                <FaIcon :icon="faCommentIcon" />
               </span>
               {{ article.comments || '5' }}
             </span>
@@ -84,9 +78,12 @@
 
         <!-- 标签 -->
         <div v-if="showTag" class="article-tags">
-          <router-link v-for="tag in article.tags" :key="tag.id" :to="`/tag/${tag.id}`" class="article-tag">
+          <!-- <router-link v-for="tag in article.tags" :key="tag.id" :to="`/tag/${tag.id}`" class="article-tag">
             #{{ tag.name }}
-          </router-link>
+          </router-link> -->
+          <div v-for="tag in article.tags" class="article-tag">
+            #{{ tag.name }}
+          </div>
         </div>
 
         <!-- 特色图片 -->
@@ -136,7 +133,7 @@
             </div>
 
             <div v-if="showNavigate" class="navigation-links">
-              <router-link v-if="prevArticle" :to="`/article/${prevArticle.id}`" class="nav-link prev">
+              <router-link v-if="prevArticle" :to="`/articles/${prevArticle.id}`" class="nav-link prev">
                 <div class="nav-link-label">
                   <el-icon>
                     <ArrowLeftBold />
@@ -145,7 +142,11 @@
                 <div class="nav-link-title">{{ prevArticle.title }}</div>
               </router-link>
               <div v-else class="nav-link prev disabled">
-                <div class="nav-link-label">上一篇</div>
+                <div class="nav-link-label">
+                  <el-icon>
+                    <ArrowLeftBold />
+                  </el-icon>
+                </div>
                 <div class="nav-link-title">已经是第一篇了</div>
               </div>
 
@@ -158,8 +159,12 @@
                 </div>
               </router-link>
               <div v-else class="nav-link next disabled">
-                <div class="nav-link-label">下一篇</div>
                 <div class="nav-link-title">已经是最后一篇了</div>
+                <div class="nav-link-label">
+                  <el-icon>
+                    <ArrowRightBold />
+                  </el-icon>
+                </div>
               </div>
             </div>
 
@@ -266,6 +271,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faEye } from '@fortawesome/free-solid-svg-icons'
+import { faComment as faCommentRegular } from '@fortawesome/free-regular-svg-icons'
+import { faCalendar as faCalendarRegular } from '@fortawesome/free-regular-svg-icons'
 import { useRoute, useRouter } from 'vue-router'
 import { useLoading } from '@/composables/useLoading'
 import ArticleDetailSkeleton from '@/components/core/ArticleDetailSkeleton.vue'
@@ -313,7 +321,7 @@ const props = withDefaults(defineProps<ArticleDetailProps>(), {
   showReward: false,
   showRelated: true,
   showCatalog: true,
-  showComment: true,
+  showComment: false,
   categoryColors: () => ({
     '日记': '#059669',
     '生活': '#10B981',
@@ -400,7 +408,7 @@ const fetchArticle = async () => {
     fetchRelatedArticlesData()
 
     // 获取评论
-    fetchCommentsData()
+    // fetchCommentsData()
 
     // 获取导航文章
     fetchNavigationArticles()
@@ -425,6 +433,9 @@ const handleBack = () => {
 
 // fontawesome icon for template
 const faArrowLeftIcon = faArrowLeft
+const faCalendarIcon = faCalendarRegular
+const faEyeIcon = faEye
+const faCommentIcon = faCommentRegular
 
 // 提取文章标题（用于目录）
 const extractHeadings = () => {
@@ -652,7 +663,7 @@ const handleLikeComment = (commentId: string) => {
 
 // 方法：导航到文章
 const navigateToArticle = (id: string) => {
-  router.push(`/article/${id}`)
+  router.push(`/articles/${id}`)
 }
 
 </script>
@@ -804,9 +815,9 @@ $breakpoint-mobile: 768px;
   .meta-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
     color: $text-secondary;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     height: 100%;
 
     &.author {
@@ -814,8 +825,8 @@ $breakpoint-mobile: 768px;
     }
 
     .author-avatar {
-      width: 32px;
-      height: 32px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       object-fit: cover;
     }
@@ -826,7 +837,23 @@ $breakpoint-mobile: 768px;
     }
 
     .meta-icon {
-      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.04);
+      color: $text-secondary;
+      transition: all 0.18s ease;
+      font-size: 0.95rem;
+    }
+
+    &:hover .meta-icon {
+      background: rgba(var(--primary-color-rgb, 5, 150, 105), 0.12);
+      color: var(--primary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(5, 150, 105, 0.08);
     }
   }
 
@@ -1292,8 +1319,8 @@ $breakpoint-mobile: 768px;
 
   .nav-link {
     padding: 0.8rem;
-    flex: 1;
     display: flex;
+    flex: 1;
     align-items: center;
     border-radius: $radius;
     text-decoration: none;
@@ -1326,11 +1353,6 @@ $breakpoint-mobile: 768px;
       }
     }
 
-    &.disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
     .nav-link-label {
       // margin-bottom: 0.25rem;
       display: flex;
@@ -1360,6 +1382,44 @@ $breakpoint-mobile: 768px;
       }
     }
 
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+
+      &.prev {
+        display: flex;
+        justify-content: flex-start;
+
+        .nav-link-label {
+          margin-left: 10px;
+          color: $text-light;
+          cursor: not-allowed;
+        }
+
+        .nav-link-title {
+          margin-left: 10px;
+          color: $text-light;
+          cursor: not-allowed;
+        }
+      }
+
+      &.next {
+        display: flex;
+        justify-content: flex-end;
+
+        .nav-link-label {
+          margin-right: 10px;
+          color: $text-light;
+          cursor: not-allowed;
+        }
+
+        .nav-link-title {
+          color: $text-light;
+          margin-right: 10px;
+          cursor: not-allowed;
+        }
+      }
+    }
   }
 }
 

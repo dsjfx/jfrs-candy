@@ -51,7 +51,9 @@
         <!-- 文章标题 -->
         <h1>{{ heroArticle?.title || '如何保持极简主义生活与工作平衡' }}</h1>
         <div class="meta">
-          <span class="category">{{ heroArticle?.category?.name || '生活哲学' }}</span>
+          <span class="category" :style="{ backgroundColor: heroArticle?.category?.color || '#3498db' }">
+            {{ heroArticle?.category?.name || '生活哲学' }}
+          </span>
           <span class="word-count">约 {{ wordCount }} 字</span>
         </div>
       </header>
@@ -92,11 +94,11 @@
       <div class="article-reactions" role="group" aria-label="article reactions">
         <button class="reaction-btn like-btn" @click="handleLike" aria-label="喜欢">
           <FaIcon :icon="faThumbsUp" />
-          <span class="reaction-count" :class="{ bump: likeBump }">{{ (heroArticle?.likes ?? 0) }}</span>
+          <span class="reaction-count" :class="{ bump: likeBump }">{{ (heroArticle?.likeCount ?? 0) }}</span>
         </button>
         <button class="reaction-btn dislike-btn" @click="handleDislike" aria-label="不喜欢">
           <FaIcon :icon="faThumbsDown" />
-          <span class="reaction-count" :class="{ bump: dislikeBump }">{{ (heroArticle?.dislikes ?? 0) }}</span>
+          <span class="reaction-count" :class="{ bump: dislikeBump }">{{ (heroArticle?.dislikeCount ?? 0) }}</span>
         </button>
       </div>
 
@@ -174,10 +176,10 @@ const handleLike = async () => {
       console.warn('like failed', err)
     }
     // optimistic local update so UI shows incremented value
-    if (typeof heroArticle.value.likes === 'number') {
-      heroArticle.value = { ...heroArticle.value, likes: (heroArticle.value.likes || 0) + 1 }
+    if (typeof heroArticle.value.likeCount === 'number') {
+      heroArticle.value = { ...heroArticle.value, likeCount: (heroArticle.value.likeCount || 0) + 1 }
     } else {
-      heroArticle.value = { ...heroArticle.value, likes: 1 }
+      heroArticle.value = { ...heroArticle.value, likeCount: 1 }
     }
     // trigger bump animation
     likeBump.value = true
@@ -193,10 +195,10 @@ const handleDislike = async () => {
     } catch (err) {
       console.warn('dislike failed', err)
     }
-    if (typeof heroArticle.value.dislikes === 'number') {
-      heroArticle.value = { ...heroArticle.value, dislikes: (heroArticle.value.dislikes || 0) + 1 }
+    if (typeof heroArticle.value.dislikeCount === 'number') {
+      heroArticle.value = { ...heroArticle.value, dislikeCount: (heroArticle.value.dislikeCount || 0) + 1 }
     } else {
-      heroArticle.value = { ...heroArticle.value, dislikes: 1 }
+      heroArticle.value = { ...heroArticle.value, dislikeCount: 1 }
     }
     // trigger bump animation
     dislikeBump.value = true
@@ -305,6 +307,8 @@ watch(debouncedSearch, (val) => {
 </script>
 
 <style scoped lang="scss">
+$breakpoint-tablet: 1024px;
+$breakpoint-mobile: 768px;
 $bg-color: $base-bg-j3;
 $border-color: $base-border-j2;
 $shadow: $shadow-xs;
@@ -312,12 +316,23 @@ $radius: $radius-sm;
 
 /* 主布局 */
 .container {
-  max-width: 1400px;
+  width: 1200px;
   margin: 2rem auto;
-  padding: 0 2rem;
+  padding: 0;
   display: grid;
   grid-template-columns: 300px 1fr;
-  gap: 3rem;
+  gap: 2rem;
+
+  @media (max-width: $breakpoint-tablet) {
+    width: 90%;
+    grid-template-columns: 1fr;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    width: 100%;
+    padding: 0 1rem;
+    grid-template-columns: 1fr;
+  }
 
   /* 侧边栏 */
   .sidebar {
@@ -472,11 +487,10 @@ $radius: $radius-sm;
 
   /* 文章内容 */
   .content {
-    max-width: 800px;
+    width: 800px;
     margin: 0 auto;
 
     .article-container {
-      max-width: 800px;
       width: 100%;
       transition: opacity 200ms ease, transform 160ms ease;
       will-change: opacity, transform;

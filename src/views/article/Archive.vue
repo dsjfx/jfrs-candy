@@ -10,70 +10,73 @@
       <div v-if="!isLoading && years.length === 0" class="empty-state">
         暂无归档文章
       </div>
-      <main class="archive-main" ref="mainRef">
-        <el-timeline :mode="mode">
-          <template v-for="year in visibleYears" :key="year.year">
-            <el-timeline-item :timestamp="`${year.year}`" :color="timeColor">
-              <div :id="`year-${year.year}`" class="year-block">
-                <div class="year-card">
-                  <div class="year-header">
-                    <div class="year-title">{{ year.year }}</div>
-                    <div class="year-meta">
-                      <span class="year-count">{{ year.count }}</span>
-                      <el-button plain class="toggle-btn" @click="toggleYear(year)">
-                        <span v-if="year.expanded">收起</span>
-                        <span v-else>展开</span>
-                      </el-button>
-                    </div>
-                  </div>
-
-                  <div class="months">
-                    <div v-for="month in year.months" :key="month.month" class="month-panel"
-                      :class="{ open: month.expanded && year.expanded }">
-                      <div class="month-header" @click="toggleMonth(year, month)">
-                        <div class="month-title">
-                          <i :class="['chev', month.expanded ? 'open' : '']"></i>
-                          {{ month.monthName }}
-                        </div>
-                        <div class="month-count">{{ month.count }}</div>
+      <div v-else class="archive-content">
+        <div class="archive-left"></div>
+        <main class="archive-main" ref="mainRef">
+          <el-timeline :mode="mode">
+            <template v-for="year in visibleYears" :key="year.year">
+              <el-timeline-item :timestamp="`${year.year}`" :color="timeColor">
+                <div :id="`year-${year.year}`" class="year-block">
+                  <div class="year-card">
+                    <div class="year-header">
+                      <div class="year-title">{{ year.year }}</div>
+                      <div class="year-meta">
+                        <span class="year-count">{{ year.count }}</span>
+                        <el-button plain class="toggle-btn" @click="toggleYear(year)">
+                          <span v-if="year.expanded">收起</span>
+                          <span v-else>展开</span>
+                        </el-button>
                       </div>
+                    </div>
 
-                      <transition name="fade-slide">
-                        <ul v-show="month.expanded && year.expanded" class="month-list">
-                          <li v-for="post in month.posts" :key="post.id" class="post-item">
-                            <router-link :to="{ name: 'ArticleDetail', params: { id: post.id } }" class="post-link">
-                              <div class="post-title">{{ post.title }}</div>
-                              <div class="post-meta">{{ formatDate(post.publishedAt) }}</div>
-                            </router-link>
-                          </li>
-                        </ul>
-                      </transition>
+                    <div class="months">
+                      <div v-for="month in year.months" :key="month.month" class="month-panel"
+                        :class="{ open: month.expanded && year.expanded }">
+                        <div class="month-header" @click="toggleMonth(year, month)">
+                          <div class="month-title">
+                            <i :class="['chev', month.expanded ? 'open' : '']"></i>
+                            {{ month.monthName }}
+                          </div>
+                          <div class="month-count">{{ month.count }}</div>
+                        </div>
+
+                        <transition name="fade-slide">
+                          <ul v-show="month.expanded && year.expanded" class="month-list">
+                            <li v-for="post in month.posts" :key="post.id" class="post-item">
+                              <router-link :to="{ name: 'ArticleDetail', params: { id: post.id } }" class="post-link">
+                                <div class="post-title">{{ post.title }}</div>
+                                <div class="post-meta">{{ formatDate(post.publishedAt) }}</div>
+                              </router-link>
+                            </li>
+                          </ul>
+                        </transition>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </el-timeline-item>
-          </template>
-        </el-timeline>
+              </el-timeline-item>
+            </template>
+          </el-timeline>
 
-        <!-- sentinel for lazy loading more years -->
-        <div ref="sentinelRef" class="sentinel" />
-      </main>
+          <!-- sentinel for lazy loading more years -->
+          <div ref="sentinelRef" class="sentinel" />
+        </main>
 
-      <!-- sidebar years -->
-      <aside class="archive-sidebar">
-        <div class="sidebar-inner">
-          <h3>年份</h3>
-          <ul class="year-nav">
-            <li v-for="y in years" :key="y.year">
-              <button class="nav-item" @click="scrollToYear(y.year)">
-                <span class="year-label">{{ y.year }}</span>
-                <span class="badge">{{ y.count }}</span>
-              </button>
-            </li>
-          </ul>
-        </div>
-      </aside>
+        <!-- sidebar years -->
+        <aside class="archive-sidebar">
+          <div class="sidebar-inner">
+            <h3>年份</h3>
+            <ul class="year-nav">
+              <li v-for="y in years" :key="y.year">
+                <button class="nav-item" @click="scrollToYear(y.year)">
+                  <span class="year-label">{{ y.year }}</span>
+                  <span class="badge">{{ y.count }}</span>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </aside>
+      </div>
     </div>
   </div>
 </template>
@@ -94,7 +97,7 @@ const timeColor = ref<string>('#059669')
 const isMobile = ref(false)
 
 // use a simple ref for mode and update it on resize to ensure plain string passed to el-timeline
-const mode = ref<TimelineProps['mode']>('alternate')
+const mode = ref<TimelineProps['mode']>('start')
 const mainRef = ref<HTMLElement | null>(null)
 const sentinelRef = ref<HTMLElement | null>(null)
 
@@ -201,7 +204,7 @@ const scrollToYear = (yearNum: number) => {
 function handleResize() {
   const mobile = window.innerWidth <= 900
   isMobile.value = mobile
-  mode.value = mobile ? 'start' : 'alternate'
+  mode.value = mobile ? 'start' : 'start'
 }
 </script>
 
@@ -209,9 +212,11 @@ function handleResize() {
 $breakpoint-mobile: 768px;
 
 .archive-container {
-  max-width: 1400px;
+  width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
   flex: 1;
 
   @media (max-width: $breakpoint-mobile) {
@@ -224,6 +229,8 @@ $breakpoint-mobile: 768px;
     font-weight: 300;
     color: #333;
     text-align: center;
+    // border-bottom: 2px solid var(--color-primary);
+    // padding-bottom: 5px;
   }
 
   .year-title {
@@ -231,27 +238,65 @@ $breakpoint-mobile: 768px;
     margin-bottom: 8px;
   }
 
-  // layout for sidebar + main
+  // layout for sidebar + main (3 columns)
   .archive-layout {
-    display: flex;
-    gap: 2rem;
+    display: grid;
+    grid-template-columns: 200px 1fr 200px;
+    /* left, main, sidebar */
+    gap: 24px;
+    align-items: start;
   }
 
+  /* wrapper for the three-column content */
+  .archive-content {
+    display: contents;
+    /* let children follow the grid columns */
+  }
+
+  /* empty state styling */
+  .empty-state {
+    grid-column: 1 / -1;
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--color-text-secondary, #6B7280);
+    background: linear-gradient(180deg, rgba(245, 246, 250, 0.6), rgba(255, 255, 255, 0.6));
+    border: 1px dashed var(--color-border, #E5E7EB);
+    border-radius: 10px;
+    font-size: 1.05rem;
+  }
+
+  /* main column: let the page (outer scroll) handle overflowing content */
   .archive-main {
-    flex: 1 1 0;
+    grid-column: 2 / 3;
     min-width: 0;
-    max-height: calc(100vh - 160px);
     padding: 0 10px;
-    overflow: auto;
+    overflow: visible;
+    /* don't create an inner scrollbar */
   }
 
+  /* left column placeholder / anchors */
+  .archive-left {
+    grid-column: 1 / 2;
+    width: 100px;
+    min-width: 100px;
+    display: flex;
+    align-items: start;
+    justify-content: center;
+    padding-top: 8px;
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+  }
+
+  /* sidebar: sticky, fixed width */
   .archive-sidebar {
-    width: 160px;
-    flex: 0 0 160px;
+    grid-column: 3 / 4;
+    width: 150px;
+    min-width: 150px;
     position: sticky;
-    top: 100px;
-    height: calc(100vh - 160px);
-    overflow: auto;
+    top: 96px;
+    height: calc(100vh - 120px);
+    overflow: visible;
+    /* avoid nested scrolling */
   }
 
   .sidebar-inner {
@@ -463,17 +508,20 @@ $breakpoint-mobile: 768px;
 
   @media (max-width: 900px) {
     .archive-layout {
-      flex-direction: column;
+      grid-template-columns: 1fr;
+      gap: 12px;
     }
 
+    .archive-left,
     .archive-sidebar {
       width: 100%;
+      min-width: 0;
       position: static;
       height: auto;
     }
 
     .archive-main {
-      max-height: none;
+      padding: 0;
     }
   }
 }

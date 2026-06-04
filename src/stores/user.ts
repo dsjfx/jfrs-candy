@@ -61,7 +61,6 @@ export const useUserStore = defineStore('user', () => {
     try {
       const res = await userApi.getSimpleUser(param)
       if (res && res.data) {
-        console.log(res.data)
         simpleUser.value = res.data
       }
     } catch (error) {

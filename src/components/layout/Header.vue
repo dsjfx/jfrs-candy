@@ -3,7 +3,7 @@
     <div class="header-container">
       <div class="header-content">
         <div class="logo" @click="router.push('/')">
-          <el-avatar :src="avatar" size="48" />
+          <el-avatar :src="avatar" size="default" />
           <h1 class="site-title">
             {{ appName }}
           </h1>
@@ -27,7 +27,7 @@
         <div class="header-actions">
           <el-button :icon="isDark ? 'Sunny' : 'Moon'" circle @click="toggleTheme"
             :title="isDark ? '切换到亮色模式' : '切换到暗色模式'" />
-          <el-button v-if="!userStore.user" type="primary" @click="showLoginDialog = true">
+          <!-- <el-button v-if="!userStore.user" type="primary" @click="showLoginDialog = true">
             登录
           </el-button>
           <el-dropdown v-else>
@@ -42,7 +42,7 @@
                 <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
               </el-dropdown-menu>
             </template>
-          </el-dropdown>
+</el-dropdown> -->
 
           <el-button class="mobile-menu-btn" :icon="Menu" circle @click="mobileMenuVisible = !mobileMenuVisible" />
         </div>

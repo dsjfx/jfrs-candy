@@ -42,6 +42,7 @@ const formatDate = (dateStr: string) => {
 .related-article-card {
   display: flex;
   gap: 1rem;
+  margin-top: 1rem;
   padding: 1rem;
   border-radius: 8px;
   background: #f9fafb;

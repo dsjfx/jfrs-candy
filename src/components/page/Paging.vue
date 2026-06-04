@@ -241,7 +241,7 @@ $breakpoint-mobile: 480px;
   gap: 15px;
   margin-top: 30px;
   padding: 20px;
-  background: #f8f9fa;
+  // background: #f8f9fa;
   border-radius: 12px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 

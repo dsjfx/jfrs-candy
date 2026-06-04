@@ -33,13 +33,16 @@
 
     <!-- 内容 -->
     <div class="article-content">
+      <div v-if="coverUrl" class="cover-wrap">
+        <img :src="coverUrl" alt="封面" class="cover-thumb" v-if="coverUrl" />
+      </div>
       <p class="article-summary">
-        {{ article.summary }}
+        {{ truncatedSummary }}
       </p>
       <!-- 默认插槽 -->
       <!-- <slot>
-        <p v-if="article.description" class="article-description">
-          {{ article.description }}
+        <p v-if="article.content" class="article-description">
+          {{ article.content }}
         </p>
       </slot> -->
     </div>
@@ -70,6 +73,7 @@
 import { computed } from 'vue'
 import { faComment } from '@fortawesome/free-regular-svg-icons'
 import type { Article, ArticleCardProps } from '@/types/article'
+import { DEFAULT_COLOR } from '@/utils/constant';
 
 // 接收props并设置默认值
 const props = withDefaults(defineProps<ArticleCardProps>(), {
@@ -78,7 +82,7 @@ const props = withDefaults(defineProps<ArticleCardProps>(), {
   showTime: true,
   showTags: true,
   maxTags: 3,
-  maxLength: 150,
+  maxLength: 200,
   customClass: '',
   isFeatured: false,
   categoryColors: () => ({
@@ -102,7 +106,11 @@ const emit = defineEmits<{
 
 // 计算属性
 const categoryColor = computed(() => {
-  return props.categoryColors[props.article.category!.name] || '#059669'
+  let color = props.article.category!.color
+  if (color) return color
+  color = props.categoryColors[props.article.category!.name]
+  if (color) return color
+  return DEFAULT_COLOR[Math.floor(Math.random() * DEFAULT_COLOR.length)]
 })
 
 const formattedDate = computed(() => {
@@ -116,6 +124,13 @@ const truncatedSummary = computed(() => {
     return props.article.summary.slice(0, props.maxLength) + '...'
   }
   return props.article.summary
+})
+
+// computed cover URL (supports coverImage or coverThumbnail fallback)
+const coverUrl = computed(() => {
+  // some APIs may return coverThumbnail instead of coverImage
+  const a: any = props.article as any
+  return props.article.coverImage || a.coverThumbnail || ''
 })
 
 const limitedTags = computed(() => {
@@ -150,14 +165,16 @@ $breakpoint-mobile: 768px;
   padding: 1.5rem;
   background: var(--card-bg, #FFFFFF);
   border-radius: var(--radius, 8px);
-  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.1));
-  border: 1px solid var(--border-color, #E5E7EB);
+  // box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.1));
+  // border: 1px solid var(--border-color, #E5E7EB);
+  border-left: 2px solid #8b1a1a;
+  border-bottom: 1px dashed #8b1a1a;
   transition: all 0.3s ease;
 
   &:hover {
-    transform: translateY(-2px);
+    // transform: translateY(-2px);
     box-shadow: var(--shadow-hover, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
-    border-color: var(--primary-color, #059669);
+    border-color: rgba(#059669, 0.3);
   }
 
   .article-header {
@@ -214,10 +231,39 @@ $breakpoint-mobile: 768px;
     }
   }
 
-  .article-summary {
-    color: var(--text-secondary, #6B7280);
+  .article-content {
     margin-bottom: 1rem;
-    line-height: 1.7;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+
+    .cover-wrap {
+      flex: 0 0 110px;
+      width: 110px;
+      height: 72px;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+      background: var(--cover-placeholder, #f3f4f6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cover-thumb {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .article-summary {
+      flex: 1 1 auto;
+      min-height: 72px;
+      margin: 0;
+      color: var(--text-secondary, #6B7280);
+      line-height: 1.6;
+    }
   }
 
   .article-footer {
@@ -298,4 +344,23 @@ $breakpoint-mobile: 768px;
 //       gap: 1rem;
 //     }
 //   }
-// }</style>
+// }
+
+@media (max-width: 480px) {
+  .article-card {
+    .article-content {
+      flex-direction: column;
+
+      .cover-wrap {
+        width: 100%;
+        height: 160px;
+        flex: none;
+      }
+
+      .article-summary {
+        min-height: auto;
+      }
+    }
+  }
+}
+</style>

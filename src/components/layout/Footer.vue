@@ -24,18 +24,22 @@
 
       <div class="footer-right">
 
+        <div class="footer-links">
+          <template v-for="(link, idx) in navLinks" :key="link.to">
+            <a v-if="/^https?:\/\//.test(link.to)" :href="link.to" class="footer-link" target="_blank"
+              rel="noopener noreferrer">
+              {{ link.label }}
+            </a>
+            <router-link v-else :to="link.to" class="footer-link">{{ link.label }}</router-link>
+            <span v-if="idx < navLinks.length - 1" class="separator">|</span>
+          </template>
+        </div>
+
         <!-- <div class="footer-socials">
           <a v-for="s in social" :key="s.href" :href="s.href" class="social-icon" target="_blank" rel="noopener">
             <FaIcon :icon="s.icon" />
           </a>
         </div> -->
-
-        <div class="footer-links">
-          <template v-for="(link, idx) in navLinks" :key="link.to">
-            <router-link :to="link.to" class="footer-link">{{ link.label }}</router-link>
-            <span v-if="idx < navLinks.length - 1" class="separator">|</span>
-          </template>
-        </div>
 
         <el-tooltip content="回到顶部" placement="top">
           <button v-show="showBackToTop" class="back-to-top" @click="scrollToTop" aria-label="回到顶部">
@@ -56,12 +60,6 @@ import { useAppName } from '@/composables/useAppName'
 
 const userStore = useUserStore()
 
-const navLinks = [
-  { label: '关于', to: '/about' },
-  { label: '归档', to: '/archive' },
-  { label: '联系', to: '/about#contact' }
-]
-
 const social = [
   { icon: faGithub, href: 'https://github.com/' },
   { icon: faWeibo, href: 'https://weibo.com/' }
@@ -72,9 +70,20 @@ const userId = ref<number>(1)
 const icpLicense = ref<string | null>();
 const publicSecurityLicense = ref<string | null>();
 
-const { appName } = useAppName()
 const appSlogan = import.meta.env.VITE_APP_TITLE_SLOGAN || '记记录生活点滴'
+const adminUrl = import.meta.env.VITE_APP_ADMIN_URL || 'http://localhost:5173'
+const albumUrl = import.meta.env.VITE_APP_ALBUM_URL || 'http://localhost:3001'
+const noteUrl = import.meta.env.VITE_APP_NOTE_URL || 'http://localhost:3002'
+const { appName } = useAppName()
 const currentYear = new Date().getFullYear()
+
+const navLinks = [
+  { label: '关于', to: '/about' },
+  // change to your external http(s) URL when needed
+  { label: '管理', to: adminUrl },
+  { label: '相册', to: albumUrl },
+  { label: '笔记', to: noteUrl },
+]
 
 const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 

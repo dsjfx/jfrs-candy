@@ -5,10 +5,10 @@
       <h1>{{ articleTitle }}</h1>
       <!-- 搜索 -->
       <div class="articles-bar">
-          <input ref="searchInputRef" v-model="searchQuery" type="text" placeholder="搜索文章..." @input="handleSearch" />
-          <FaIcon :icon="faSearch" />
-          <button v-if="searchQuery" class="clear-btn" type="button" @click="clearSearch" aria-label="清除搜索">×</button>
-        </div>
+        <input ref="searchInputRef" v-model="searchQuery" type="text" placeholder="搜索文章..." @input="handleSearch" />
+        <FaIcon :icon="faSearch" />
+        <button v-if="searchQuery" class="clear-btn" type="button" @click="clearSearch" aria-label="清除搜索">×</button>
+      </div>
     </div>
 
     <div v-if="isLoading" class="loading-container">
@@ -36,18 +36,24 @@
 
     <!-- 文章列表 -->
     <div v-else class="articles-list">
-      <!-- 文章项 -->
-      <ArticleCard v-for="article in articles" :key="article.id" :article="article" :show-time="true" :max-tags="2"
-        @tag-click="handleTagClick" @read-more="handleReadMore" @click="handleArticleClick" />
+      <div class="articles-left"></div>
 
-      <!-- 加载更多按钮 -->
-      <!-- <div v-if="hasMore" class="load-more-container">
-        <button class="load-more-btn" :disabled="isLoadingMore" @click="loadMore">
-          <span v-if="!isLoadingMore">加载更多</span>
-          <LoadingSpinner v-else size="small" />
-        </button>
-      </div> -->
+      <!-- 文章项 -->
+      <div class="articles-center">
+        <ArticleCard v-for="article in articles" :key="article.id" :article="article" :show-time="true" :max-tags="2"
+          @tag-click="handleTagClick" @read-more="handleReadMore" @click="handleArticleClick" />
+      </div>
+
+      <div class="articles-right"></div>
     </div>
+
+    <!-- 加载更多按钮 -->
+    <!-- <div v-if="hasMore" class="load-more-container">
+      <button class="load-more-btn" :disabled="isLoadingMore" @click="loadMore">
+        <span v-if="!isLoadingMore">加载更多</span>
+        <LoadingSpinner v-else size="small" />
+      </button>
+    </div> -->
 
     <!-- 搜索提示 + 分页控件 -->
     <div v-if="!isLoading && !isEmpty" class="pagination-row">
@@ -65,9 +71,9 @@
         <button class="tag" @click="clearSearch">{{ searchQuery }} ×</button>
       </div>
 
-      <Paging :current="current" :page-size="pageSize" :total="pageData.pagination.total" :showIcons="true"
-        :showText="true" :showPageSize="false" :showInfo="false" :showJump="false" :pageSizeOptions="[5, 10, 20, 50]"
-        @page-change="handlePageChange" @page-size-change="handlePageSizeChange" />
+      <Paging class="paging" :current="current" :page-size="pageSize" :total="pageData.pagination.total"
+        :showIcons="true" :showText="true" :showPageSize="false" :showInfo="false" :showJump="false"
+        :pageSizeOptions="[5, 10, 20, 50]" @page-change="handlePageChange" @page-size-change="handlePageSizeChange" />
     </div>
 
     <!-- 底部信息 -->
@@ -84,7 +90,6 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons'
 import ArticleCard from '@/components/articles/ArticleCard.vue'
 import ErrorDisplay from '@/components/core/ErrorDisplay.vue'
 import EmptyState from '@/components/core/EmptyState.vue'
-import ArticleSkeleton from '@/components/core/ArticleSkeleton.vue'
 import LoadingSpinner from '@/components/core/LoadingSpinner.vue'
 import Paging from '../../components/page/Paging.vue'
 import type { Article } from '@/types/article'
@@ -296,16 +301,25 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
+$breakpoint-tablet: 1024px;
 $breakpoint-mobile: 768px;
 
 // 主要内容区域
 .article-container {
-  max-width: 1400px;
+  width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
   flex: 1;
 
+  @media (max-width: $breakpoint-tablet) {
+    width: 100%;
+    padding: 15px;
+  }
+
   @media (max-width: $breakpoint-mobile) {
+    width: 100%;
     padding: 10px;
   }
 }
@@ -342,7 +356,8 @@ $breakpoint-mobile: 768px;
       width: 100%;
       padding: 0.8rem 1rem 0.8rem 2.5rem;
       font-size: 1rem;
-      border: 2px solid rgba(5,150,105,0.12); /* normal subtle green */
+      border: 2px solid rgba(5, 150, 105, 0.12);
+      /* normal subtle green */
       border-radius: 25px;
       outline: none;
       transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
@@ -355,12 +370,13 @@ $breakpoint-mobile: 768px;
       }
 
       &:hover {
-        border-color: rgba(var(--accent-color-rgb, 5,150,105), 0.28); /* stronger green on hover */
+        border-color: rgba(var(--accent-color-rgb, 5, 150, 105), 0.28);
+        /* stronger green on hover */
       }
 
       &:focus {
         border-color: var(--accent-color);
-        box-shadow: 0 6px 18px rgba(var(--accent-color-rgb, 5,150,105), 0.10);
+        box-shadow: 0 6px 18px rgba(var(--accent-color-rgb, 5, 150, 105), 0.10);
         transform: translateY(-1px);
       }
 
@@ -374,7 +390,8 @@ $breakpoint-mobile: 768px;
       left: 1rem;
       top: 50%;
       transform: translateY(-50%);
-      color: #7f8c8d; /* default icon color */
+      color: #7f8c8d;
+      /* default icon color */
       cursor: pointer;
 
       @media (max-width: $breakpoint-mobile) {
@@ -405,13 +422,13 @@ $breakpoint-mobile: 768px;
 
     .clear-btn:hover,
     .clear-bt:hover {
-      background: rgba(var(--accent-color-rgb, 5,150,105), 0.08);
+      background: rgba(var(--accent-color-rgb, 5, 150, 105), 0.08);
       color: var(--accent-color);
     }
 
     /* icon color on hover/focus */
     &:hover svg,
-    input:focus ~ svg {
+    input:focus~svg {
       color: var(--accent-color);
       transform: translateY(-50%) scale(1.05);
     }
@@ -475,16 +492,47 @@ $breakpoint-mobile: 768px;
 }
 
 .articles-list {
-  margin-top: 40px;
-  display: flex;
-  flex-direction: column;
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 100px 1fr 100px;
   gap: 1.5rem;
+
+  .articles-center {
+    display: flex;
+    flex-direction: column;
+    gap: 5rem;
+  }
 }
 
 .load-more-container {
   margin-top: 40px;
   text-align: center;
   padding: 20px;
+
+  .load-more-btn {
+    padding: 12px 32px;
+    background: #059669;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    min-height: 48px;
+
+    &:hover:not(:disabled) {
+      background: #047857;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    }
+
+    &:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+  }
 }
 
 .pagination-row {
@@ -493,68 +541,47 @@ $breakpoint-mobile: 768px;
   justify-content: space-between;
   gap: 12px;
   margin-top: 24px;
-}
 
-.search-pill {
-  background: rgba(0, 0, 0, 0.03);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.95rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  .pill-clear {
-    background: transparent;
-    border: none;
-    color: var(--color-primary);
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 8px;
-  }
-}
-
-.search-tag {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  .tag {
-    padding: 6px 10px;
-    background: var(--color-primary);
-    color: #fff;
-    border: none;
-    border-radius: 16px;
-    cursor: pointer
+  .paging {
+    flex: 1;
   }
 
-  .tag-label {
-    color: #666
-  }
-}
+  .search-pill {
+    background: rgba(0, 0, 0, 0.03);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 
-.load-more-btn {
-  padding: 12px 32px;
-  background: #059669;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  font-size: 16px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 120px;
-  min-height: 48px;
-
-  &:hover:not(:disabled) {
-    background: #047857;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    .pill-clear {
+      background: transparent;
+      border: none;
+      color: var(--color-primary);
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
   }
 
-  &:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
+  .search-tag {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .tag {
+      padding: 6px 10px;
+      background: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      cursor: pointer
+    }
+
+    .tag-label {
+      color: #666
+    }
   }
 }
 
@@ -568,30 +595,5 @@ $breakpoint-mobile: 768px;
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-
-  .blog-header {
-    padding: 1.5rem 0;
-
-    .blog-title {
-      font-size: 2rem;
-    }
-
-    .nav-menu {
-      gap: 1rem;
-    }
-  }
-
 }
-
-// @media (max-width: 480px) {
-//   .nav-menu {
-//     flex-direction: column;
-//     gap: 0.5rem;
-//   }
-
-//   .article-meta {
-//     flex-direction: column;
-//     align-items: flex-start;
-//     gap: 0.5rem;
-//   }
-// }</style>
+</style>

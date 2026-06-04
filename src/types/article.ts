@@ -12,8 +12,8 @@ export interface Article {
 
   // 操作属性
   views?: number | 0
-  likes?: number | 0
-  dislikes?: number | 0
+  likeCount?: number | 0
+  dislikeCount?: number | 0
   comments?: number | 0
 
   // 关联属性
@@ -103,6 +103,7 @@ export interface Tag {
   }
 }
 
+// 归档
 export interface ArchivePost {
   id: number;
   title: string;
