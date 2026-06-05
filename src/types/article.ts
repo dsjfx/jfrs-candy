@@ -16,6 +16,9 @@ export interface Article {
   dislikeCount?: number | 0
   comments?: number | 0
 
+  likes?: number[] | []
+  dislikes?: number[] | []
+
   // 关联属性
   category: Category | null
   tags?: Tag[]

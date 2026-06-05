@@ -239,6 +239,7 @@ const loadHomeArticles = async (search?: string) => {
       const randomRecord = records[idx]
       if (randomRecord) {
         heroArticle.value = randomRecord
+        heroArticle.value.likeCount = randomRecord.likes?.length
         wordCount.value = getDisplayWordCount(heroArticle.value.content || '')
         readTime.value = getReadTimeMedium(heroArticle.value.content || '', 300)
         tags.value = heroArticle.value.tags || []
@@ -359,7 +360,7 @@ $radius: $radius-sm;
       // hover state
       &:hover input {
         border-color: rgba(5, 150, 105, 0.22);
-        transform: translateY(-1px);
+        // transform: translateY(-1px);
       }
 
       // focus state
@@ -386,9 +387,9 @@ $radius: $radius-sm;
         /* keep clicks on input */
       }
 
-      // icon color changes on hover/focus
+      // icon color changes when the wrapper is hovered or any child has focus
       &:hover svg,
-      input:focus+svg {
+      &:focus-within svg {
         color: var(--accent-color);
         transform: translateY(-50%) scale(1.06);
       }
