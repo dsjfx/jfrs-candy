@@ -5,7 +5,7 @@ import ResponseFactory from '@/utils/responseFactory'
 import { accessUrl } from '@/utils/cabinet'
 
 function makeUrl(url: string = '') {
-  return accessUrl('C', url)
+  return accessUrl('CO', url)
 }
 
 // 获取评论列表

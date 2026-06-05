@@ -21,7 +21,7 @@ export async function markdownToHtml(markdown: string, options?: Config): Promis
 // 统计文字数量（不包括 HTML 标签）
 export function getDisplayWordCount(htmlContent: string): number {
   const plainText = getPlainText(htmlContent);
-    
+
   // 普通展示用这个就够了
   return plainText.length;
 }
@@ -38,25 +38,25 @@ export function getReadTimeMedium(htmlContent: string, wpm: number): string {
   // 1. 基础字数
   const plainText = getPlainText(htmlContent);
   let adjustedWordCount = plainText.length;
-  
+
   // 2. 图片调整（每张图 +10 秒 ≈ 50 字视觉开销）
   const imageCount = (htmlContent.match(/<img/g) || []).length;
   adjustedWordCount += imageCount * 50;
-  
+
   // 3. 代码块调整（用户会放慢）
   const codeCount = (htmlContent.match(/<pre>/g) || []).length;
   adjustedWordCount += codeCount * 80;
-  
+
   // 4. 标题调整（小标题帮助加快阅读，减少计数）
   const headingCount = (htmlContent.match(/<h[2-3]>/g) || []).length;
   adjustedWordCount -= headingCount * 20;
-  
+
   // 5. 计算分钟数
   let minutes = Math.ceil(adjustedWordCount / wpm);
-  
+
   // 6. 人性化边界
   minutes = Math.max(1, Math.min(minutes, 60)); // 最多 1 小时
-  
+
   return formatReadTime(minutes || 0);
 }
 
@@ -123,9 +123,9 @@ export const formatDate2 = (dateStr: string) => {
 }
 
 const MAP_URL: Record<string, string> = {
-  'A': '/jdmk/blog',
-  'C': '/jdmk/comment',
-  'U': '/jdmk/auth',
+  'BL': '/blog',
+  'CO': '/comment',
+  'AU': '/auth',
 }
 
 export function accessUrl(code: string, url: string) {

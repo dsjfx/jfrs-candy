@@ -6,7 +6,7 @@ import ResponseFactory from "@/utils/responseFactory"
 
 
 function makeUrl(url: string) {
-  return accessUrl('U', url)
+  return accessUrl('AU', url)
 }
 
 // export function loginApi(username: string, password: string) {

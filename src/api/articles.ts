@@ -6,7 +6,7 @@ import ResponseFactory from '@/utils/responseFactory'
 import { accessUrl } from '@/utils/cabinet'
 
 function makeUrl(url: string) {
-  return accessUrl('A', url)
+  return accessUrl('BL', url)
 }
 
 // 获取文章列表
