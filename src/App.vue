@@ -10,15 +10,26 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useRouter } from 'vue-router';
+import { useAppName } from './composables/useAppName';
 // import { useUserStore } from '@/stores/user'
 
+const router = useRouter();
 // const userStore = useUserStore()
 
 onMounted(() => {
+  const { appName } = useAppName();
+
   // 初始化用户信息
   // if (userStore.token) {
   //   // 可以在这里添加 token 刷新逻辑
   // }
+
+  // 全局后置钩子
+  router.afterEach((to, _from) => {
+    // 标题
+    document.title = appName.value || '默认标题'
+  })
 })
 </script>
 

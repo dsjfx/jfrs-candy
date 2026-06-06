@@ -387,7 +387,7 @@ $breakpoint-mobile: 768px;
 
     .title-divider {
       color: var(--color-deputy);
-      margin: 0 1px;
+      margin: 0 2px;
       font-weight: 800;
     }
 
