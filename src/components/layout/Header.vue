@@ -5,7 +5,15 @@
         <div class="logo" @click="router.push('/')">
           <el-avatar :src="avatar" size="default" />
           <h1 class="site-title">
-            {{ appName }}
+            <span v-if="appNameParts.hasMaster" class="title-master">
+              {{ appNameParts.master }}
+            </span>
+            <span v-if="appNameParts.hasMaster && appNameParts.hasSlave" class="title-divider">
+              ·
+            </span>
+            <span v-if="appNameParts.hasSlave" class="title-slave">
+              {{ appNameParts.slave }}
+            </span>
           </h1>
         </div>
 
@@ -137,13 +145,13 @@ import { faGithub, faWeibo, faQq } from '@fortawesome/free-brands-svg-icons'
 import { userApi } from '@/api'
 import { useThemeStore } from '@/stores'
 import { useUserStore } from '@/stores/user'
-import { useAppName } from '@/composables/useAppName'
+import { useAppNameStruct } from '@/composables/useAppName'
 
 const router = useRouter()
 const themeStore = useThemeStore()
 const userStore = useUserStore()
 
-const { appName } = useAppName()
+const { appNameParts } = useAppNameStruct()
 const appSlogan = import.meta.env.VITE_APP_TITLE_SLOGAN || '记记录生活点滴'
 
 // avatar url
@@ -373,17 +381,17 @@ $breakpoint-mobile: 768px;
       font-size: 1.5rem;
     }
 
-    .title-candy {
+    .title-master {
       color: var(--color-primary)
     }
 
     .title-divider {
       color: var(--color-deputy);
-      margin: 0 8px;
+      margin: 0 1px;
       font-weight: 800;
     }
 
-    .title-diary {
+    .title-slave {
       color: var(--color-secondary);
     }
   }
