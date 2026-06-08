@@ -99,10 +99,12 @@
           <!-- 文章内容 -->
           <article class="article-content" ref="contentRef">
             <!-- 使用 v-html 或 markdown 渲染 -->
-            <div class="content-html" v-html="article.content"></div>
+            <!-- <div class="content-html" v-html="article.content"></div> -->
 
             <!-- 或者使用 markdown 组件 -->
             <!-- <MarkdownRenderer :content="article.content" /> -->
+
+            <SafeHtmlRenderer :html="article?.content" ref="contentRef" />
 
           </article>
 
@@ -283,6 +285,7 @@ import RelatedArticleCard from '@/components/articles/RelatedArticleCard.vue'
 import CommentForm from '@/components/articles/CommentForm.vue'
 import CommentItem from '@/components/articles/CommentItem.vue'
 import ShareMenu from '@/components/articles/ShareMenu.vue'
+import SafeHtmlRenderer from '@/components/core/SafeHtmlRenderer.vue'
 import { useUserStore } from '@/stores/user'
 import { useArticleStore } from '@/stores/article'
 import { useCommentStore } from '@/stores/comment'
@@ -975,143 +978,143 @@ $breakpoint-mobile: 768px;
 }
 
 // 文章内容
-.article-content {
-  overflow-x: auto;
-  font-size: 1.1rem;
-  line-height: 1.8;
-  color: $text-primary;
+// .article-content {
+//   overflow-x: auto;
+//   font-size: 1.1rem;
+//   line-height: 1.8;
+//   color: $text-primary;
 
-  :deep() {
+//   :deep() {
 
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      color: $text-primary;
-      margin-top: 2rem;
-      margin-bottom: 1rem;
-      font-weight: 600;
-      scroll-margin-top: 80px;
-    }
+//     h1,
+//     h2,
+//     h3,
+//     h4,
+//     h5,
+//     h6 {
+//       color: $text-primary;
+//       margin-top: 2rem;
+//       margin-bottom: 1rem;
+//       font-weight: 600;
+//       scroll-margin-top: 80px;
+//     }
 
-    h1 {
-      font-size: 1.8rem;
-    }
+//     h1 {
+//       font-size: 1.8rem;
+//     }
 
-    h2 {
-      font-size: 1.6rem;
-      // border-bottom: 2px solid $primary-light;
-      padding-bottom: 0.5rem;
-    }
+//     h2 {
+//       font-size: 1.6rem;
+//       // border-bottom: 2px solid $primary-light;
+//       padding-bottom: 0.5rem;
+//     }
 
-    h3 {
-      font-size: 1.4rem;
-    }
+//     h3 {
+//       font-size: 1.4rem;
+//     }
 
-    h4 {
-      font-size: 1.2rem;
-    }
+//     h4 {
+//       font-size: 1.2rem;
+//     }
 
-    p {
-      margin-bottom: 1.5rem;
-    }
+//     p {
+//       margin-bottom: 1.5rem;
+//     }
 
-    a {
-      color: $primary-color;
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-      transition: all 0.3s ease;
+//     a {
+//       color: $primary-color;
+//       text-decoration: none;
+//       border-bottom: 1px solid transparent;
+//       transition: all 0.3s ease;
 
-      &:hover {
-        border-bottom-color: $primary-color;
-      }
-    }
+//       &:hover {
+//         border-bottom-color: $primary-color;
+//       }
+//     }
 
-    img {
-      max-width: 100%;
-      height: auto;
-      border-radius: $radius;
-      margin: 1.5rem 0;
-      box-shadow: $shadow;
-    }
+//     img {
+//       max-width: 100%;
+//       height: auto;
+//       border-radius: $radius;
+//       margin: 1.5rem 0;
+//       box-shadow: $shadow;
+//     }
 
-    blockquote {
-      border-left: 4px solid $primary-color;
-      margin: 1.5rem 0;
-      padding: 1rem 1.5rem;
-      background: rgba($primary-color, 0.05);
-      border-radius: 0 $radius $radius 0;
-      color: $text-secondary;
+//     blockquote {
+//       border-left: 4px solid $primary-color;
+//       margin: 1.5rem 0;
+//       padding: 1rem 1.5rem;
+//       background: rgba($primary-color, 0.05);
+//       border-radius: 0 $radius $radius 0;
+//       color: $text-secondary;
 
-      p {
-        margin: 0;
-      }
-    }
+//       p {
+//         margin: 0;
+//       }
+//     }
 
-    code {
-      background: rgba($primary-color, 0.1);
-      padding: 0.2rem 0.4rem;
-      border-radius: 4px;
-      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-      font-size: 0.9em;
-      color: $primary-dark;
-    }
+//     code {
+//       background: rgba($primary-color, 0.1);
+//       padding: 0.2rem 0.4rem;
+//       border-radius: 4px;
+//       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+//       font-size: 0.9em;
+//       color: $primary-dark;
+//     }
 
-    pre {
-      background: #2d2d2d;
-      color: #fff;
-      padding: 1.5rem;
-      border-radius: $radius;
-      overflow-x: auto;
-      margin: 1.5rem 0;
+//     pre {
+//       background: #2d2d2d;
+//       color: #fff;
+//       padding: 1.5rem;
+//       border-radius: $radius;
+//       overflow-x: auto;
+//       margin: 1.5rem 0;
 
-      code {
-        background: none;
-        padding: 0;
-        color: inherit;
-      }
-    }
+//       code {
+//         background: none;
+//         padding: 0;
+//         color: inherit;
+//       }
+//     }
 
-    ul,
-    ol {
-      margin: 1.5rem 0;
-      padding-left: 1.5rem;
+//     ul,
+//     ol {
+//       margin: 1.5rem 0;
+//       padding-left: 1.5rem;
 
-      li {
-        margin-bottom: 0.5rem;
+//       li {
+//         margin-bottom: 0.5rem;
 
-        &::marker {
-          color: $primary-color;
-        }
-      }
-    }
+//         &::marker {
+//           color: $primary-color;
+//         }
+//       }
+//     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1.5rem 0;
+//     table {
+//       width: 100%;
+//       border-collapse: collapse;
+//       margin: 1.5rem 0;
 
-      th,
-      td {
-        padding: 0.75rem 1rem;
-        border: 1px solid $border-color;
-        text-align: left;
-      }
+//       th,
+//       td {
+//         padding: 0.75rem 1rem;
+//         border: 1px solid $border-color;
+//         text-align: left;
+//       }
 
-      th {
-        background: rgba($primary-color, 0.1);
-        font-weight: 600;
-        color: $text-primary;
-      }
+//       th {
+//         background: rgba($primary-color, 0.1);
+//         font-weight: 600;
+//         color: $text-primary;
+//       }
 
-      tr:nth-child(even) {
-        background: $bg-color;
-      }
-    }
-  }
-}
+//       tr:nth-child(even) {
+//         background: $bg-color;
+//       }
+//     }
+//   }
+// }
 
 // 文章脚部
 .article-footer {

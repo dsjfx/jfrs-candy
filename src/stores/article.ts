@@ -81,20 +81,25 @@ export const useArticleStore = defineStore('article', () => {
     {
       current?: number;
       size?: number;
-      search?: string
+      search?: string;
+      status?: string;
     } =
     {
       current: 1,
-      size: 10
+      size: 10,
+      status: 'published',
     }
   ) => {
     const current: number = payload.current ?? 1
     const size: number = payload.size ?? 10
     const search: string | undefined = payload.search
+    const status: string | undefined = payload.status || 'published'
 
     try {
       const params: any = { current, size }
       if (search) params.search = search
+      if (status) params.status = status
+
       const data = await articleApi.getArticles(params)
 
       if (data && data.data) {
