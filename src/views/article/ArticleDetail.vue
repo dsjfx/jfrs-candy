@@ -104,7 +104,8 @@
             <!-- 或者使用 markdown 组件 -->
             <!-- <MarkdownRenderer :content="article.content" /> -->
 
-            <SafeHtmlRenderer :html="article?.content" ref="contentRef" />
+            <!-- <SafeHtmlRenderer :html="article?.content" ref="contentRef" /> -->
+            <SafeHtmlPrism :html="article?.content" ref="contentRef" />
 
           </article>
 
@@ -286,6 +287,7 @@ import CommentForm from '@/components/articles/CommentForm.vue'
 import CommentItem from '@/components/articles/CommentItem.vue'
 import ShareMenu from '@/components/articles/ShareMenu.vue'
 import SafeHtmlRenderer from '@/components/core/SafeHtmlRenderer.vue'
+import SafeHtmlPrism from '@/components/core/SafeHtmlPrism.vue'
 import { useUserStore } from '@/stores/user'
 import { useArticleStore } from '@/stores/article'
 import { useCommentStore } from '@/stores/comment'

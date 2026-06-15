@@ -1,37 +1,213 @@
 <template>
-  <div ref="root" class="content-html" v-html="sanitizedHtml"></div>
+  <div ref="contentRef" class="content-html" v-html="sanitizedHtml"></div>
 </template>
 
-<script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+<script setup>
+import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import DOMPurify from 'dompurify'
+import Prism from 'prismjs'
+import 'prismjs/themes/prism-tomorrow.css'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-typescript'
+import 'prismjs/components/prism-markup'
+import 'prismjs/components/prism-css'
 
-const props = defineProps<{ html: string }>()
-
-const root = ref<HTMLElement | null>(null)
-
-const sanitizedHtml = computed(() => {
-  try {
-    return DOMPurify.sanitize(props.html || '', { SAFE_FOR_TEMPLATES: true })
-  } catch (e) {
-    // fallback: escape angle brackets
-    return (props.html || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+const props = defineProps({
+  html: {
+    type: String,
+    required: false,
+    default: '',
+  },
+  // 是否自动高亮
+  autoHighlight: {
+    type: Boolean,
+    default: true
+  },
+  // DOMPurify 配置
+  purifyConfig: {
+    type: Object,
+    default: () => ({})
   }
 })
 
-// ensure re-render on html change
-watch(() => props.html, () => {
-  // computed handles value change; keep this watcher so parent can access root via ref
+const contentRef = ref(null)
+
+// DOMPurify 配置（允许代码高亮需要的属性和标签）
+const defaultPurifyConfig = {
+  ALLOWED_TAGS: [
+    'div', 'p', 'br', 'span', 'pre', 'code',
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li', 'a', 'img', 'table',
+    'thead', 'tbody', 'tr', 'td', 'th',
+    'strong', 'em', 'b', 'i', 'blockquote'
+  ],
+  ALLOWED_ATTR: [
+    'class', 'id', 'href', 'src', 'alt', 'title',
+    'target', 'rel', 'data-*'
+  ],
+  // 允许代码块的语言类
+  ALLOWED_CLASSES: [
+    'language-*', 'line-numbers', 'highlight'
+  ],
+  // 允许代码内容中的特殊字符（避免转义 $）
+  ALLOW_UNKNOWN_PROTOCOLS: false,
+  // 自定义钩子：保护模板字符串
+  hooks: {
+    afterSanitizeAttributes: (node) => {
+      if (node.nodeName === 'CODE' || node.nodeName === 'PRE') {
+        // 保护 code 标签内的内容不被过度转义
+        return node
+      }
+    }
+  }
+}
+
+// 合并配置
+const sanitizeConfig = {
+  ...defaultPurifyConfig,
+  ...props.purifyConfig
+}
+
+// 净化 HTML
+const sanitizedHtml = computed(() => {
+  if (!props.html) return ''
+
+  // 预处理：临时替换模板字符串中的 ${} 避免被破坏
+  let processedHtml = props.html
+  const placeholders = []
+
+  // 保护模板字符串中的变量
+  processedHtml = processedHtml.replace(/\$\{([^}]+)\}/g, (match) => {
+    const placeholder = `__TEMPLATE_PLACEHOLDER_${placeholders.length}__`
+    placeholders.push({ placeholder, original: match })
+    return placeholder
+  })
+
+  // 净化 HTML
+  let cleanHtml = DOMPurify.sanitize(processedHtml, sanitizeConfig)
+
+  // 恢复模板字符串
+  placeholders.forEach(({ placeholder, original }) => {
+    cleanHtml = cleanHtml.replace(placeholder, original)
+  })
+
+  return cleanHtml
 })
 
-// expose inner root so parent components can query its DOM for headings
-defineExpose({ root })
+// 高亮代码块
+const highlightCodeBlocks = () => {
+  if (!contentRef.value || !props.autoHighlight) return
+
+  const codeBlocks = contentRef.value.querySelectorAll('pre code')
+  codeBlocks.forEach((block) => {
+    try {
+      // 如果已经有高亮标记，跳过
+      if (block.getAttribute('data-highlighted')) return
+
+      // 获取语言类型
+      let language = 'javascript'
+      const classList = block.className.split(' ')
+      for (const cls of classList) {
+        if (cls.startsWith('language-')) {
+          language = cls.replace('language-', '')
+          break
+        }
+      }
+
+      // 获取原始代码（保留模板字符串格式）
+      const originalCode = block.textContent
+
+      // 执行高亮
+      const grammar = Prism.languages[language] || Prism.languages.javascript
+      const highlighted = Prism.highlight(originalCode, grammar, language)
+
+      // 替换内容并标记已高亮
+      block.innerHTML = highlighted
+      block.setAttribute('data-highlighted', 'true')
+
+      // 添加复制按钮（可选）
+      addCopyButton(block)
+    } catch (error) {
+      console.warn('代码高亮失败:', error)
+      // 降级：显示原始代码
+      block.textContent = block.textContent
+    }
+  })
+}
+
+// 添加复制按钮功能
+const addCopyButton = (codeBlock) => {
+  const pre = codeBlock.parentElement
+  if (pre && !pre.querySelector('.copy-button')) {
+    const button = document.createElement('button')
+    button.className = 'copy-button'
+    button.textContent = '复制'
+    button.onclick = async () => {
+      try {
+        const code = codeBlock.textContent
+        await navigator.clipboard.writeText(code)
+        button.textContent = '已复制！'
+        setTimeout(() => {
+          button.textContent = '复制'
+        }, 2000)
+      } catch (err) {
+        console.error('复制失败:', err)
+      }
+    }
+    pre.style.position = 'relative'
+    button.style.position = 'absolute'
+    button.style.top = '8px'
+    button.style.right = '8px'
+    pre.appendChild(button)
+  }
+}
+
+// 观察 DOM 变化（处理动态内容）
+const setupMutationObserver = () => {
+  if (!contentRef.value) return
+
+  const observer = new MutationObserver((mutations) => {
+    let shouldHighlight = false
+    mutations.forEach((mutation) => {
+      if (mutation.type === 'childList' && mutation.addedNodes.length) {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === 1) { // Element node
+            if (node.matches?.('pre code') || node.querySelector?.('pre code')) {
+              shouldHighlight = true
+            }
+          }
+        })
+      }
+    })
+
+    if (shouldHighlight) {
+      setTimeout(() => highlightCodeBlocks(), 0)
+    }
+  })
+
+  observer.observe(contentRef.value, {
+    childList: true,
+    subtree: true
+  })
+
+  return observer
+}
+
+// 监听 HTML 变化重新高亮
+watch(() => props.html, async () => {
+  await nextTick()
+  highlightCodeBlocks()
+}, { deep: true })
+
+// 初始化
+onMounted(async () => {
+  await nextTick()
+  highlightCodeBlocks()
+  setupMutationObserver()
+})
 </script>
 
 <style scoped lang="scss">
-/* the component itself is unstyled; it inherits styles from parent */
-
-/* 2026-06-08 now add itself's style for reuse  */
 $breakpoint-tablet: 1024px;
 $breakpoint-mobile: 768px;
 $bg-color: $base-bg-j3;

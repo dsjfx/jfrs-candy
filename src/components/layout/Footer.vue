@@ -13,12 +13,17 @@
           </span>
         </div>
         <div class="footer-beian">
-          <a v-if="icpLicense" href="https://beian.miit.gov.cn/" target="_blank">
-            {{ icpLicense }}
-          </a>
-          <a v-if="publicSecurityLicense" href="http://www.beian.gov.cn/" target="_blank">
-            {{ publicSecurityLicense }}
-          </a>
+          <span class="footer-beian-icp">
+            <a v-if="icpLicense" :href="icpUrl" target="_blank">
+              {{ icpLicense }}
+            </a>
+          </span>
+          <span class="footer-beian-mps">
+            <img class="mps" src="@/assets/img/logo-mps.png" alt="mps" />
+            <a v-if="publicSecurityLicense" :href="mpsUrl" target="_blank">
+              {{ publicSecurityLicense }}
+            </a>
+          </span>
         </div>
       </div>
 
@@ -67,8 +72,10 @@ const social = [
 
 const showBackToTop = ref(false)
 const userId = ref<number>(1)
-const icpLicense = ref<string | null>();
-const publicSecurityLicense = ref<string | null>();
+const icpLicense = ref<string | null>('苏ICP备2026029057号-1');
+const icpUrl = ref<string | ''>('https://beian.miit.gov.cn/');
+const publicSecurityLicense = ref<string | null>('苏公网安备32040002010730号');
+const mpsUrl = ref<string | ''>('https://beian.mps.gov.cn/#/query/webSearch?code=32040002010730')
 
 const appSlogan = import.meta.env.VITE_APP_TITLE_SLOGAN || '记记录生活点滴'
 const adminUrl = import.meta.env.VITE_APP_ADMIN_URL || 'http://localhost:5173'
@@ -91,25 +98,26 @@ const handleScroll = () => {
   showBackToTop.value = window.scrollY > 300
 }
 
-const fetchSimpleUser = async () => {
-  try {
-    await userStore.getSimpleUser({})
-    let simpleUser = userStore.simpleUser
-    if (simpleUser?.icpLicense) {
-      icpLicense.value = simpleUser.icpLicense
-    }
-    if (simpleUser?.publicSecurityLicense) {
-      publicSecurityLicense.value = simpleUser.publicSecurityLicense
-    }
-  } catch (error) {
-    console.log(error)
-  }
-}
+// const fetchSimpleUser = async () => {
+//   try {
+//     await userStore.getSimpleUser({})
+//     let simpleUser = userStore.simpleUser
+//     if (simpleUser?.icpLicense) {
+//       icpLicense.value = simpleUser.icpLicense
+//     }
+//     if (simpleUser?.publicSecurityLicense) {
+//       publicSecurityLicense.value = simpleUser.publicSecurityLicense
+//     }
+//   } catch (error) {
+//     console.log(error)
+//   }
+// }
 
 onMounted(async () => {
-  await fetchSimpleUser()
+  // await fetchSimpleUser()
 
   window.addEventListener('scroll', handleScroll, { passive: true })
+
   // initialize
   handleScroll()
 })
@@ -154,6 +162,7 @@ $breakpoint-mobile: 768px;
   .footer-copyright {
     display: flex;
     justify-content: center;
+    align-items: center;
     color: var(--color-text-secondary);
     font-size: 0.875rem;
 
@@ -183,6 +192,28 @@ $breakpoint-mobile: 768px;
 
       &:hover {
         color: var(--text-hover);
+      }
+    }
+
+    .footer-beian-icp {
+      margin-left: 0;
+    }
+
+    .footer-beian-mps {
+      margin-left: 20px;
+
+      img {
+        vertical-align: middle;
+      }
+
+      a {
+        vertical-align: middle;
+      }
+
+      .mps {
+        width: 16px;
+        height: 17px;
+        margin-right: 5px;
       }
     }
   }

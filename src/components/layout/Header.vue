@@ -17,7 +17,7 @@
           </h1>
         </div>
 
-        <img class="slogan artistic" src="@/assets/img/slogan1.png" alt="slogan" />
+        <img class="slogan artistic" src="@/assets/img/slogan.png" alt="slogan" />
 
         <nav class="nav">
           <ul class="nav-list">
