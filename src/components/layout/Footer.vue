@@ -20,10 +20,10 @@
           </span>
           <span class="footer-beian-mps">
             <img class="mps" src="@/assets/img/logo-mps.png" alt="mps" />
-            <a v-if="publicSecurityLicense" :href="mpsUrl" target="_blank">
+            <a v-if="publicSecurityLicense && isDaily" :href="mpsUrl" target="_blank">
               {{ publicSecurityLicense }}
             </a>
-            <a v-if="publicSecurityLicense2" :href="mpsUrl2" target="_blank">
+            <a v-if="publicSecurityLicense2 && isNote" :href="mpsUrl2" target="_blank">
               {{ publicSecurityLicense2 }}
             </a>
           </span>
