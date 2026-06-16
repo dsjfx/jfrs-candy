@@ -18,7 +18,7 @@
         </div>
 
         <img v-if="isDaily" class="slogan artistic" src="@/assets/img/slogan.png" alt="slogan" />
-        <div v-if="isNote" class="slogan artistic">{{ appSlogan }}</div>
+        <div v-if="isNote" class="slogan artistic2">{{ appSlogan }}</div>
 
         <nav class="nav">
           <ul class="nav-list">
@@ -415,9 +415,18 @@ $breakpoint-mobile: 768px;
     transform: rotate(1deg);
     display: inline-block;
     margin-left: 8px;
-    font-family: '华文行楷', 'Georgia', 'Times New Roman', serif;
+    font-family: '华文中宋', 'Georgia', 'Times New Roman', serif;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.04), 2px 2px 6px rgba(0, 0, 0, 0.06);
     // color: var(--color-primary);
+  }
+
+  &.artistic2 {
+    transform: rotate(-2deg);
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 20px;
+    font-family: '华文中宋', 'Georgia', 'Times New Roman', serif;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.04), 2px 2px 6px rgba(0, 0, 0, 0.06);
   }
 }
 
