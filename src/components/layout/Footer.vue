@@ -23,13 +23,16 @@
             <a v-if="publicSecurityLicense" :href="mpsUrl" target="_blank">
               {{ publicSecurityLicense }}
             </a>
+            <a v-if="publicSecurityLicense2" :href="mpsUrl2" target="_blank">
+              {{ publicSecurityLicense2 }}
+            </a>
           </span>
         </div>
       </div>
 
       <div class="footer-right">
 
-        <div class="footer-links">
+        <div v-if="isDaily" class="footer-links">
           <template v-for="(link, idx) in navLinks" :key="link.to">
             <a v-if="/^https?:\/\//.test(link.to)" :href="link.to" class="footer-link" target="_blank"
               rel="noopener noreferrer">
@@ -40,11 +43,14 @@
           </template>
         </div>
 
-        <!-- <div class="footer-socials">
-          <a v-for="s in social" :key="s.href" :href="s.href" class="social-icon" target="_blank" rel="noopener">
-            <FaIcon :icon="s.icon" />
-          </a>
-        </div> -->
+        <div v-if="isNote" class="footer-socials">
+          <template v-for="(s, idx) in social" :key="s.href">
+            <a :href="s.href" class="social-icon" target="_blank" rel="noopener">
+              <FaIcon :icon="s.icon" />
+            </a>
+            <span v-if="idx < social.length - 1" class="separator">|</span>
+          </template>
+        </div>
 
         <el-tooltip content="回到顶部" placement="top">
           <button v-show="showBackToTop" class="back-to-top" @click="scrollToTop" aria-label="回到顶部">
@@ -62,6 +68,7 @@ import { faArrowUp } from '@fortawesome/free-solid-svg-icons'
 import { faGithub, faWeibo } from '@fortawesome/free-brands-svg-icons'
 import { useUserStore } from '@/stores/user'
 import { useAppName } from '@/composables/useAppName'
+import { isDaily, isNote } from '@/utils/cabinet'
 
 const userStore = useUserStore()
 
@@ -76,6 +83,8 @@ const icpLicense = ref<string | null>('苏ICP备2026029057号-1');
 const icpUrl = ref<string | ''>('https://beian.miit.gov.cn/');
 const publicSecurityLicense = ref<string | null>('苏公网安备32040002010730号');
 const mpsUrl = ref<string | ''>('https://beian.mps.gov.cn/#/query/webSearch?code=32040002010730')
+const publicSecurityLicense2 = ref<string | null>(null)
+const mpsUrl2 = ref<string | ''>();
 
 const appSlogan = import.meta.env.VITE_APP_TITLE_SLOGAN || '记记录生活点滴'
 const adminUrl = import.meta.env.VITE_APP_ADMIN_URL || 'http://localhost:5173'

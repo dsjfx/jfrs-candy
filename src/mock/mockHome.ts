@@ -68,31 +68,31 @@ background: var(--bg-primary);
 
 // Additional simple mock data used by Home.vue
 export const mockLatestArticles = [
-    {
-        id: 1,
-        title: '如何保持极简主义生活与工作平衡',
-        summary: '探讨在数字时代如何简化工作流程，减少干扰...',
-        createdAt: '2023-10-15T10:00:00Z'
-    },
-    {
-        id: 2,
-        title: '现代CSS布局的实用技巧',
-        summary: 'Flexbox、Grid和容器查询的实际应用案例...',
-        createdAt: '2023-10-10T14:30:00Z'
-    },
-    {
-        id: 3,
-        title: '为什么写作是思考的最佳工具',
-        summary: '写作不仅是表达，更是理清思维的过程...',
-        createdAt: '2023-10-05T09:15:00Z'
-    }
+  {
+    id: 1,
+    title: '如何保持极简主义生活与工作平衡',
+    summary: '探讨在数字时代如何简化工作流程，减少干扰...',
+    publishedAt: '2023-10-15T10:00:00Z'
+  },
+  {
+    id: 2,
+    title: '现代CSS布局的实用技巧',
+    summary: 'Flexbox、Grid和容器查询的实际应用案例...',
+    publishedAt: '2023-10-10T14:30:00Z'
+  },
+  {
+    id: 3,
+    title: '为什么写作是思考的最佳工具',
+    summary: '写作不仅是表达，更是理清思维的过程...',
+    publishedAt: '2023-10-05T09:15:00Z'
+  }
 ]
 
 export const mockCatalog = [
-    { id: 1, text: '什么是真正的极简主义', level: 2 },
-    { id: 2, text: '数字断舍离实践', level: 2 },
-    { id: 3, text: '工作空间的简化', level: 2 },
-    { id: 4, text: '持续维护的习惯', level: 2 }
+  { id: 1, text: '什么是真正的极简主义', level: 2 },
+  { id: 2, text: '数字断舍离实践', level: 2 },
+  { id: 3, text: '工作空间的简化', level: 2 },
+  { id: 4, text: '持续维护的习惯', level: 2 }
 ]
 
 export const mockTags = ['极简主义', '技术', '生活', '写作', '设计']

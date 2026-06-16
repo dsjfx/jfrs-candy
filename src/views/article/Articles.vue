@@ -96,7 +96,7 @@ import type { Article } from '@/types/article'
 import { useArticleStore } from '@/stores/article'
 import useLoading from '@/composables/useLoading'
 import useDebouncedRef from '@/composables/useDebouncedRef'
-import cabinet from '@/utils/cabinet'
+import { DEFAULT_CURRENT, DEFAULT_PAGESIZE } from '@/utils/constant.ts'
 
 const router = useRouter()
 const articleStore = useArticleStore()
@@ -114,8 +114,8 @@ const articleTitle = import.meta.env.VITE_APP_ARTICLE_TITLE
 
 // 响应式数据
 
-const current = ref(cabinet.CONS_CURRENT)
-const pageSize = ref(cabinet.CONS_PAGESIZE)
+const current = ref(DEFAULT_CURRENT)
+const pageSize = ref(DEFAULT_PAGESIZE)
 const searchQuery = ref('')
 
 // 骨架屏数量

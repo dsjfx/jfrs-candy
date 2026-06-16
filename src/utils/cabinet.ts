@@ -132,14 +132,15 @@ export function accessUrl(code: string, url: string) {
   return `${MAP_URL[code]}${url}`
 }
 
-// 默认参数值
-export const CONS_CURRENT = 1
-
-export const CONS_PAGESIZE = 10
+const subject = import.meta.env.VITE_APP_SUBJECT || ''
+// daily app
+export const isDaily = subject === 'daily'
+// note app
+export const isNote = subject === 'note'
 
 export default {
-  CONS_CURRENT,
-  CONS_PAGESIZE,
+  isDaily,
+  isNote,
   delay,
   formatDate,
   formatDate2,

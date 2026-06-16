@@ -49,7 +49,7 @@
                 <FaIcon :icon="faCalendarIcon" />
               </span>
               <span>
-                <time :datetime="article.createdAt">{{ formatDate(article.createdAt) }}</time>
+                <time :datetime="article.publishedAt">{{ formatDate(article.publishedAt) }}</time>
               </span>
 
             </div>

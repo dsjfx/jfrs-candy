@@ -17,7 +17,8 @@
           </h1>
         </div>
 
-        <img class="slogan artistic" src="@/assets/img/slogan.png" alt="slogan" />
+        <img v-if="isDaily" class="slogan artistic" src="@/assets/img/slogan.png" alt="slogan" />
+        <div v-if="isNote" class="slogan artistic">{{ appSlogan }}</div>
 
         <nav class="nav">
           <ul class="nav-list">
@@ -35,24 +36,26 @@
         <div class="header-actions">
           <el-button :icon="isDark ? 'Sunny' : 'Moon'" circle @click="toggleTheme"
             :title="isDark ? '切换到亮色模式' : '切换到暗色模式'" />
-          <!-- <el-button v-if="!userStore.user" type="primary" @click="showLoginDialog = true">
-            登录
-          </el-button>
-          <el-dropdown v-else>
-            <div class="user-avatar">
-              <el-avatar :size="32" :src="userStore.user?.avatar" />
-              <span class="username">{{ userStore.user?.username }}</span>
-            </div>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item>个人中心</el-dropdown-item>
-                <el-dropdown-item v-if="userStore.user">我的文章</el-dropdown-item>
-                <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-</el-dropdown> -->
+          <div v-if="isDaily">
+            <el-button v-if="!userStore.user" type="primary" @click="showLoginDialog = true">
+              登录
+            </el-button>
+            <el-dropdown v-else>
+              <div class="user-avatar">
+                <el-avatar :size="32" :src="userStore.user?.avatar" />
+                <span class="username">{{ userStore.user?.username }}</span>
+              </div>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item>个人中心</el-dropdown-item>
+                  <el-dropdown-item v-if="userStore.user">我的文章</el-dropdown-item>
+                  <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
 
-          <el-button class="mobile-menu-btn" :icon="Menu" circle @click="mobileMenuVisible = !mobileMenuVisible" />
+            <el-button class="mobile-menu-btn" :icon="Menu" circle @click="mobileMenuVisible = !mobileMenuVisible" />
+          </div>
         </div>
       </div>
 
@@ -146,6 +149,7 @@ import { userApi } from '@/api'
 import { useThemeStore } from '@/stores'
 import { useUserStore } from '@/stores/user'
 import { useAppNameStruct } from '@/composables/useAppName'
+import { isDaily, isNote } from '@/utils/cabinet'
 
 const router = useRouter()
 const themeStore = useThemeStore()
@@ -411,7 +415,7 @@ $breakpoint-mobile: 768px;
     transform: rotate(1deg);
     display: inline-block;
     margin-left: 8px;
-    font-family: 'Georgia', 'Times New Roman', serif;
+    font-family: '华文行楷', 'Georgia', 'Times New Roman', serif;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.04), 2px 2px 6px rgba(0, 0, 0, 0.06);
     // color: var(--color-primary);
   }

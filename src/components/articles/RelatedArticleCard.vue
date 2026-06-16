@@ -7,7 +7,7 @@
     <div class="related-article-content">
       <h4 class="related-article-title">{{ article.title }}</h4>
       <div class="related-article-meta">
-        <span class="related-article-date">{{ formatDate(article.createdAt) }}</span>
+        <span class="related-article-date">{{ formatDate(article.publishedAt) }}</span>
         <span class="related-article-views">👁️ {{ article.views || 0 }}</span>
       </div>
       <p class="related-article-summary">{{ article.summary }}</p>
@@ -16,14 +16,16 @@
 </template>
 
 <script setup lang="ts">
-interface Article {
-  id: string | number
-  title: string
-  summary: string
-  coverImage?: string
-  createdAt: string
-  views?: number
-}
+import type { Article } from '@/types';
+
+// interface Article {
+//   id: string | number
+//   title: string
+//   summary: string
+//   coverImage?: string
+//   publishedAt: string
+//   views?: number
+// }
 
 interface Props {
   article: Article

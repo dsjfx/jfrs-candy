@@ -25,7 +25,7 @@
           <div class="article-footer">
             <div class="article-meta">
               <span class="article-date">
-                <i class="date-icon">📅</i> {{ formatDate(article.createdAt) }}
+                <i class="date-icon">📅</i> {{ formatDate(article.publishedAt) }}
               </span>
               <span class="article-tags">
                 <span class="tag" v-for="tag in article.tags" :key="tag">
@@ -104,18 +104,6 @@ import type { Article } from '@/types/article'
 // 主色调
 const primaryColor = '#059669'
 
-// 文章数据
-// interface Article {
-//   id: number
-//   title: string
-//   summary: string
-//   category: string
-//   tags: string[]
-//   createdAt: string
-//   date?: string
-//   comments: number
-// }
-
 const articles = ref<Article[]>([
   {
     id: 1,
@@ -123,7 +111,7 @@ const articles = ref<Article[]>([
     summary: '读《山月记》最触动我的是那句"我深怕自己本非美玉，故而不敢加以刻苦琢磨..."，这句话道出了多少人在自我认知与价值实现之间的挣扎...',
     category: '书评',
     tags: ['读书', '文学', '感悟'],
-    createdAt: '2026-01-19',
+    publishedAt: '2026-01-19',
     comments: 12
   },
   {
@@ -132,7 +120,7 @@ const articles = ref<Article[]>([
     summary: '欢迎本博客的小公主：草莓。时间过得真快，转眼间我们的家庭迎来了新成员...',
     category: '日记',
     tags: ['生活', '家庭', '成长'],
-    createdAt: '2025-01-19',
+    publishedAt: '2025-01-19',
     date: '2025-01-19',
     comments: 12
   },
@@ -142,7 +130,7 @@ const articles = ref<Article[]>([
     summary: '例行年度总结，总结维度和去年相同，顺序略有调整。今年在生活上有买房、装修、结婚、生娃几件事...',
     category: '日记',
     tags: ['年度总结', '生活', '工作'],
-    createdAt: '2025-01-11',
+    publishedAt: '2025-01-11',
     date: '2025-01-11',
     comments: 14
   },
@@ -152,7 +140,7 @@ const articles = ref<Article[]>([
     summary: '周末难得闲暇，天气也正好，一家人一拍即合，决定出门走走。目的地选在了武汉新天地...',
     category: '旅行',
     tags: ['旅行', '武汉', '家庭'],
-    createdAt: '2026-01-20',
+    publishedAt: '2026-01-20',
     date: '2026-01-20',
     comments: 4
   },
@@ -162,7 +150,7 @@ const articles = ref<Article[]>([
     summary: '昨天中午，我给银行打电话咨询业务，通话一分多钟时，手机突然弹出一个提示界面，说可以使用"AI速记"...',
     category: '生活',
     tags: ['科技', '隐私', 'AI'],
-    createdAt: '2026-01-09',
+    publishedAt: '2026-01-09',
     date: '2026-01-09',
     comments: 4
   },
@@ -172,7 +160,7 @@ const articles = ref<Article[]>([
     summary: '坚持写晨间日记三个月，最大的收获不是记录了多少内容，而是培养了一种与自我对话的习惯...',
     category: '随笔',
     tags: ['写作', '习惯', '自我成长'],
-    createdAt: '2025-12-28',
+    publishedAt: '2025-12-28',
     comments: 8
   },
   {
@@ -181,7 +169,7 @@ const articles = ref<Article[]>([
     summary: '前两天早上和往常一样下班前提前把车启动车辆，发现远程系统自动启动了远程...',
     category: '生活',
     tags: ['汽车', '生活记录'],
-    createdAt: '2025-11-21',
+    publishedAt: '2025-11-21',
     date: '2025-11-21',
     comments: 13
   }

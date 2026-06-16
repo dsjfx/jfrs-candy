@@ -36,7 +36,7 @@ class Request {
           ...config.params,
           timestamp: Date.now(), // 时间戳防缓存
           version: import.meta.env.VITE_APP_VERSION,        // API版本
-          subject: import.meta.env.VITE_CONS_SUBJECT,       // 平台标识
+          subject: import.meta.env.VITE_APP_SUBJECT,       // 平台标识
         };
 
         return config

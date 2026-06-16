@@ -27,6 +27,7 @@ export interface Article {
   // 次要属性
   createdAt: string
   updatedAt: string
+  publishedAt: string
   // slug: string
 
 

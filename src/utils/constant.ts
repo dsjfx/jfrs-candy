@@ -15,3 +15,7 @@ export const DEFAULT_COLOR = [
   '#8B5CF6',
   '#F59E0B'
 ]
+
+// 默认分页参数值
+export const DEFAULT_CURRENT = 1
+export const DEFAULT_PAGESIZE = 10

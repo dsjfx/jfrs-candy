@@ -114,7 +114,7 @@ const categoryColor = computed(() => {
 })
 
 const formattedDate = computed(() => {
-  const date = new Date(props.article.createdAt)
+  const date = new Date(props.article.publishedAt)
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
 })
 

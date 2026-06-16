@@ -5,30 +5,29 @@
         <h3 class="card-title">最近更新</h3>
       </div>
     </template>
-    
+
     <div class="articles-list">
-      <div
-        v-for="article in recentArticles"
-        :key="article.id"
-        class="article-item"
-        @click="goToArticle(article)"
-      >
+      <div v-for="article in recentArticles" :key="article.id" class="article-item" @click="goToArticle(article)">
         <div class="article-content">
           <h4 class="article-title">{{ article.title }}</h4>
           <div class="article-meta">
             <span class="article-date">
-              <el-icon><Calendar /></el-icon>
-              {{ formatDate(article.createdAt) }}
+              <el-icon>
+                <Calendar />
+              </el-icon>
+              {{ formatDate(article.publishedAt) }}
             </span>
             <span class="article-views">
-              <el-icon><View /></el-icon>
+              <el-icon>
+                <View />
+              </el-icon>
               {{ article.viewCount }}
             </span>
           </div>
         </div>
       </div>
     </div>
-    
+
     <div v-if="recentArticles.length === 0" class="empty-state">
       <el-empty description="暂无文章" />
     </div>
@@ -80,17 +79,17 @@ onMounted(() => {
     border-bottom: 1px solid var(--color-border);
     cursor: pointer;
     transition: background-color 0.3s;
-    
+
     &:last-child {
       border-bottom: none;
     }
-    
+
     &:hover {
       .article-title {
         color: var(--color-primary);
       }
     }
-    
+
     .article-content {
       .article-title {
         margin: 0 0 8px 0;
@@ -104,19 +103,19 @@ onMounted(() => {
         overflow: hidden;
         transition: color 0.3s;
       }
-      
+
       .article-meta {
         display: flex;
         align-items: center;
         gap: 16px;
         font-size: 0.75rem;
         color: var(--color-text-secondary);
-        
-        & > span {
+
+        &>span {
           display: flex;
           align-items: center;
           gap: 4px;
-          
+
           .el-icon {
             font-size: 0.75rem;
           }

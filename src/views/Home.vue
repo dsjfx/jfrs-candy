@@ -22,7 +22,7 @@
         <h3>最新文章</h3>
         <template v-if="latestArticles.length">
           <article v-for="item in latestArticles" :key="item.id" class="article-preview">
-            <time :datetime="item.createdAt">{{ formatDate(item.createdAt) }}</time>
+            <time :datetime="item.publishedAt">{{ formatDate(item.publishedAt) }}</time>
             <h4>
               <router-link :to="`/articles/${item.id}`">{{ item.title || '未命名文章' }}</router-link>
             </h4>
@@ -33,7 +33,7 @@
         </template>
         <template v-else>
           <article v-for="item in mockLatestArticles" :key="item.id" class="article-preview">
-            <time :datetime="item.createdAt">{{ formatDate(item.createdAt) }}</time>
+            <time :datetime="item.publishedAt">{{ formatDate(item.publishedAt) }}</time>
             <h4>{{ item.title }}</h4>
             <p>{{ item.summary }}</p>
           </article>
@@ -44,8 +44,8 @@
     <!-- 右侧文章内容 -->
     <article class="content">
       <header class="article-header">
-        <time v-if="heroArticle" :datetime="heroArticle.createdAt">
-          {{ formatDate(heroArticle.createdAt) }} • 阅读时间 {{ readTime }}
+        <time v-if="heroArticle" :datetime="heroArticle.publishedAt">
+          {{ formatDate(heroArticle.publishedAt) }} • 阅读时间 {{ readTime }}
         </time>
         <time v-else datetime="2023-10-15">2023年10月15日 • 阅读时间 5分钟</time>
         <!-- 文章标题 -->

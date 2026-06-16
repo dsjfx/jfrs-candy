@@ -28,7 +28,7 @@ onMounted(() => {
   // 全局后置钩子
   router.afterEach((to, _from) => {
     // 标题
-    document.title = appName.value || '默认标题'
+    document.title = appName.value || '糖果生活'
   })
 })
 </script>
