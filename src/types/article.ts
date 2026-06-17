@@ -100,6 +100,7 @@ export interface Tag {
   id: number
   name: string
   slug?: string
+  color?: string
   articleCount: number | 0
   BlogTag?: {
     blogId: number

@@ -52,7 +52,8 @@
       <div class="article-meta">
         <!-- 标签 -->
         <div v-if="showTags && limitedTags" class="article-tags">
-          <span v-for="tag in limitedTags" class="tag" :key="tag.id" @click="emitTagClick(tag.name)">
+          <span v-for="tag in limitedTags" class="tag" :key="tag.id" @click="emitTagClick(tag.name)"
+            :style="{ '--tag-color': tag.color || '', '--tag-color-rgb': tagColorRgb(tag.color) }">
             #{{ tag.name }}
           </span>
           <span v-if="hasMoreTags" class="tag-more">...</span>
@@ -141,6 +142,28 @@ const limitedTags = computed(() => {
 const hasMoreTags = computed(() => {
   return props.article.tags && props.article.tags.length > props.maxTags
 })
+
+// helper: convert hex or rgb string to 'r,g,b' string for CSS usage
+function tagColorRgb(color?: string | null) {
+  if (!color) return '5,150,105' // fallback to brand green
+  // hex #rrggbb
+  const hexMatch = String(color).trim().match(/^#?([0-9a-f]{6})$/i)
+  if (hexMatch) {
+    const v = hexMatch[1]
+    if (v !== undefined && v.length) {
+      const r = parseInt(v.slice(0, 2), 16)
+      const g = parseInt(v.slice(2, 4), 16)
+      const b = parseInt(v.slice(4, 6), 16)
+      return `${r},${g},${b}`
+    }
+  }
+  // rgb(r,g,b) or rgba(...)
+  const rgbMatch = String(color).match(/(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/)
+  if (rgbMatch) {
+    return `${rgbMatch[1]},${rgbMatch[2]},${rgbMatch[3]}`
+  }
+  return '5,150,105'
+}
 
 // 方法
 const emitTagClick = (tag: string) => {
@@ -301,15 +324,16 @@ $breakpoint-mobile: 768px;
 
     .tag {
       font-size: 0.8rem;
-      color: var(--primary-color, #059669);
-      background: rgba(var(--primary-color-rgb, 5, 150, 105), 0.1);
+      /* use dynamic tag color via CSS variables set inline */
+      color: rgba(var(--tag-color-rgb, 5, 150, 105), 1);
+      background: rgba(var(--tag-color-rgb, 5, 150, 105), 0.1);
       padding: 0.2rem 0.6rem;
       border-radius: 12px;
-      transition: all 0.3s ease;
+      transition: all 0.18s ease, background 0.18s ease, color 0.18s ease;
       cursor: pointer;
 
       &:hover {
-        background: var(--primary-color, #059669);
+        background: rgba(var(--tag-color-rgb, 5, 150, 105), 1);
         color: white;
       }
     }
