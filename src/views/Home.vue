@@ -108,7 +108,8 @@
         <div class="tags">
           <template v-if="heroArticle">
             <span v-if="tags.length" class="tag-label">标签:</span>
-            <span v-for="tag in tags" :key="tag.id" class="tag" @click="filterByTag(tag.id)">
+            <span v-for="tag in tags" :key="tag.id" class="tag" @click="filterByTag(tag.id)"
+              :style="{ '--tag-color-rgb': tagColorRgb(tag.color) }">
               #{{ tag.name }}
             </span>
           </template>
@@ -148,7 +149,7 @@ import SafeHtmlRenderer from '@/components/core/SafeHtmlRenderer.vue'
 import SafeHtmlToVNodes from '@/components/core/SafeHtmlToVNodes.vue'
 import LoadingSpinner from '@/components/core/LoadingSpinner.vue'
 import { homeContent, mockLatestArticles, mockCatalog, mockTags } from '@/mock/mockHome'
-import { formatDate, getDisplayWordCount, getReadTimeMedium } from '@/utils/cabinet'
+import { formatDate, getDisplayWordCount, getReadTimeMedium, tagColorRgb } from '@/utils/cabinet'
 import {
   DEBOUNCED_INPUT_DELAY,
   DEFAULT_READ_TIME,
@@ -1000,15 +1001,15 @@ $radius: $radius-sm;
       .tag {
         margin-left: 5px;
         padding: 0.3rem 0.5rem;
-        background: var(--bg-secondary);
-        color: var(--text-secondary);
-        border-radius: 20px;
         font-size: 0.85rem;
         cursor: pointer;
         transition: var(--transition);
+        color: rgba(var(--tag-color-rgb, 5, 150, 105), 1);
+        background: rgba(var(--tag-color-rgb, 5, 150, 105), 0.1);
+        border-radius: 20px;
 
         &:hover {
-          background: var(--accent-color);
+          background: rgba(var(--tag-color-rgb, 5, 150, 105), 1);
           color: white;
         }
       }

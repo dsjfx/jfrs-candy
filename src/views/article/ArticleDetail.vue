@@ -51,7 +51,6 @@
               <span>
                 <time :datetime="article.publishedAt">{{ formatDate(article.publishedAt) }}</time>
               </span>
-
             </div>
 
             <span v-if="showView" class="meta-item">
@@ -70,7 +69,8 @@
           </div>
 
           <div class="meta-right">
-            <span v-if="showCategory" class="article-category" :style="{ backgroundColor: categoryColor }">
+            <span v-if="showCategory" class="article-category"
+              :style="{ '--category-color-rgb': tagColorRgb(article.category?.color || categoryColor) }">
               {{ article.category?.name }}
             </span>
           </div>
@@ -81,7 +81,8 @@
           <!-- <router-link v-for="tag in article.tags" :key="tag.id" :to="`/tag/${tag.id}`" class="article-tag">
             #{{ tag.name }}
           </router-link> -->
-          <div v-for="tag in article.tags" class="article-tag">
+          <div v-for="tag in article.tags" :key="tag.id" class="article-tag"
+            :style="{ '--tag-color-rgb': tagColorRgb(tag.color) }">
             #{{ tag.name }}
           </div>
         </div>
@@ -293,7 +294,7 @@ import { useArticleStore } from '@/stores/article'
 import { useCommentStore } from '@/stores/comment'
 import type { Article, ArticleDetailProps, Category } from '@/types/article'
 import type { Comment } from '@/types/comment'
-import { formatDate } from '@/utils/cabinet'
+import { formatDate, tagColorRgb } from '@/utils/cabinet'
 import { ElMessage } from 'element-plus'
 
 // 路由和状态
@@ -875,9 +876,10 @@ $breakpoint-mobile: 768px;
       display: inline-block;
       padding: 0.25rem 0.75rem;
       border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: white;
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: rgba(var(--category-color-rgb, 5, 150, 105), 1);
+      background: rgba(var(--category-color-rgb, 5, 150, 105), 0.1);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -934,15 +936,15 @@ $breakpoint-mobile: 768px;
 
   .article-tag {
     padding: 0.4rem 0.8rem;
-    background: rgba($primary-color, 0.1);
-    color: $primary-color;
-    border-radius: 20px;
     font-size: 0.85rem;
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all 0.18s ease;
+    color: rgba(var(--tag-color-rgb, 5, 150, 105), 1);
+    background: rgba(var(--tag-color-rgb, 5, 150, 105), 0.1);
+    border-radius: 20px;
 
     &:hover {
-      background: $primary-color;
+      background: rgba(var(--tag-color-rgb, 5, 150, 105), 1);
       color: white;
       transform: translateY(-2px);
     }

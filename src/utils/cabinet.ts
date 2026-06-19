@@ -66,6 +66,29 @@ function formatReadTime(minutes: number): string {
   return `${minutes} 分钟`;
 }
 
+// helper: convert hex or rgb string to 'r,g,b' string for CSS usage
+export function tagColorRgb(color?: string | null) {
+  if (!color) return '5,150,105' // fallback to brand green
+  // hex #rrggbb
+  const hexMatch = String(color).trim().match(/^#?([0-9a-f]{6})$/i)
+  if (hexMatch) {
+    const v = hexMatch[1]
+    if (v !== undefined && v.length) {
+      const r = parseInt(v.slice(0, 2), 16)
+      const g = parseInt(v.slice(2, 4), 16)
+      const b = parseInt(v.slice(4, 6), 16)
+      return `${r},${g},${b}`
+    }
+  }
+  // rgb(r,g,b) or rgba(...)
+  const rgbMatch = String(color).match(/(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})/)
+  if (rgbMatch) {
+    return `${rgbMatch[1]},${rgbMatch[2]},${rgbMatch[3]}`
+  }
+  return '5,150,105'
+}
+
+
 /**
  * 默认分页数据
  * @returns 分页数据
