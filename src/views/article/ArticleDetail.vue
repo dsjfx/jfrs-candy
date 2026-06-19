@@ -154,7 +154,7 @@
                 <div class="nav-link-title">已经是第一篇了</div>
               </div>
 
-              <router-link v-if="nextArticle" :to="`/article/${nextArticle.id}`" class="nav-link next">
+              <router-link v-if="nextArticle" :to="`/articles/${nextArticle.id}`" class="nav-link next">
                 <div class="nav-link-title">{{ nextArticle.title }}</div>
                 <div class="nav-link-label">
                   <el-icon>
