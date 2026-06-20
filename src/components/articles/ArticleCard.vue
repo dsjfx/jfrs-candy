@@ -169,9 +169,18 @@ $breakpoint-mobile: 768px;
   border-radius: var(--radius, 8px);
   // box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.1));
   // border: 1px solid var(--border-color, #E5E7EB);
-  border-left: 2px solid #8b1a1a;
+  // border-left: 2px solid #8b1a1a;
+  border: none;
   border-bottom: 1px dashed #8b1a1a;
   transition: all 0.3s ease;
+
+  &:nth-child(odd) {
+    border-left: 2px solid #ec8702;
+  }
+
+  &:nth-child(even) {
+    border-right: 2px solid #8b1a1a;
+  }
 
   &:hover {
     // transform: translateY(-2px);
