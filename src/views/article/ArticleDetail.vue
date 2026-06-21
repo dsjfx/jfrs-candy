@@ -110,6 +110,10 @@
 
           </article>
 
+          <div class="article-end">
+            <span>完</span>
+          </div>
+
           <!-- <div v-if="showAction" class="article-action">
             <button v-if="showLike" class="action-btn" :class="{ 'liked': article.isLiked }" @click="toggleLike">
               <i class="action-icon">{{ article.isLiked ? '💖' : '🤍' }}</i>
@@ -979,6 +983,25 @@ $breakpoint-mobile: 768px;
 // 文章主内容
 .article-main {
   background: $card-bg;
+}
+
+.article-end {
+  margin-top: 40px;
+  text-align: center;
+
+  span {
+    color: var(--color-primary);
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  &::before {
+    content: '----- '
+  }
+
+  &::after {
+    content: ' -----';
+  }
 }
 
 // 文章内容

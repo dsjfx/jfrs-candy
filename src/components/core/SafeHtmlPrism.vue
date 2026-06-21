@@ -2,7 +2,7 @@
   <div ref="contentRef" class="content-html" v-html="sanitizedHtml"></div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted } from 'vue'
 import DOMPurify from 'dompurify'
 import Prism from 'prismjs'
@@ -30,7 +30,15 @@ const props = defineProps({
   }
 })
 
-const contentRef = ref(null)
+interface phType {
+  placeholder: string;
+  original: string
+}
+
+const contentRef = ref<HTMLElement | null>(null)
+
+// give the SFC a name so IDEs (Volar/Vetur) can better resolve the component
+defineOptions({ name: 'SafeHtmlPrism' })
 
 // DOMPurify 配置（允许代码高亮需要的属性和标签）
 const defaultPurifyConfig = {
@@ -53,7 +61,7 @@ const defaultPurifyConfig = {
   ALLOW_UNKNOWN_PROTOCOLS: false,
   // 自定义钩子：保护模板字符串
   hooks: {
-    afterSanitizeAttributes: (node) => {
+    afterSanitizeAttributes: (node: { nodeName: string }) => {
       if (node.nodeName === 'CODE' || node.nodeName === 'PRE') {
         // 保护 code 标签内的内容不被过度转义
         return node
@@ -74,7 +82,7 @@ const sanitizedHtml = computed(() => {
 
   // 预处理：临时替换模板字符串中的 ${} 避免被破坏
   let processedHtml = props.html
-  const placeholders = []
+  const placeholders: phType[] = []
 
   // 保护模板字符串中的变量
   processedHtml = processedHtml.replace(/\$\{([^}]+)\}/g, (match) => {
@@ -102,41 +110,31 @@ const highlightCodeBlocks = () => {
   codeBlocks.forEach((block) => {
     try {
       // 如果已经有高亮标记，跳过
-      if (block.getAttribute('data-highlighted')) return
+      if ((block as HTMLElement).getAttribute('data-highlighted')) return
 
-      // 获取语言类型
-      let language = 'javascript'
-      const classList = block.className.split(' ')
-      for (const cls of classList) {
-        if (cls.startsWith('language-')) {
-          language = cls.replace('language-', '')
-          break
-        }
-      }
-
-      // 获取原始代码（保留模板字符串格式）
-      const originalCode = block.textContent
-
-      // 执行高亮
-      const grammar = Prism.languages[language] || Prism.languages.javascript
-      const highlighted = Prism.highlight(originalCode, grammar, language)
-
-      // 替换内容并标记已高亮
-      block.innerHTML = highlighted
-      block.setAttribute('data-highlighted', 'true')
+      // Prefer Prism API which will detect language from className
+      // Prism.highlightElement handles language detection and tokenization
+      // Note: highlightElement expects an Element (code block)
+      Prism.highlightElement(block as Element)
+        ; (block as HTMLElement).setAttribute('data-highlighted', 'true')
 
       // 添加复制按钮（可选）
-      addCopyButton(block)
+      addCopyButton(block as HTMLElement)
     } catch (error) {
       console.warn('代码高亮失败:', error)
-      // 降级：显示原始代码
-      block.textContent = block.textContent
     }
   })
+
+  // As a fallback, ensure Prism runs for any remaining nodes
+  try {
+    if (contentRef.value) Prism.highlightAllUnder(contentRef.value)
+  } catch (e) {
+    // ignore
+  }
 }
 
 // 添加复制按钮功能
-const addCopyButton = (codeBlock) => {
+const addCopyButton = (codeBlock: HTMLElement) => {
   const pre = codeBlock.parentElement
   if (pre && !pre.querySelector('.copy-button')) {
     const button = document.createElement('button')
@@ -205,6 +203,9 @@ onMounted(async () => {
   highlightCodeBlocks()
   setupMutationObserver()
 })
+// expose the internal root element so parent components (like ArticleDetail.vue)
+// can query it directly: parentRef.value.querySelector(...)
+defineExpose({ root: contentRef })
 </script>
 
 <style scoped lang="scss">

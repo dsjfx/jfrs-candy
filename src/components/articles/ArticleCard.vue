@@ -167,7 +167,7 @@ $breakpoint-mobile: 768px;
   padding: 1.5rem;
   background: var(--card-bg, #FFFFFF);
   border-radius: var(--radius, 8px);
-  // box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.1));
+  box-shadow: var(--shadow, 0 1px 3px rgba(0, 0, 0, 0.1));
   // border: 1px solid var(--border-color, #E5E7EB);
   // border-left: 2px solid #8b1a1a;
   border: none;

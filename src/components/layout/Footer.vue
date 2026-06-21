@@ -73,7 +73,7 @@ import { isDaily, isNote } from '@/utils/cabinet'
 const userStore = useUserStore()
 
 const social = [
-  { icon: faGithub, href: 'https://github.com/' },
+  { icon: faGithub, href: 'https://github.com/dsjfx' },
   { icon: faWeibo, href: 'https://weibo.com/' }
 ]
 
