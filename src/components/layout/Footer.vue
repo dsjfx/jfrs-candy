@@ -82,9 +82,9 @@ const userId = ref<number>(1)
 const icpLicense = ref<string | null>('苏ICP备2026029057号-1');
 const icpUrl = ref<string | ''>('https://beian.miit.gov.cn/');
 const publicSecurityLicense = ref<string | null>('苏公网安备32040002010730号');
-const mpsUrl = ref<string | ''>('https://beian.mps.gov.cn/#/query/webSearch?code=32040002010730')
-const publicSecurityLicense2 = ref<string | null>(null)
-const mpsUrl2 = ref<string | ''>();
+const mpsUrl = ref<string | ''>('https://beian.mps.gov.cn/#/query/webSearch?code=32040002010730');
+const publicSecurityLicense2 = ref<string | null>('苏公网安备32040402001116号');
+const mpsUrl2 = ref<string | ''>('https://beian.mps.gov.cn/#/query/webSearch?code=32040402001116');
 
 const appSlogan = import.meta.env.VITE_APP_TITLE_SLOGAN || '记记录生活点滴'
 const adminUrl = import.meta.env.VITE_APP_ADMIN_URL || 'http://localhost:5173'
