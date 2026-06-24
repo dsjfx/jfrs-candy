@@ -5,6 +5,7 @@ export interface Article {
   // 主要属性
   id: number
   title: string
+  subtitle?: string
   content: string
   summary: string
   coverImage?: string
@@ -15,7 +16,6 @@ export interface Article {
   likeCount?: number | 0
   dislikeCount?: number | 0
   comments?: number | 0
-
   likes?: number[] | []
   dislikes?: number[] | []
 
@@ -28,9 +28,9 @@ export interface Article {
   createdAt: string
   updatedAt: string
   publishedAt: string
+
+
   // slug: string
-
-
   // isPublished: boolean
   // isLiked?: boolean
   // isBookmarked?: boolean

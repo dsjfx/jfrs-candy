@@ -34,7 +34,13 @@
         </nav>
 
         <!-- 文章标题 -->
-        <h1 class="article-title">{{ article.title }}</h1>
+        <h1 class="article-title">
+          <span>{{ article.title }}</span>
+          <span v-if="article.subtitle" class="article-subtitle">
+            <span class="pipe">|</span>
+            <span class="sub-title">{{ article.subtitle }}</span>
+          </span>
+        </h1>
 
         <!-- 文章元信息 -->
         <div class="article-meta">
@@ -791,6 +797,20 @@ $breakpoint-mobile: 768px;
 
   @media (max-width: $breakpoint-mobile) {
     font-size: 1.8rem;
+  }
+
+  .article-subtitle {
+    font-size: 2rem;
+
+    .pipe {
+      margin: auto 20px;
+      font-weight: 500;
+    }
+
+    .sub-title {
+      font-weight: 400;
+      opacity: 0.6;
+    }
   }
 }
 
