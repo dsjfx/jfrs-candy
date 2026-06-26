@@ -117,7 +117,7 @@
           </article>
 
           <div class="article-end">
-            <span>完</span>
+            <span>THE END</span>
           </div>
 
           <!-- <div v-if="showAction" class="article-action">
@@ -1009,19 +1009,22 @@ $breakpoint-mobile: 768px;
 .article-end {
   margin-top: 40px;
   text-align: center;
+  font-size: 20px;
+  color: var(--color-primary);
 
   span {
     color: var(--color-primary);
-    font-size: 20px;
     font-weight: 600;
   }
 
   &::before {
-    content: '----- '
+    content: '----- ';
+    opacity: .5;
   }
 
   &::after {
     content: ' -----';
+    opacity: .5;
   }
 }
 
