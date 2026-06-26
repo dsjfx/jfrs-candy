@@ -24,7 +24,13 @@
           <article v-for="item in latestArticles" :key="item.id" class="article-preview">
             <time :datetime="item.publishedAt">{{ formatDate(item.publishedAt) }}</time>
             <h4>
-              <router-link :to="`/articles/${item.id}`">{{ item.title || '未命名文章' }}</router-link>
+              <router-link :to="`/articles/${item.id}`">
+                <span>{{ item.title || '未命名文章' }}</span>
+                <span v-if="item.subtitle" class="master-title">
+                  <span class="pipe">|</span>
+                  <span class="subtitle">{{ item.subtitle }}</span>
+                </span>
+              </router-link>
             </h4>
             <p v-if="item.summary">{{ item.summary }}</p>
             <p v-else-if="item.summary">{{ item.summary }}</p>
@@ -49,7 +55,13 @@
         </time>
         <time v-else datetime="2023-10-15">2023年10月15日 • 阅读时间 5分钟</time>
         <!-- 文章标题 -->
-        <h1>{{ heroArticle?.title || '如何保持极简主义生活与工作平衡' }}</h1>
+        <h1>
+          <span>{{ heroArticle?.title || '如何保持极简主义生活与工作平衡' }}</span>
+          <span v-if="heroArticle?.subtitle" class="master-title">
+            <span class="pipe">|</span>
+            <span class="subtitle">{{ heroArticle?.subtitle }}</span>
+          </span>
+        </h1>
         <div class="meta">
           <span class="category" :style="{ backgroundColor: heroArticle?.category?.color || '#3498db' }">
             {{ heroArticle?.category?.name || '生活哲学' }}
@@ -476,6 +488,12 @@ $radius: $radius-sm;
               color: var(--accent-color);
             }
           }
+
+          .master-title {
+            .pipe {
+              margin: auto 10px;
+            }
+          }
         }
 
         p {
@@ -527,6 +545,17 @@ $radius: $radius-sm;
         font-size: 2.5rem;
         line-height: 1.2;
         color: var(--text-primary);
+
+        .master-title {
+          .pipe {
+            margin: auto 10px;
+          }
+
+          .subtitle {
+            font-size: 2.3rem;
+            font-weight: 400;
+          }
+        }
       }
 
       .meta {

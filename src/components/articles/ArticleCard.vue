@@ -3,7 +3,8 @@
     <!-- 头部 -->
     <div class="article-header">
       <!-- 使用props控制显示 -->
-      <span v-if="showCategory" class="article-category" :style="{ backgroundColor: categoryColor }">
+      <span v-if="showCategory" class="article-category"
+        :style="{ '--category-color-rgb': tagColorRgb(categoryColor) }">
         {{ article.category?.name }}
       </span>
 
@@ -24,7 +25,11 @@
     <!-- 标题 -->
     <h2 class="article-title">
       <span class="article-title-text" @click="handleClick">
-        {{ article.title }}
+        <span>{{ article.title }}</span>
+        <span v-if="article.subtitle" class="master-title">
+          <span class="pipe">|</span>
+          <span class="subtitle">{{ article.subtitle }}</span>
+        </span>
       </span>
       <span v-if="showTime && formattedDate" class="article-time">
         {{ formattedDate }}
@@ -171,15 +176,16 @@ $breakpoint-mobile: 768px;
   // border: 1px solid var(--border-color, #E5E7EB);
   // border-left: 2px solid #8b1a1a;
   border: none;
-  border-bottom: 1px dashed #8b1a1a;
+  // border-bottom: 1px dashed #8b1a1a;
+  border-bottom: 1px dashed #5a026b;
   transition: all 0.3s ease;
 
   &:nth-child(odd) {
-    border-left: 2px solid #ec8702;
+    border-left: 2px solid #5a026b;
   }
 
   &:nth-child(even) {
-    border-right: 2px solid #8b1a1a;
+    border-right: 2px solid #5a026b;
   }
 
   &:hover {
@@ -198,10 +204,11 @@ $breakpoint-mobile: 768px;
   .article-category {
     display: inline-block;
     padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: white;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: rgba(var(--category-color-rgb, 5, 150, 105), 1);
+    background: rgba(var(--category-color-rgb, 5, 150, 105), 0.1);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -235,10 +242,27 @@ $breakpoint-mobile: 768px;
       border-radius: 4px;
     }
 
-    .article-title-text:hover {
-      cursor: pointer;
-      color: $base-color-j1;
-      text-decoration: underline;
+    .article-title-text {
+
+      &:hover {
+        cursor: pointer;
+        color: $base-color-j1;
+        text-decoration: underline;
+      }
+
+      .master-title {
+        font-weight: 600;
+
+        .pipe {
+          margin: auto 10px;
+          color: #5a026b;
+          opacity: .2;
+        }
+
+        .subtitle {
+          font-weight: 400;
+        }
+      }
     }
   }
 

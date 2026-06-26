@@ -36,9 +36,9 @@
         <!-- 文章标题 -->
         <h1 class="article-title">
           <span>{{ article.title }}</span>
-          <span v-if="article.subtitle" class="article-subtitle">
+          <span v-if="article.subtitle" class="master-title">
             <span class="pipe">|</span>
-            <span class="sub-title">{{ article.subtitle }}</span>
+            <span class="subtitle">{{ article.subtitle }}</span>
           </span>
         </h1>
 
@@ -799,17 +799,18 @@ $breakpoint-mobile: 768px;
     font-size: 1.8rem;
   }
 
-  .article-subtitle {
+  .master-title {
     font-size: 2rem;
 
     .pipe {
       margin: auto 20px;
-      font-weight: 500;
+      font-weight: 600;
+      opacity: .8;
     }
 
-    .sub-title {
+    .subtitle {
       font-weight: 400;
-      opacity: 0.6;
+      opacity: 0.7;
     }
   }
 }

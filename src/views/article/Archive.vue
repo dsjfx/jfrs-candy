@@ -44,7 +44,13 @@
                           <ul v-show="month.expanded && year.expanded" class="month-list">
                             <li v-for="post in month.posts" :key="post.id" class="post-item">
                               <router-link :to="{ name: 'ArticleDetail', params: { id: post.id } }" class="post-link">
-                                <div class="post-title">{{ post.title }}</div>
+                                <div class="post-title">
+                                  <span>{{ post.title }}</span>
+                                  <span v-if="post.subtitle" class="master-title">
+                                    <span class="pipe">|</span>
+                                    <span class="subtitle">{{ post.subtitle }}</span>
+                                  </span>
+                                </div>
                                 <div class="post-meta">{{ formatDate(post.publishedAt) }}</div>
                               </router-link>
                             </li>
@@ -449,7 +455,17 @@ $breakpoint-mobile: 768px;
   }
 
   .post-title {
-    font-weight: 600
+    font-weight: 600;
+
+    .master-title {
+      .pipe {
+        margin: auto 10px;
+      }
+    }
+
+    &:hover {
+      color: $base-color-j1;
+    }
   }
 
   .post-meta {

@@ -112,6 +112,7 @@ export interface Tag {
 export interface ArchivePost {
   id: number;
   title: string;
+  subtitle?: string;
   publishedAt: string;
   day: number;
   summary?: string;
