@@ -161,6 +161,20 @@ export const isDaily = subject === 'daily'
 // note app
 export const isNote = subject === 'note'
 
+export function isMobile() {
+  const ua = navigator.userAgent;
+  // 移动端 UA 正则
+  const mobileRegex = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i;
+
+  // 屏幕宽度小于 768px
+  const isSmallScreen = window.innerWidth <= 768;
+
+  // 支持触摸事件
+  const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+  return mobileRegex.test(ua) || (isSmallScreen || isTouch);
+}
+
 export default {
   isDaily,
   isNote,

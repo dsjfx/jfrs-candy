@@ -320,7 +320,8 @@ $breakpoint-mobile: 768px;
 
   @media (max-width: $breakpoint-mobile) {
     width: 100%;
-    padding: 10px;
+    margin: 0;
+    padding: 0;
   }
 }
 
@@ -330,6 +331,11 @@ $breakpoint-mobile: 768px;
   margin-bottom: 50px;
   padding-top: 10px;
   text-align: center;
+
+  @media (max-width: $breakpoint-mobile) {
+    display: flex;
+    flex-direction: column;
+  }
 
   h1 {
     margin-bottom: 20px;
@@ -349,7 +355,7 @@ $breakpoint-mobile: 768px;
     margin: 0 auto;
 
     @media (max-width: $breakpoint-mobile) {
-      max-width: 400px;
+      margin: 0 20px;
     }
 
     input {
@@ -497,10 +503,32 @@ $breakpoint-mobile: 768px;
   grid-template-columns: 100px 1fr 100px;
   gap: 1.5rem;
 
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-columns: 1fr;
+    // gap: 0;
+    margin: auto 15px;
+  }
+
+  .articles-left {
+    @media (max-width: $breakpoint-mobile) {
+      display: none;
+    }
+  }
+
   .articles-center {
     display: flex;
     flex-direction: column;
     gap: 5rem;
+
+    @media (max-width: $breakpoint-mobile) {
+      gap: 3rem;
+    }
+  }
+
+  .articles-right {
+    @media (max-width: $breakpoint-mobile) {
+      display: none;
+    }
   }
 }
 
@@ -590,10 +618,10 @@ $breakpoint-mobile: 768px;
 }
 
 // 响应式设计
-@media (max-width: 768px) {
-  .article-container {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-}
+// @media (max-width: 768px) {
+//   .article-container {
+//     grid-template-columns: 1fr;
+//     gap: 1rem;
+//   }
+// }
 </style>

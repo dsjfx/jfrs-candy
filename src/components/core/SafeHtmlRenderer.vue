@@ -40,7 +40,9 @@ $shadow: $shadow-xs;
 $radius: $radius-sm;
 
 .content-html {
-  overflow-x: auto;
+  width: calc(100vw - 40px - 15px);
+  max-width: 100%;
+  // overflow-x: auto;
   font-size: 1.1rem;
   line-height: 1.8;
   // color: $text-primary;
@@ -78,6 +80,10 @@ $radius: $radius-sm;
       color: transparent;
       letter-spacing: -0.02em;
       border-bottom: 2px solid #e2e8f0;
+
+      @media (max-width: $breakpoint-mobile) {
+        font-size: 2rem;
+      }
     }
 
     h2 {
@@ -88,6 +94,10 @@ $radius: $radius-sm;
       /* 清新绿条，增加层次感 */
       border-left: 5px solid var(--accent-color);
       color: #2c3e4e;
+
+      @media (max-width: $breakpoint-mobile) {
+        font-size: 1.5rem;
+      }
     }
 
     h3 {
@@ -95,7 +105,11 @@ $radius: $radius-sm;
       padding: 0 0.5rem 0 0;
       font-size: 1.5rem;
       color: #2c5a6e;
+
       // background: linear-gradient(to right, #d9f0e9, transparent);
+      @media (max-width: $breakpoint-mobile) {
+        font-size: 1.2rem;
+      }
     }
 
     h4 {
@@ -105,6 +119,10 @@ $radius: $radius-sm;
       font-weight: 550;
       color: #3b6e62;
       border-bottom: 1px dashed #cbd5e1;
+
+      @media (max-width: $breakpoint-mobile) {
+        font-size: 1rem;
+      }
     }
 
     h5 {
@@ -112,6 +130,10 @@ $radius: $radius-sm;
       font-weight: 550;
       color: #4a7c6b;
       font-style: normal;
+
+      @media (max-width: $breakpoint-mobile) {
+        font-size: 0.88rem;
+      }
     }
 
     h6 {
@@ -120,6 +142,10 @@ $radius: $radius-sm;
       color: #5f8b7a;
       text-transform: uppercase;
       letter-spacing: 0.5px;
+
+      @media (max-width: $breakpoint-mobile) {
+        font-size: 0.8rem;
+      }
     }
 
     p {

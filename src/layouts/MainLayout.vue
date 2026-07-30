@@ -26,6 +26,11 @@ $breakpoint-mobile: 768px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+
+  @media (max-width: $breakpoint-mobile) {
+    width: 100%;
+    overflow-x: hidden;
+  }
 }
 
 .layout-container {
@@ -37,10 +42,11 @@ $breakpoint-mobile: 768px;
   gap: 32px;
 
   @media (max-width: $breakpoint-mobile) {
-    min-width: 90%;
+    width: 100%;
+    min-width: 100%;
     max-width: 100%;
-    margin: 10px;
-    padding: 0 5px;
+    margin: 0;
+    padding: 0;
   }
 }
 

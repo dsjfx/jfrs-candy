@@ -147,6 +147,7 @@ $breakpoint-mobile: 768px;
   border-top: 1px solid var(--color-border);
 
   @media (max-width: $breakpoint-mobile) {
+    margin-top: 20px;
     padding: 10px;
   }
 }
@@ -161,12 +162,22 @@ $breakpoint-mobile: 768px;
   // padding: 0 20px;
   color: var(--text-footer);
   font-size: 0.9rem;
+
+  @media (max-width: $breakpoint-mobile) {
+    grid-template-columns: 1fr;
+    margin: 0;
+  }
 }
 
 .footer-left {
   display: flex;
   flex-direction: row;
   gap: 8px;
+
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+    gap: 2px;
+  }
 
   .footer-copyright {
     display: flex;
@@ -175,6 +186,10 @@ $breakpoint-mobile: 768px;
     color: var(--color-text-secondary);
     font-size: 0.875rem;
 
+    @media (max-width: $breakpoint-mobile) {
+      font-size: 0.75rem;
+    }
+
     .footer-title {
       margin: 0 5px;
     }
@@ -182,7 +197,7 @@ $breakpoint-mobile: 768px;
     .footer-slogan {
       margin-left: 5px;
       color: var(--color-text-secondary);
-      font-size: 0.875rem;
+      // font-size: 0.875rem;
     }
 
     .separator {
@@ -196,6 +211,15 @@ $breakpoint-mobile: 768px;
     display: inline-block;
     font-size: 0.875rem;
 
+    @media (max-width: $breakpoint-mobile) {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      gap: 2px;
+      margin-left: 10px;
+      font-size: 0.75rem;
+    }
+
     a {
       color: var(--text-footer);
 
@@ -206,10 +230,21 @@ $breakpoint-mobile: 768px;
 
     .footer-beian-icp {
       margin-left: 0;
+
+      @media (max-width: $breakpoint-mobile) {
+        display: inline-flex;
+        justify-content: center;
+      }
     }
 
     .footer-beian-mps {
       margin-left: 20px;
+
+      @media (max-width: $breakpoint-mobile) {
+        display: inline-flex;
+        justify-content: center;
+        margin-left: 0;
+      }
 
       img {
         vertical-align: middle;

@@ -44,13 +44,13 @@ export const useUserStore = defineStore('user', () => {
       if (data && data.data) {
         let _data = data.data
         user.value = _data
-        setUserInfo({
-          id: _data.id,
-          username: _data.username,
-          nickname: _data.nickname,
-          email: _data.email || '',
-          avatar: _data.avatar || '',
-        })
+        // setUserInfo({
+        //   id: _data.id,
+        //   username: _data.username,
+        //   nickname: _data.nickname,
+        //   email: _data.email || '',
+        //   avatar: _data.avatar || '',
+        // })
       }
     } catch (error) {
       logout()

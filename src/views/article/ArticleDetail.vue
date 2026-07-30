@@ -754,7 +754,7 @@ $breakpoint-mobile: 768px;
     }
 
     @media (max-width: $breakpoint-mobile) {
-      padding: 0;
+      padding: 0 1rem;
     }
   }
 }
@@ -900,7 +900,7 @@ $breakpoint-mobile: 768px;
     .article-category {
       display: inline-block;
       padding: 0.25rem 0.75rem;
-      border-radius: 20px;
+      border-radius: 8px;
       font-size: 0.95rem;
       font-weight: 400;
       color: rgba(var(--category-color-rgb, 5, 150, 105), 1);
@@ -982,13 +982,14 @@ $breakpoint-mobile: 768px;
   border-radius: $radius;
   overflow: hidden;
   box-shadow: $shadow;
+  text-align: center;
 
   .featured-image-content {
-    width: 100%;
+    max-width: 70%;
     height: auto;
     max-height: 400px;
     object-fit: cover;
-    display: block;
+    // display: block;
   }
 
   .image-caption {
@@ -1266,6 +1267,11 @@ $breakpoint-mobile: 768px;
     // border-radius: $radius;
     // box-shadow: $shadow;
     // background: $card-bg;
+
+    @media (max-width: $breakpoint-mobile) {
+      margin-bottom: 1rem;
+      padding: 1rem;
+    }
 
     .widget-title {
       margin-bottom: 1rem;

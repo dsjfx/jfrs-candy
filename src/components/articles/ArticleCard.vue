@@ -176,16 +176,28 @@ $breakpoint-mobile: 768px;
   // border: 1px solid var(--border-color, #E5E7EB);
   // border-left: 2px solid #8b1a1a;
   border: none;
-  // border-bottom: 1px dashed #8b1a1a;
   border-bottom: 1px dashed #5a026b;
   transition: all 0.3s ease;
 
+  @media (max-width: $breakpoint-mobile) {
+    padding: 2px 5px;
+    border-bottom: none;
+  }
+
   &:nth-child(odd) {
     border-left: 2px solid #5a026b;
+
+    @media (max-width: $breakpoint-mobile) {
+      border-left: none;
+    }
   }
 
   &:nth-child(even) {
     border-right: 2px solid #5a026b;
+
+    @media (max-width: $breakpoint-mobile) {
+      border-right: none;
+    }
   }
 
   &:hover {
@@ -306,6 +318,7 @@ $breakpoint-mobile: 768px;
     justify-content: space-between;
     align-items: center;
     padding-top: 1rem;
+    padding-bottom: 10px;
     border-top: 1px solid var(--border-color, #E5E7EB);
   }
 
@@ -316,7 +329,7 @@ $breakpoint-mobile: 768px;
     flex-wrap: wrap;
 
     @media (max-width: $breakpoint-mobile) {
-      display: none;
+      // gap: 5px;
     }
   }
 
@@ -361,6 +374,10 @@ $breakpoint-mobile: 768px;
     &:hover {
       color: var(--primary-dark, #047857);
       transform: translateX(3px);
+
+      @media (max-width: $breakpoint-mobile) {
+        transform: none;
+      }
     }
   }
 }

@@ -17,8 +17,8 @@
           </h1>
         </div>
 
-        <img v-if="isDaily" class="slogan artistic" src="@/assets/img/slogan.png" alt="slogan" />
-        <div v-if="isNote" class="slogan artistic2">{{ appSlogan }}</div>
+        <img v-if="isDaily && !isPhone" class="slogan artistic" src="@/assets/img/slogan.png" alt="slogan" />
+        <div v-if="isNote && !isPhone" class="slogan artistic2">{{ appSlogan }}</div>
 
         <nav class="nav">
           <ul class="nav-list">
@@ -37,7 +37,7 @@
           <el-button :icon="isDark ? 'Sunny' : 'Moon'" circle @click="toggleTheme"
             :title="isDark ? '切换到亮色模式' : '切换到暗色模式'" />
           <div v-if="isDaily">
-            <el-button v-if="!userStore.user" type="primary" @click="showLoginDialog = true">
+            <el-button v-if="!userStore.userInfo" type="primary" @click="showLoginDialog = true">
               登录
             </el-button>
             <el-dropdown v-else>
@@ -149,7 +149,7 @@ import { userApi } from '@/api'
 import { useThemeStore } from '@/stores'
 import { useUserStore } from '@/stores/user'
 import { useAppNameStruct } from '@/composables/useAppName'
-import { isDaily, isNote } from '@/utils/cabinet'
+import { isDaily, isMobile, isNote } from '@/utils/cabinet'
 
 const router = useRouter()
 const themeStore = useThemeStore()
@@ -161,6 +161,7 @@ const appSlogan = import.meta.env.VITE_APP_TITLE_SLOGAN || '记记录生活点�
 // avatar url
 const avatar = ref<string>('https://picsum.photos/200/200?random=10')
 
+const isPhone = ref(false)
 const mobileMenuVisible = ref(false)
 const showLoginDialog = ref(false)
 const loginLoading = ref(false)
@@ -305,11 +306,19 @@ const fetchSimpleUser = async () => {
   }
 }
 
+const checkIfMobile = () => {
+  isPhone.value = isMobile()
+}
+
 onMounted(async () => {
   await fetchSimpleUser()
 
+  checkIfMobile()
+
   // 组件挂载时加载保存的用户名
   loadSavedUsername()
+
+  window.addEventListener('resize', checkIfMobile);
 })
 
 </script>
@@ -330,11 +339,12 @@ $breakpoint-mobile: 768px;
     // max-width: 1300px;
     // min-height: 70px;
     margin: 0 20px;
-    // padding: 0 20px;
 
     @media (max-width: $breakpoint-mobile) {
+      width: 100%;
       min-height: 50px;
-      padding: 0 10px;
+      margin: 0;
+      padding: 0 20px;
     }
   }
 }
@@ -357,15 +367,18 @@ $breakpoint-mobile: 768px;
   cursor: pointer;
   padding-left: 8px;
 
+  @media (max-width: $breakpoint-mobile) {
+    padding-left: 0;
+    gap: 8px;
+  }
+
   img {
     width: auto;
     max-height: 40px;
     padding-left: 20px;
-    // vertical-align: middle;
 
     @media (max-width: $breakpoint-mobile) {
       max-height: 30px;
-      padding-left: 10px;
     }
   }
 
@@ -374,7 +387,6 @@ $breakpoint-mobile: 768px;
     padding-left: 8px;
     font-size: 1.8rem;
     font-weight: 800;
-    // vertical-align: middle;
     color: var(--color-primary);
     background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
     background-clip: text;
@@ -382,7 +394,7 @@ $breakpoint-mobile: 768px;
     // -webkit-text-fill-color: transparent;
 
     @media (max-width: $breakpoint-mobile) {
-      font-size: 1.5rem;
+      font-size: 1.3rem;
     }
 
     .title-master {
@@ -391,7 +403,7 @@ $breakpoint-mobile: 768px;
 
     .title-divider {
       color: var(--color-deputy);
-      margin: 0 2px;
+      margin: 0 1px;
       font-weight: 800;
     }
 
@@ -402,14 +414,9 @@ $breakpoint-mobile: 768px;
 }
 
 .slogan {
-  // padding-top: 10px;
   font-size: 18px;
   font-weight: bolder;
   color: rgba($base-color-j9, 0.7);
-
-  @media (max-width: $breakpoint-mobile) {
-    font-size: 14px;
-  }
 
   &.artistic {
     transform: rotate(1deg);
