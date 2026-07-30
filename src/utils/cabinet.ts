@@ -172,7 +172,7 @@ export function isMobile() {
   // 支持触摸事件
   const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-  return mobileRegex.test(ua) || (isSmallScreen || isTouch);
+  return mobileRegex.test(ua) || (isSmallScreen && isTouch);
 }
 
 export default {
