@@ -754,7 +754,7 @@ $breakpoint-mobile: 768px;
     }
 
     @media (max-width: $breakpoint-mobile) {
-      padding: 0 1rem;
+      padding: 1rem;
     }
   }
 }
@@ -1388,6 +1388,8 @@ $breakpoint-mobile: 768px;
     cursor: default;
 
     &.prev {
+      display: inline-flex;
+      justify-content: flex-start;
       border-left: 1px solid $primary-color;
       border-bottom: 1px solid $primary-color;
 
@@ -1397,6 +1399,8 @@ $breakpoint-mobile: 768px;
     }
 
     &.next {
+      display: inline-flex;
+      justify-content: flex-end;
       border-right: 1px solid $primary-color;
       border-bottom: 1px solid $primary-color;
 
@@ -1422,6 +1426,10 @@ $breakpoint-mobile: 768px;
       color: $text-light;
       text-transform: uppercase;
       letter-spacing: 1px;
+
+      @media (max-width: $breakpoint-mobile) {
+        display: none;
+      }
 
       &:hover {
         cursor: pointer;

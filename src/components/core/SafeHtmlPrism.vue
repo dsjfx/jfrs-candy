@@ -50,9 +50,10 @@ const defaultPurifyConfig = {
     'strong', 'em', 'b', 'i', 'blockquote'
   ],
   ALLOWED_ATTR: [
-    'class', 'id', 'href', 'src', 'alt', 'title',
+    'style', 'class', 'id', 'href', 'src', 'alt', 'title',
     'target', 'rel', 'data-*'
   ],
+  // ALLOW_STYLE: true,
   // 允许代码块的语言类
   ALLOWED_CLASSES: [
     'language-*', 'line-numbers', 'highlight'

@@ -5,7 +5,13 @@
     </div>
 
     <div class="related-article-content">
-      <h4 class="related-article-title">{{ article.title }}</h4>
+      <h4 class="related-article-title">
+        <span>{{ article.title }}</span>
+        <span v-if="article.subtitle" class="master-title">
+          <span class="pipe">|</span>
+          <span class="subtitle">{{ article.subtitle }}</span>
+        </span>
+      </h4>
       <div class="related-article-meta">
         <span class="related-article-date">{{ formatDate(article.publishedAt) }}</span>
         <span class="related-article-views">👁️ {{ article.views || 0 }}</span>
@@ -79,16 +85,30 @@ const formatDate = (dateStr: string) => {
   }
 
   .related-article-title {
+    display: -webkit-box;
+    margin-bottom: 0.5rem;
     font-size: 0.95rem;
     font-weight: 600;
     color: #1f2937;
-    margin-bottom: 0.5rem;
     line-height: 1.4;
-    display: -webkit-box;
     line-clamp: 2;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+
+    .master-title {
+
+      .pipe {
+        margin: auto 10px;
+        font-weight: 600;
+        opacity: .8;
+      }
+
+      .subtitle {
+        font-weight: 400;
+        opacity: 0.7;
+      }
+    }
   }
 
   .related-article-meta {
