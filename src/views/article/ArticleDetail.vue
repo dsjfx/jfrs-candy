@@ -51,7 +51,7 @@
             </span>
 
             <div v-if="showTime" class="meta-item">
-              <span title="发布日期" class="meta-icon">
+              <span v-if="mobile" title="发布日期" class="meta-icon">
                 <FaIcon :icon="faCalendarIcon" />
               </span>
               <span>
@@ -215,8 +215,17 @@
               </el-icon>
             </span>
             目录
+            <button class="toc-toggle" v-if="mobile" @click="toggleToc" :aria-expanded="tocVisible"
+              :aria-label="tocVisible ? '收起目录' : '展开目录'">
+              <span class="toc-icon" v-if="tocVisible">
+                <FontAwesomeIcon :icon="['fas', 'caret-up']" />
+              </span>
+              <span class="toc-icon" v-else>
+                <FontAwesomeIcon :icon="['fas', 'caret-down']" />
+              </span>
+            </button>
           </h3>
-          <div class="toc-content">
+          <div class="toc-content" v-show="tocVisible || !mobile">
             <nav class="toc-nav">
               <ul class="toc-list">
                 <li v-for="heading in headings" :key="heading.id" class="toc-item" :class="{
@@ -304,7 +313,7 @@ import { useArticleStore } from '@/stores/article'
 import { useCommentStore } from '@/stores/comment'
 import type { Article, ArticleDetailProps, Category } from '@/types/article'
 import type { Comment } from '@/types/comment'
-import { formatDate, tagColorRgb } from '@/utils/cabinet'
+import { formatDate, isMobile, tagColorRgb } from '@/utils/cabinet'
 import { ElMessage } from 'element-plus'
 
 // 路由和状态
@@ -375,6 +384,10 @@ const showBackToTop = ref(false)
 
 // ~~~~计算属性
 
+const mobile = computed(() => isMobile())
+// 目录可见性（移动端默认隐藏）
+const tocVisible = ref(!mobile.value)
+
 const currentUrl = computed(() => window.location.href)
 
 // 文章数据
@@ -400,10 +413,12 @@ const categoryColor = computed(() => {
 onMounted(async () => {
   await fetchArticle()
   setupScrollListeners()
+  setupResizeListeners()
 })
 
 onUnmounted(() => {
   removeScrollListeners()
+  removeResizeListeners()
 })
 
 // ~~~~方法
@@ -436,6 +451,25 @@ const fetchArticle = async () => {
     const errorMessage = err instanceof Error ? err.message : '操作失败'
     setError(errorMessage)
   }
+}
+
+// 切换目录可见性
+const toggleToc = () => {
+  tocVisible.value = !tocVisible.value
+}
+
+// Resize 监听：同步更新 mobile 与 tocVisible
+const updateIsMobile = () => {
+  // if switching between desktop/mobile, adjust toc visibility
+  tocVisible.value = !mobile
+}
+
+const setupResizeListeners = () => {
+  window.addEventListener('resize', updateIsMobile)
+}
+
+const removeResizeListeners = () => {
+  window.removeEventListener('resize', updateIsMobile)
 }
 
 const handleBack = () => {
@@ -552,17 +586,27 @@ const scrollToHeading = (id: string) => {
 const setupScrollListeners = () => {
   window.addEventListener('scroll', handleScroll)
   window.addEventListener('scroll', updateActiveHeading)
+  // 额外监听touchmove事件，对移动端更友好
+  window.addEventListener('touchmove', handleScroll);
 }
 
 // 移除滚动监听
 const removeScrollListeners = () => {
   window.removeEventListener('scroll', handleScroll)
   window.removeEventListener('scroll', updateActiveHeading)
+  window.removeEventListener('touchmove', handleScroll);
 }
 
 // 处理滚动
 const handleScroll = () => {
-  showBackToTop.value = window.scrollY > 500
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+  // 当滚动距离大于300px时显示按钮
+  showBackToTop.value = window.scrollY > 300
+
+  // 如果滚动到顶部，确保按钮隐藏
+  if (scrollTop === 0) {
+    showBackToTop.value = false;
+  }
 }
 
 // 更新活动标题
@@ -589,6 +633,9 @@ const scrollToTop = () => {
     top: 0,
     behavior: 'smooth'
   })
+
+  // 立即隐藏，但也会在滚动事件中再次确认
+  showBackToTop.value = false;
 }
 
 // 更新阅读量
@@ -826,21 +873,25 @@ $breakpoint-mobile: 768px;
   gap: 1rem;
   border-top: 1px solid $border-color;
 
-  @media (max-width: $breakpoint-mobile) {
-    flex-direction: column;
-    align-items: flex-start;
+  // @media (max-width: $breakpoint-mobile) {
+  //   flex-direction: column;
+  //   align-items: flex-start;
 
-    .meta-right {
-      width: 100%;
-      justify-content: flex-start;
-    }
-  }
+  //   .meta-right {
+  //     width: 100%;
+  //     justify-content: flex-start;
+  //   }
+  // }
 
   .meta-left {
     display: flex;
     align-items: center;
     gap: 1.5rem;
     flex-wrap: wrap;
+
+    @media (max-width: $breakpoint-mobile) {
+      gap: 0.5rem;
+    }
   }
 
   .meta-item {
@@ -850,6 +901,11 @@ $breakpoint-mobile: 768px;
     color: $text-secondary;
     font-size: 0.95rem;
     height: 100%;
+
+    @media (max-width: $breakpoint-mobile) {
+      gap: 0.3rem;
+      margin-right: 0.5rem;
+    }
 
     &.author {
       gap: 0.75rem;
@@ -878,6 +934,12 @@ $breakpoint-mobile: 768px;
       color: $text-secondary;
       transition: all 0.18s ease;
       font-size: 0.95rem;
+
+      @media (max-width: $breakpoint-mobile) {
+        width: auto;
+        height: auto;
+        background: transparent;
+      }
     }
 
     &:hover .meta-icon {
@@ -1269,8 +1331,9 @@ $breakpoint-mobile: 768px;
     // background: $card-bg;
 
     @media (max-width: $breakpoint-mobile) {
-      margin-bottom: 1rem;
+      margin-bottom: 0;
       padding: 1rem;
+      padding-bottom: 0;
     }
 
     .widget-title {
@@ -1285,6 +1348,30 @@ $breakpoint-mobile: 768px;
 
       .meta-icon {
         font-size: 1.2rem;
+      }
+
+      .toc-toggle {
+        margin-left: auto;
+        background: transparent;
+        border: 1px solid $border-color;
+        color: $text-secondary;
+        padding: 0;
+        width: 36px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        cursor: pointer;
+
+        @media (min-width: $breakpoint-mobile) {
+          display: none;
+        }
+
+        .toc-icon {
+          line-height: 1;
+        }
       }
     }
   }

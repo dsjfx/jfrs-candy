@@ -2,9 +2,9 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 // 按分类导入常用图标
-import { 
-  faSearch, 
-  faUser, 
+import {
+  faSearch,
+  faUser,
   faHome,
   faCog,
   faBars,
@@ -15,18 +15,20 @@ import {
   faTrash,
   faDownload,
   faComment,
-  faHouse
+  faHouse,
+  faCaretUp,
+  faCaretDown
 } from '@fortawesome/free-solid-svg-icons'
 
-import { 
-  faGithub, 
+import {
+  faGithub,
   faTwitter,
   faFacebook,
   faWeibo,
   faQq
 } from '@fortawesome/free-brands-svg-icons'
 
-import { 
+import {
   faStar as farStar,
   faHeart as farHeart,
   faBell as farBell
@@ -37,11 +39,11 @@ library.add(
   // solid
   faSearch, faUser, faHome, faCog, faBars, faTimes,
   faArrowRight, faPlus, faEdit, faTrash, faDownload,
-  faComment, faHouse,
-  
+  faComment, faHouse, faCaretUp, faCaretDown,
+
   // brands
   faGithub, faTwitter, faFacebook, faWeibo, faQq,
-  
+
   // regular
   farStar, farHeart, farBell
 )
