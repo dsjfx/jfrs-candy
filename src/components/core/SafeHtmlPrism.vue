@@ -302,7 +302,7 @@ $radius: $radius-sm;
 
     p {
       margin-top: 0;
-      margin-bottom: 0.8em;
+      margin-bottom: 0.3em;
     }
 
     a {
@@ -321,7 +321,7 @@ $radius: $radius-sm;
       max-width: 100%;
       height: auto;
       border-radius: $radius;
-      margin: 1.5rem 0;
+      margin: 0.5rem 0;
       box-shadow: $shadow;
     }
 
