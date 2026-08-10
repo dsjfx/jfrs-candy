@@ -51,7 +51,7 @@
             </span>
 
             <div v-if="showTime" class="meta-item">
-              <span v-if="mobile" title="发布日期" class="meta-icon">
+              <span title="发布日期" class="meta-icon">
                 <FaIcon :icon="faCalendarIcon" />
               </span>
               <span>
@@ -554,14 +554,14 @@ const fetchNavigationArticles = async () => {
     if (prev) {
       prevArticle.value = {
         id: `${prev.id}`,
-        title: prev.title,
+        title: prev.subtitle || prev.title,
       }
     }
 
     if (next) {
       nextArticle.value = {
         id: `${next.id}`,
-        title: next.title,
+        title: next.subtitle || next.title,
       }
     }
   } catch (err) {

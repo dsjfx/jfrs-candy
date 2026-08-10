@@ -1,6 +1,6 @@
-# jCandy
+# jfrs-candy
 
-jCandy 是一个基于 Vue 3、Vite、TypeScript 和 Pinia 的个人博客 Web 应用。它以简洁现代的方式展示文章内容，同时支持照片墙和个人介绍页面。
+jfrs-candy 是一个基于 Vue 3、Vite、TypeScript 和 Pinia 的个人博客 Web 应用。它以简洁现代的方式展示文章内容，同时支持照片墙和个人介绍页面。
 
 ## 主要功能
 

@@ -161,12 +161,16 @@ const author = ref<User>({} as User)
 const showQrDialog = ref(false)
 const qrImageUrl = ref('')
 
+const subject = import.meta.env.VITE_APP_SUBJECT || ''
 
 const getUser = async () => {
   startLoading();
 
   try {
-    await userStore.getUserInfo({ id: 1 });
+    let id = 1;
+    if (subject === 'note')
+      id = 2;
+    await userStore.getUserInfo({ id });
     if (userStore.user) {
       // const user: User = userStore.user;
       author.value = userStore.user;
