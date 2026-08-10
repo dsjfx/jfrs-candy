@@ -1474,6 +1474,10 @@ $breakpoint-mobile: 768px;
     transition: all 0.3s ease;
     cursor: default;
 
+    @media (max-width: $breakpoint-mobile) {
+      padding: 0.3rem;
+    }
+
     &.prev {
       display: inline-flex;
       justify-content: flex-start;
@@ -1555,6 +1559,10 @@ $breakpoint-mobile: 768px;
           margin-left: 10px;
           color: $text-light;
           cursor: not-allowed;
+
+          @media (max-width: $breakpoint-mobile) {
+            margin-left: 5px;
+          }
         }
       }
 
@@ -1572,6 +1580,10 @@ $breakpoint-mobile: 768px;
           color: $text-light;
           margin-right: 10px;
           cursor: not-allowed;
+
+          @media (max-width: $breakpoint-mobile) {
+            margin-right: 5px;
+          }
         }
       }
     }
