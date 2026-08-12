@@ -456,6 +456,10 @@ $radius: $radius-sm;
       }
     }
 
+    .ql-align-center {
+      text-align: center;
+    }
+
     /* 响应式调整 */
     @media (max-width: $breakpoint-mobile) {
       .prose-content h1 {
