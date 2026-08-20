@@ -1457,18 +1457,24 @@ $breakpoint-mobile: 768px;
 
 // 文章导航
 .navigation-links {
-  margin-top: 20px;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  // display: flex;
+  // flex-direction: row;
+  // justify-content: space-between;
+  // align-items: center;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
+  margin-top: 20px;
+
+  &>* {
+    min-width: 0;
+  }
 
   .nav-link {
-    padding: 0.8rem;
     display: flex;
     flex: 1;
     align-items: center;
+    padding: 0.8rem;
     border-radius: $radius;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -1529,16 +1535,21 @@ $breakpoint-mobile: 768px;
     }
 
     .nav-link-title {
+      // width: 95%;
       // margin-left: 10px;
       font-size: 0.95rem;
       color: $text-primary;
       line-height: 1.4;
       font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
 
       &:hover {
         cursor: pointer;
         color: $primary-color;
       }
+
     }
 
     &.disabled {

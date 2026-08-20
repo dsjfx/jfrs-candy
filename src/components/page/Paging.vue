@@ -266,6 +266,7 @@ $breakpoint-mobile: 480px;
 
     @media (max-width: $breakpoint-mobile) {
       font-size: 0.8rem;
+      padding: 10px;
     }
 
     &:hover:not(:disabled) {
