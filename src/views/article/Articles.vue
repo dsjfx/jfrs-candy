@@ -94,12 +94,14 @@ import LoadingSpinner from '@/components/core/LoadingSpinner.vue'
 import Paging from '../../components/page/Paging.vue'
 import type { Article } from '@/types/article'
 import { useArticleStore } from '@/stores/article'
+import { useSearchStore } from '@/stores/searchStore.ts'
 import useLoading from '@/composables/useLoading'
 import useDebouncedRef from '@/composables/useDebouncedRef'
 import { DEFAULT_CURRENT, DEFAULT_PAGESIZE } from '@/utils/constant.ts'
 
 const router = useRouter()
 const articleStore = useArticleStore()
+const searchStore = useSearchStore()
 const {
   isLoading,
   isLoadingMore,
@@ -114,9 +116,9 @@ const articleTitle = import.meta.env.VITE_APP_ARTICLE_TITLE
 
 // 响应式数据
 
-const current = ref(DEFAULT_CURRENT)
-const pageSize = ref(DEFAULT_PAGESIZE)
-const searchQuery = ref('')
+const current = ref(searchStore.currentPage || DEFAULT_CURRENT)
+const pageSize = ref(searchStore.pageSize || DEFAULT_PAGESIZE)
+const searchQuery = ref<string>(searchStore.keyword || '')
 
 // 骨架屏数量
 const skeletonCount = ref(1)
@@ -205,11 +207,17 @@ const fetchArticles = async () => {
   }, 2000)
 
   try {
-    await articleStore.fetchArticles({
+    const res = await articleStore.fetchArticles({
       current: current.value,
       size: pageSize.value,
       search: searchQuery.value || undefined
     })
+    searchStore.updateSearchParams({
+      keyword: searchQuery.value,
+      currentPage: current.value,
+      pageSize: pageSize.value
+    })
+    console.log('文章列表数据:', res)
   } catch (err) {
     console.error('加载文章失败:', err)
     // error.value = err instanceof Error ? err.message : '加载失败'
@@ -269,7 +277,9 @@ const handleArticleClick = (article: Article) => {
 
 const handlePageChange = async (page: number) => {
   if (page >= 1 && page <= totalPages.value && page !== current.value) {
-    current.value = page
+    // current.value = page
+    searchStore.setPage(page)
+
     // fetch considering search
     try {
       await articleStore.fetchArticles({ current: page, size: pageSize.value, search: searchQuery.value })
@@ -281,13 +291,16 @@ const handlePageChange = async (page: number) => {
 }
 
 const handlePageSizeChange = (size: number) => {
-  pageSize.value = size
-  current.value = 1
+  // pageSize.value = size
+  // current.value = 1
+  searchStore.setPage(1)
+  searchStore.setPageSize(size)
 }
 
 const clearSearch = () => {
   searchQuery.value = ''
-  current.value = 1
+  // current.value = 1
+  searchStore.setPage(1)
   fetchArticles()
   // focus input after clearing
   if (searchInputRef.value) searchInputRef.value.focus()
@@ -295,6 +308,11 @@ const clearSearch = () => {
 
 // 生命周期
 onMounted(async () => {
+
+  // 把 Pinia 中的关键词同步到输入框
+  searchQuery.value = searchStore.keyword || ''
+
+  // 获取数据
   await fetchArticles()
 })
 

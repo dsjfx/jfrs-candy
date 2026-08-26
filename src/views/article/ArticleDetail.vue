@@ -1535,7 +1535,6 @@ $breakpoint-mobile: 768px;
     }
 
     .nav-link-title {
-      // width: 95%;
       // margin-left: 10px;
       font-size: 0.95rem;
       color: $text-primary;
