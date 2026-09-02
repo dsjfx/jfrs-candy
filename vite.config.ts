@@ -37,16 +37,16 @@ export default defineConfig({
     }
   },
   build: {
-    // 生产构建优化
-    target: 'es2015', // 使用ES2015+以获得更好的Tree-shaking
-    minify: 'esbuild', // 压缩时进一步移除死代码
+    // Production construction optimization
+    target: 'es2015', // Use ES2015+ for better Tree-shaking
+    minify: 'esbuild', // Further remove dead code during compression
     rollupOptions: {
       output: {
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
         manualChunks: {
-          // 代码分割，配合Tree-shaking
+          // Code splitting, in conjunction with Tree-shaking
           'vendor': ['vue', 'vue-router']
         }
       }
