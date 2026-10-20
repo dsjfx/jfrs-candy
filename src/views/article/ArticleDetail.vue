@@ -11,14 +11,14 @@
       <ErrorDisplay :error="error" @retry="fetchArticle" />
     </div>
 
-    <!-- 文章内容 -->
+    <!-- 文章内容 Article Content -->
     <main v-else class="article-detail">
-      <!-- 文章头部 -->
+      <!-- 文章头部 Article Header -->
       <div class="article-header">
 
         <!-- 返回按钮 -->
         <button class="back-button" @click="handleBack" aria-label="返回上一页">
-          <FaIcon :icon="faArrowLeftIcon" />
+          <!-- <FaIcon :icon="faArrowLeftIcon" /> -->
           <span>返回</span>
         </button>
 
@@ -52,7 +52,7 @@
 
             <div v-if="showTime" class="meta-item">
               <span title="发布日期" class="meta-icon">
-                <FaIcon :icon="faCalendarIcon" />
+                <FaIcon :icon="['far', 'calendar']" />
               </span>
               <span>
                 <time :datetime="article.publishedAt">{{ formatDate(article.publishedAt) }}</time>
@@ -61,14 +61,14 @@
 
             <span v-if="showView" class="meta-item">
               <span title="阅读" class="meta-icon">
-                <FaIcon :icon="faEyeIcon" />
+                <FaIcon :icon="['far', 'eye']" />
               </span>
               {{ article.views || 0 }}
             </span>
 
             <span v-if="showComments" class="meta-item">
               <span title="评论" class="meta-icon">
-                <FaIcon :icon="faCommentIcon" />
+                <FaIcon :icon="['far', 'comment']" />
               </span>
               {{ article.comments || '5' }}
             </span>
@@ -93,7 +93,7 @@
           </div>
         </div>
 
-        <!-- 特色图片 -->
+        <!-- 特色图片 Featured Image -->
         <div v-if="article.coverImage" class="featured-image">
           <img :src="article.coverImage" :alt="article.title" class="featured-image-content" loading="lazy" />
           <div v-if="article.imageCaption" class="image-caption">
@@ -101,7 +101,7 @@
           </div>
         </div>
 
-        <!-- 左侧内容 -->
+        <!-- 左侧内容 Left Content -->
         <div class="article-main">
           <!-- 文章内容 -->
           <article class="article-content" ref="contentRef">
@@ -137,9 +137,9 @@
             </button>
           </div> -->
 
-          <!-- 文章脚部 -->
+          <!-- 文章脚部 Article Footer -->
           <footer class="article-footer">
-            <!-- 版权声明 -->
+            <!-- 版权声明 Copyright Notice -->
             <div v-if="showCopyright" class="copyright">
               <p>本文作者：{{ article.author?.nickname || '佚名' }}</p>
               <p>原文链接：<a :href="currentUrl" class="original-link">{{ currentUrl }}</a></p>
@@ -182,7 +182,7 @@
               </div>
             </div>
 
-            <!-- 打赏区域 -->
+            <!-- 打赏区域 Reward Area -->
             <!-- <div v-if="showReward && article.enableReward" class="reward-section">
               <h3 class="reward-title">如果觉得有帮助，可以请作者喝杯咖啡 ☕</h3>
               <div class="reward-images">
@@ -191,7 +191,7 @@
               </div>
             </div> -->
 
-            <!-- 相关文章 -->
+            <!-- 相关文章 Related Articles -->
             <div v-if="showRelated && relatedArticles.length > 0" class="related-articles">
               <h3 class="related-title">相关推荐</h3>
               <div class="related-list">
@@ -204,9 +204,9 @@
 
       </div>
 
-      <!-- 右侧侧边栏 -->
+      <!-- 右侧侧边栏 Right Sidebar -->
       <aside class="article-sidebar">
-        <!-- 目录导航 -->
+        <!-- 目录导航 Catalog Navigation -->
         <div v-if="showCatalog" class="sidebar-widget toc-widget" ref="tocRef">
           <h3 class="widget-title">
             <span class="meta-icon">
@@ -242,48 +242,16 @@
         </div>
       </aside>
 
-      <!-- 评论区域 -->
-      <div v-if="showComment" class="comments-section">
-        <div class="comments-header">
-          <h2 class="comments-title">
-            <i class="comments-icon">💬</i>
-            评论 ({{ article.comments || 0 }})
-          </h2>
-          <button class="refresh-comments" @click="refreshComments">
-            <i class="refresh-icon">🔄</i>
-            刷新
-          </button>
-        </div>
-
-        <!-- 评论表单 -->
-        <CommentForm v-if="userStore.isLogin" :article-id="`${article.id}`" @comment-added="handleNewComment" />
-        <div v-else class="login-prompt">
-          请<router-link to="/login" class="login-link">登录</router-link>后发表评论
-        </div>
-
-        <!-- 评论列表 -->
-        <div v-if="comments.length > 0" class="comments-list">
-          <CommentItem v-for="comment in comments" :key="comment.id" :article-id="comment.id" :comment="comment"
-            @reply="handleReply" @like="handleLikeComment" />
-        </div>
-        <div v-else class="no-comments">
-          还没有评论，快来抢沙发吧！
-        </div>
-
-        <!-- 加载更多评论 -->
-        <div v-if="hasMoreComments" class="load-more-comments">
-          <button class="load-more-btn" :disabled="isLoadingComments" @click="loadMoreComments">
-            <span v-if="!isLoadingComments">加载更多评论</span>
-            <LoadingSpinner v-else size="small" />
-          </button>
-        </div>
+      <!-- 评论区域 Comment area -->
+      <div class="comment-container">
+        <CommentSection v-if="showComment && article.id" :article-id="article.id" @count-change="commentHandler" />
       </div>
     </main>
 
-    <!-- 分享菜单 -->
+    <!-- 分享菜单 Share Menu -->
     <ShareMenu v-if="showShareMenu" :title="article.title" :url="currentUrl" @close="showShareMenu = false" />
 
-    <!-- 回到顶部按钮 -->
+    <!-- 回到顶部按钮 Back to Top Button -->
     <button v-show="showBackToTop" class="back-to-top" @click="scrollToTop" aria-label="回到顶部">
       ↑
     </button>
@@ -293,26 +261,21 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons'
-import { faEye } from '@fortawesome/free-solid-svg-icons'
-import { faComment as faCommentRegular } from '@fortawesome/free-regular-svg-icons'
-import { faCalendar as faCalendarRegular } from '@fortawesome/free-regular-svg-icons'
 import { useRoute, useRouter } from 'vue-router'
 import { useLoading } from '@/composables/useLoading'
 import ArticleDetailSkeleton from '@/components/core/ArticleDetailSkeleton.vue'
 import ErrorDisplay from '@/components/core/ErrorDisplay.vue'
 import LoadingSpinner from '@/components/core/LoadingSpinner.vue'
 import RelatedArticleCard from '@/components/articles/RelatedArticleCard.vue'
-import CommentForm from '@/components/articles/CommentForm.vue'
-import CommentItem from '@/components/articles/CommentItem.vue'
+import CommentSection from '@/components/comment/CommentSection.vue'
+import CommentForm from '@/components/comment/CommentForm.vue'
+import CommentItem from '@/components/comment/CommentItem.vue'
 import ShareMenu from '@/components/articles/ShareMenu.vue'
-import SafeHtmlRenderer from '@/components/core/SafeHtmlRenderer.vue'
+// import SafeHtmlRenderer from '@/components/core/SafeHtmlRenderer.vue'
 import SafeHtmlPrism from '@/components/core/SafeHtmlPrism.vue'
 import { useUserStore } from '@/stores/user'
 import { useArticleStore } from '@/stores/article'
-import { useCommentStore } from '@/stores/comment'
 import type { Article, ArticleDetailProps, Category } from '@/types/article'
-import type { Comment } from '@/types/comment'
 import { formatDate, isMobile, tagColorRgb } from '@/utils/cabinet'
 import { ElMessage } from 'element-plus'
 
@@ -321,8 +284,6 @@ const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const articleStore = useArticleStore()
-const commentStore = useCommentStore()
-const articleId = computed(() => route.params.id as string)
 
 // 加载状态
 const { isLoading, hasError, error, setError, withLoading } = useLoading()
@@ -346,7 +307,7 @@ const props = withDefaults(defineProps<ArticleDetailProps>(), {
   showReward: false,
   showRelated: true,
   showCatalog: true,
-  showComment: false,
+  showComment: true,
   categoryColors: () => ({
     '日记': '#059669',
     '生活': '#10B981',
@@ -356,11 +317,6 @@ const props = withDefaults(defineProps<ArticleDetailProps>(), {
   })
 })
 
-
-// 文章数据
-// const article = ref<Article>({} as Article)
-// 相关文章
-// const relatedArticles = ref<any[]>([])
 // 导航文章
 const prevArticle = ref<any>(null)
 const nextArticle = ref<any>(null)
@@ -371,18 +327,18 @@ const activeHeading = ref('')
 const contentRef = ref<HTMLElement>()
 const tocRef = ref<HTMLElement>()
 
-// 评论相关
-// const comments = ref<any[]>([])
-const currentPage = ref(1)
-const pageSize = ref(10)
-const hasMoreComments = ref(false)
-const isLoadingComments = ref(false)
-
 // UI状态
 const showShareMenu = ref(false)
 const showBackToTop = ref(false)
+// const showLogin = ref(false)
+// const showRegister = ref(false)
 
-// ~~~~计算属性
+// ~~~~ Computed properties
+
+const isLoggedIn = computed(() => userStore.isLogin)
+// const user = computed(() => userStore.user)
+
+const articleId = computed(() => route.params.id as string)
 
 const mobile = computed(() => isMobile())
 // 目录可见性（移动端默认隐藏）
@@ -397,10 +353,6 @@ const article = computed(() => articleStore.article)
 const relatedArticles = computed(() => articleStore.relatedArticles)
 const adjacentArticle = computed(() => articleStore.adjacentArticle)
 
-// 评论相关
-const comments = computed(() => commentStore.comments)
-const commentPage = computed(() => commentStore.commentPageData)
-
 const categoryColor = computed(() => {
   const category: Category | null = article.value.category
   if (category) {
@@ -409,11 +361,12 @@ const categoryColor = computed(() => {
   return '#059669'
 })
 
-// ~~~~生命周期
+// ^^^^生命周期
 onMounted(async () => {
   await fetchArticle()
   setupScrollListeners()
   setupResizeListeners()
+
 })
 
 onUnmounted(() => {
@@ -421,7 +374,8 @@ onUnmounted(() => {
   removeResizeListeners()
 })
 
-// ~~~~方法
+// ^^^^方法
+
 
 // 获取文章详情
 const fetchArticle = async () => {
@@ -437,9 +391,6 @@ const fetchArticle = async () => {
 
     // 获取相关文章
     fetchRelatedArticlesData()
-
-    // 获取评论
-    // fetchCommentsData()
 
     // 获取导航文章
     fetchNavigationArticles()
@@ -481,11 +432,6 @@ const handleBack = () => {
   }
 }
 
-// fontawesome icon for template
-const faArrowLeftIcon = faArrowLeft
-const faCalendarIcon = faCalendarRegular
-const faEyeIcon = faEye
-const faCommentIcon = faCommentRegular
 
 // 提取文章标题（用于目录）
 const extractHeadings = () => {
@@ -513,24 +459,6 @@ const fetchRelatedArticlesData = async () => {
 
   } catch (err) {
     console.error('获取相关文章失败:', err)
-  }
-}
-
-// 获取评论
-const fetchCommentsData = async () => {
-  try {
-    await commentStore.fetchComments({
-      current: currentPage.value,
-      size: pageSize.value,
-      articleId: articleId.value,
-    })
-
-    if (commentPage) {
-      hasMoreComments.value = commentPage.value.pagination.hasNext || false
-      article.value.comments = commentPage.value.pagination.total
-    }
-  } catch (err) {
-    ElMessage.error(err!)
   }
 }
 
@@ -675,53 +603,14 @@ const scrollToTop = () => {
 //   }
 // }
 
-// 方法：刷新评论
-const refreshComments = async () => {
-  currentPage.value = 1
-  await fetchCommentsData()
+const commentHandler = (newCount: number) => {
+  article.value.comments = newCount
 }
 
-// 方法：加载更多评论
-const loadMoreComments = async () => {
-  if (isLoadingComments.value || !hasMoreComments.value) return
-
-  isLoadingComments.value = true
-  currentPage.value++
-
-  // try {
-  //   commentStore.commentPageData
-  //   const data = await commentStore.fetchComments({
-  //     articleId: articleId.value,
-  //     current: currentPage.value,
-  //     size: pageSize.value
-  //   })
-  //   comments.value.push(...data.comments)
-  //   hasMoreComments.value = data.hasMore
-  // } catch (err) {
-  //   console.error('加载更多评论失败:', err)
-  //   currentPage.value--
-  // } finally {
-  //   isLoadingComments.value = false
-  // }
-}
-
-// 方法：处理新评论
-const handleNewComment = (newComment: any) => {
-  comments.value.unshift(newComment)
-  // article.value.comments++
-}
-
-// 方法：处理回复
-const handleReply = (comment: Comment) => {
-  const commentId = comment.id
-  console.log('回复评论:', commentId)
-  // 实现回复逻辑
-}
-
-// 方法：处理点赞评论
-const handleLikeComment = (commentId: string) => {
-  console.log('点赞评论:', commentId)
-  // 实现点赞评论逻辑
+// 方法：Toast提示
+const showToast = (message: string) => {
+  // 可以使用 Element Plus 或其他库的 toast
+  alert(message)
 }
 
 // 方法：导航到文章
@@ -734,6 +623,7 @@ const navigateToArticle = (id: string) => {
 <style lang="scss" scoped>
 // 变量定义（与列表页保持一致）
 $bg-color: $base-bg-j3;
+$card-bg: $base-bg-j3;
 $border-color: $base-border-j2;
 $shadow: $shadow-xs;
 $radius: $radius-sm;
@@ -783,13 +673,15 @@ $breakpoint-mobile: 768px;
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      background: transparent;
-      border: 1px solid $border-color;
-      color: $text-secondary;
-      cursor: pointer;
       margin-bottom: 12px;
+      padding: 6px 14px;
+      border-radius: 8px;
+      // background: transparent;
+      border: 1px solid $border-color;
+      font-weight: bolder;
+      color: var(--color-primary);
+      background: rgba(var(--category-color-rgb, 5, 150, 105), 0.1);
+      cursor: pointer;
 
       span {
         font-size: 0.9rem;
@@ -961,7 +853,7 @@ $breakpoint-mobile: 768px;
 
     .article-category {
       display: inline-block;
-      padding: 0.25rem 0.75rem;
+      padding: 0.2rem 0.6rem;
       border-radius: 8px;
       font-size: 0.95rem;
       font-weight: 400;
@@ -1091,144 +983,6 @@ $breakpoint-mobile: 768px;
   }
 }
 
-// 文章内容
-// .article-content {
-//   overflow-x: auto;
-//   font-size: 1.1rem;
-//   line-height: 1.8;
-//   color: $text-primary;
-
-//   :deep() {
-
-//     h1,
-//     h2,
-//     h3,
-//     h4,
-//     h5,
-//     h6 {
-//       color: $text-primary;
-//       margin-top: 2rem;
-//       margin-bottom: 1rem;
-//       font-weight: 600;
-//       scroll-margin-top: 80px;
-//     }
-
-//     h1 {
-//       font-size: 1.8rem;
-//     }
-
-//     h2 {
-//       font-size: 1.6rem;
-//       // border-bottom: 2px solid $primary-light;
-//       padding-bottom: 0.5rem;
-//     }
-
-//     h3 {
-//       font-size: 1.4rem;
-//     }
-
-//     h4 {
-//       font-size: 1.2rem;
-//     }
-
-//     p {
-//       margin-bottom: 1.5rem;
-//     }
-
-//     a {
-//       color: $primary-color;
-//       text-decoration: none;
-//       border-bottom: 1px solid transparent;
-//       transition: all 0.3s ease;
-
-//       &:hover {
-//         border-bottom-color: $primary-color;
-//       }
-//     }
-
-//     img {
-//       max-width: 100%;
-//       height: auto;
-//       border-radius: $radius;
-//       margin: 1.5rem 0;
-//       box-shadow: $shadow;
-//     }
-
-//     blockquote {
-//       border-left: 4px solid $primary-color;
-//       margin: 1.5rem 0;
-//       padding: 1rem 1.5rem;
-//       background: rgba($primary-color, 0.05);
-//       border-radius: 0 $radius $radius 0;
-//       color: $text-secondary;
-
-//       p {
-//         margin: 0;
-//       }
-//     }
-
-//     code {
-//       background: rgba($primary-color, 0.1);
-//       padding: 0.2rem 0.4rem;
-//       border-radius: 4px;
-//       font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-//       font-size: 0.9em;
-//       color: $primary-dark;
-//     }
-
-//     pre {
-//       background: #2d2d2d;
-//       color: #fff;
-//       padding: 1.5rem;
-//       border-radius: $radius;
-//       overflow-x: auto;
-//       margin: 1.5rem 0;
-
-//       code {
-//         background: none;
-//         padding: 0;
-//         color: inherit;
-//       }
-//     }
-
-//     ul,
-//     ol {
-//       margin: 1.5rem 0;
-//       padding-left: 1.5rem;
-
-//       li {
-//         margin-bottom: 0.5rem;
-
-//         &::marker {
-//           color: $primary-color;
-//         }
-//       }
-//     }
-
-//     table {
-//       width: 100%;
-//       border-collapse: collapse;
-//       margin: 1.5rem 0;
-
-//       th,
-//       td {
-//         padding: 0.75rem 1rem;
-//         border: 1px solid $border-color;
-//         text-align: left;
-//       }
-
-//       th {
-//         background: rgba($primary-color, 0.1);
-//         font-weight: 600;
-//         color: $text-primary;
-//       }
-
-//       tr:nth-child(even) {
-//         background: $bg-color;
-//       }
-//     }
-//   }
-// }
 
 // 文章脚部
 .article-footer {
@@ -1600,123 +1354,19 @@ $breakpoint-mobile: 768px;
   }
 }
 
-// 评论区域
-.comments-section {
-  margin-bottom: 3rem;
-  padding: 2rem;
-  background: $card-bg;
-  border-radius: $radius;
-  box-shadow: $shadow;
-  border: 1px solid $border-color;
 
-  .comments-header {
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid $primary-light;
-  }
+.comment-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 1200px;
+  margin: 2rem 0;
+  padding: 0 1.5rem;
 
-  .comments-title {
-    margin: 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.4rem;
-    color: $text-primary;
-
-    .comments-icon {
-      font-size: 1.5rem;
-    }
-  }
-
-  .refresh-comments {
-    padding: 0.5rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: $bg-color;
-    border: 1px solid $border-color;
-    border-radius: $radius;
-    color: $text-secondary;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-
-    &:hover {
-      background: $primary-color;
-      color: white;
-      border-color: $primary-color;
-    }
-
-    .refresh-icon {
-      font-size: 1rem;
-    }
-  }
-
-  .login-prompt {
-    margin-bottom: 2rem;
-    padding: 1.5rem;
-    background: $bg-color;
-    border-radius: $radius;
-    text-align: center;
-    color: $text-secondary;
-
-    .login-link {
-      margin: 0 0.25rem;
-      color: $primary-color;
-      text-decoration: none;
-      font-weight: 500;
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-
-  .no-comments {
-    padding: 3rem;
-    text-align: center;
-    color: $text-light;
-    font-style: italic;
-    background: $bg-color;
-    border-radius: $radius;
+  @media (max-width: $breakpoint-mobile) {
+    max-width: 100vh;
   }
 }
 
-// 加载更多评论
-.load-more-comments {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  text-align: center;
-  border-top: 1px solid $border-color;
-
-  .load-more-btn {
-    min-width: 150px;
-    min-height: 44px;
-    padding: 0.75rem 2rem;
-    background: $primary-color;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    font-size: 0.95rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-
-    &:hover:not(:disabled) {
-      background: $primary-dark;
-      transform: translateY(-2px);
-      box-shadow: $shadow-hover;
-    }
-
-    &:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-    }
-  }
-}
 
 // 分享菜单
 .share-menu {
@@ -1739,6 +1389,9 @@ $breakpoint-mobile: 768px;
   position: fixed;
   bottom: 2rem;
   right: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 48px;
   height: 48px;
   background: $primary-color;
@@ -1752,9 +1405,6 @@ $breakpoint-mobile: 768px;
   transition: all 0.3s ease;
   opacity: 0;
   transform: translateY(20px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
   &.show {
     opacity: 1;
@@ -1767,75 +1417,6 @@ $breakpoint-mobile: 768px;
     box-shadow: 0 6px 16px rgba(5, 150, 105, 0.4);
   }
 }
-
-// 响应式设计
-// @media (max-width: 768px) {
-
-//   .article-detail {
-//     padding: 0 1rem;
-//   }
-
-//   .article-header {
-//     padding: 1.5rem;
-//   }
-
-//   .article-title {
-//     font-size: 1.8rem;
-//   }
-
-//   .article-meta {
-//     flex-direction: column;
-//     align-items: flex-start;
-//     gap: 1rem;
-
-//     .meta-right {
-//       width: 100%;
-//       justify-content: flex-start;
-//     }
-//   }
-
-//   // .article-content-container {
-//   //   gap: 1rem;
-//   // }
-
-//   .article-main,
-//   .sidebar-widget {
-//     padding: 1.5rem;
-//   }
-
-//   .comments-section {
-//     padding: 1.5rem;
-//   }
-
-//   .back-to-top {
-//     bottom: 1rem;
-//     right: 1rem;
-//     width: 40px;
-//     height: 40px;
-//     font-size: 1.2rem;
-//   }
-// }
-
-// @media (max-width: 480px) {
-//   .article-meta {
-//     .meta-left {
-//       flex-direction: column;
-//       align-items: flex-start;
-//       gap: 0.75rem;
-//     }
-//   }
-
-//   .featured-image {
-//     .featured-image-content {
-//       max-height: 250px;
-//     }
-//   }
-
-//   .reward-images {
-//     flex-direction: column;
-//     align-items: center;
-//   }
-// }
 
 // 动画
 @keyframes fadeIn {

@@ -42,18 +42,17 @@
             </el-button>
             <el-dropdown v-else>
               <div class="user-avatar">
-                <el-avatar :size="32" :src="userStore.user?.avatar" />
-                <span class="username">{{ userStore.user?.username }}</span>
+                <el-avatar :size="32" :src="userStore.userInfo?.avatar" />
+                <span class="username">{{ userStore.userInfo?.username }}</span>
               </div>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item>个人中心</el-dropdown-item>
-                  <el-dropdown-item v-if="userStore.user">我的文章</el-dropdown-item>
+                  <el-dropdown-item v-if="userStore.userInfo">我的文章</el-dropdown-item>
                   <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
-
           </div>
 
           <div>
@@ -79,80 +78,23 @@
     </div>
   </header>
 
-  <!-- 登录对话框 - 移到 header 外部，确保全屏显示 -->
-  <el-dialog v-model="showLoginDialog" title="登录" width="420px" :close-on-click-modal="false"
-    :close-on-press-escape="true" :destroy-on-close="true" class="login-dialog" @close="handleDialogClose">
-    <el-form ref="loginFormRef" :model="loginForm" :rules="loginRules" label-width="0" class="login-form"
-      @submit.prevent="handleLogin">
-      <el-form-item prop="username">
-        <el-input v-model="loginForm.username" placeholder="请输入用户名 / 邮箱" size="large" :prefix-icon="User" clearable />
-      </el-form-item>
-
-      <el-form-item prop="password">
-        <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" size="large" :prefix-icon="Lock"
-          show-password clearable @keyup.enter="handleLogin" />
-      </el-form-item>
-
-      <div class="login-options">
-        <el-checkbox v-model="loginForm.rememberMe">记住密码</el-checkbox>
-        <el-link type="primary" underline="never" @click="handleForgotPassword">
-          忘记密码？
-        </el-link>
-      </div>
-
-      <el-form-item>
-        <el-button type="primary" size="large" :loading="loginLoading" class="login-button" @click="handleLogin">
-          {{ loginLoading ? '登录中...' : '登录' }}
-        </el-button>
-      </el-form-item>
-
-      <div class="login-footer">
-        <span>还没有账号？</span>
-        <el-link type="primary" underline="hover" @click="handleRegister">
-          立即注册
-        </el-link>
-      </div>
-
-      <div class="login-divider">
-        <span>其他登录方式</span>
-      </div>
-
-      <div class="social-login">
-        <el-button circle size="large" @click="socialLogin('github')">
-          <el-icon>
-            <FaIcon :icon="faGithub" />
-          </el-icon>
-        </el-button>
-        <el-button circle size="large" @click="socialLogin('wechat')">
-          <el-icon>
-            <FaIcon :icon="faWeibo" />
-          </el-icon>
-        </el-button>
-        <el-button circle size="large" @click="socialLogin('qq')">
-          <el-icon>
-            <FaIcon :icon="faQq" />
-          </el-icon>
-        </el-button>
-      </div>
-    </el-form>
-  </el-dialog>
+  <LoginDialog v-model="showLoginDialog" @login-success="handleLoginSuccess" />
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
-  House, Document, Folder, PriceTag, Picture, User, Menu,
-  Sunny, Moon, Lock
+  House, Document, Folder, User, Menu,
+  Sunny, Moon
 } from '@element-plus/icons-vue'
-import type { FormInstance, FormRules } from 'element-plus'
-import { ElMessage } from 'element-plus'
-import { faGithub, faWeibo, faQq } from '@fortawesome/free-brands-svg-icons'
-import { userApi } from '@/api'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { useThemeStore } from '@/stores'
 import { useUserStore } from '@/stores/user'
 import { useAppNameStruct } from '@/composables/useAppName'
 import { isDaily, isMobile, isNote } from '@/utils/cabinet'
+import LoginDialog from '@/components/auth/LoginDialog.vue'
+import type { UserInfo } from '@/types/user'
 
 const router = useRouter()
 const themeStore = useThemeStore()
@@ -167,26 +109,6 @@ const avatar = ref<string>('https://picsum.photos/200/200?random=10')
 const isPhone = ref(false)
 const mobileMenuVisible = ref(false)
 const showLoginDialog = ref(false)
-const loginLoading = ref(false)
-const loginFormRef = ref<FormInstance>()
-
-const loginForm = reactive({
-  username: '',
-  password: '',
-  rememberMe: false
-})
-
-// 表单验证规则
-const loginRules: FormRules = {
-  username: [
-    { required: true, message: '请输入用户名/邮箱', trigger: 'blur' },
-    { min: 3, max: 50, message: '长度在 3 到 50 个字符', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '长度在 6 到 20 个字符', trigger: 'blur' }
-  ]
-}
 
 const isDark = computed(() => themeStore.isDark)
 
@@ -208,94 +130,26 @@ const toggleTheme = () => {
   themeStore.toggleTheme()
 }
 
-const handleLogin = async () => {
-  if (!loginFormRef.value) return
-
-  await loginFormRef.value.validate(async (valid) => {
-    if (!valid) return
-
-    loginLoading.value = true
-    try {
-      const response = await userApi.login({
-        username: loginForm.username,
-        password: loginForm.password
-      })
-
-      // 保存 token
-      if (response.data.accessToken) {
-        localStorage.setItem('token', response.data.accessToken)
-
-        // 保存用户信息
-        if (response.data.userInfo) {
-          userStore.user = response.data.userInfo
-        }
-
-        // 记住密码功能
-        if (loginForm.rememberMe) {
-          localStorage.setItem('rememberMe', 'true')
-          localStorage.setItem('savedUsername', loginForm.username)
-        } else {
-          localStorage.removeItem('rememberMe')
-          localStorage.removeItem('savedUsername')
-        }
-
-        ElMessage.success('登录成功！')
-        showLoginDialog.value = false
-
-        // 清空表单
-        loginForm.username = ''
-        loginForm.password = ''
-        loginForm.rememberMe = false
-      }
-    } catch (error: any) {
-      console.error('登录失败:', error)
-      ElMessage.error(error.response?.data?.message || '登录失败，请检查用户名和密码')
-    } finally {
-      loginLoading.value = false
-    }
-  })
-}
-
-const handleDialogClose = () => {
-  // 关闭对话框时重置表单
-  if (loginFormRef.value) {
-    loginFormRef.value.resetFields()
-  }
-}
-
-const handleForgotPassword = () => {
-  ElMessage.info('请联系管理员重置密码')
-}
-
-const handleRegister = () => {
-  ElMessage.info('注册功能开发中')
-  // 可以跳转到注册页面或打开注册对话框
-  // router.push('/register')
-}
-
-const socialLogin = (type: string) => {
-  ElMessage.info(`${type} 登录功能开发中`)
-  // 实现第三方登录
+const handleLoginSuccess = (userInfo: UserInfo) => {
+  showLoginDialog.value = false
 }
 
 const logout = () => {
-  localStorage.removeItem('token')
-  localStorage.removeItem('rememberMe')
-  localStorage.removeItem('savedUsername')
-  userStore.user = null
-  ElMessage.success('已退出登录')
-}
-
-// 检查是否有记住的用户名
-const loadSavedUsername = () => {
-  const rememberMe = localStorage.getItem('rememberMe')
-  if (rememberMe === 'true') {
-    const savedUsername = localStorage.getItem('savedUsername')
-    if (savedUsername) {
-      loginForm.username = savedUsername
-      loginForm.rememberMe = true
-    }
-  }
+  ElMessageBox.confirm('确定要退出登录吗？', '提示', {
+    type: 'warning'
+  }).then(() => {
+    const subect: string = import.meta.env.VITE_APP_SUBJECT
+    localStorage.removeItem(subect.concat('_token'))
+    localStorage.removeItem('user_info')
+    localStorage.removeItem('rememberMe')
+    localStorage.removeItem('savedUsername')
+    userStore.userInfo = null
+    ElMessage.success('已退出登录')
+  }).catch((action) => {
+    if (action === 'cancel' || action === 'close') return  // 用户取消，静默
+    // 真正的错误再处理/上报
+    console.error(action)
+  });
 }
 
 const fetchSimpleUser = async () => {
@@ -318,10 +172,7 @@ onMounted(async () => {
 
   checkIfMobile()
 
-  // 组件挂载时加载保存的用户名
-  loadSavedUsername()
-
-  window.addEventListener('resize', checkIfMobile);
+  window.addEventListener('resize', checkIfMobile)
 })
 
 </script>
@@ -529,6 +380,13 @@ $breakpoint-mobile: 768px;
       display: inline-flex;
     }
   }
+}
+
+// 去除轮廓
+:deep(.el-tooltip__trigger:focus),
+:deep(.el-dropdown__caret:focus) {
+  outline: none;
+  box-shadow: none;
 }
 
 .mobile-menu {

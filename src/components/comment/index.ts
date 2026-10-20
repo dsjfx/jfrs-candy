@@ -1,0 +1,5 @@
+export { default as CommentSection } from './CommentSection.vue'
+export { default as CommentForm } from './CommentForm.vue'
+export { default as CommentItem } from './CommentItem.vue'
+export { default as CommentEmpty } from './CommentEmpty.vue'
+export { default as CommentSkeleton } from './CommentSkeleton.vue'

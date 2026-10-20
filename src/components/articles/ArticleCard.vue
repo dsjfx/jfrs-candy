@@ -215,7 +215,7 @@ $breakpoint-mobile: 768px;
 
   .article-category {
     display: inline-block;
-    padding: 0.25rem 0.75rem;
+    padding: 0.2rem 0.6rem;
     border-radius: 8px;
     font-size: 0.95rem;
     font-weight: 400;

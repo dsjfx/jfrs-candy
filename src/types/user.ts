@@ -24,6 +24,7 @@ export interface UserInfo {
   nickname: string
   email: string
   avatar: string
+  role?: string
   roles?: string[]
   permissions?: string[]
 }
@@ -40,6 +41,38 @@ export interface LoginResponse {
   expiresIn: number
   tokenType: string
   userInfo: UserInfo
+}
+
+/**
+ * 登陆参数
+ */
+export interface LoginParams {
+  username: string
+  password: string
+  captcha: string
+  captchaId: string
+  appType: string
+}
+
+/**
+ * 验证码参数
+ */
+export interface CaptchaParam {
+  captchaId?: string
+  captchInput?: string
+}
+
+/**
+ * 验证码返回
+ */
+export interface CaptchaResponse {
+  id: string
+  svg?: string
+  expiresIn?: number
+}
+
+export interface CaptchaValid {
+  isValid: boolean
 }
 
 export interface Author {

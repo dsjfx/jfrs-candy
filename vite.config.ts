@@ -33,7 +33,12 @@ export default defineConfig({
         target: 'http://localhost:6060',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, '')
-      }
+      },
+      // '/api/jdmk': {
+      //   target: 'http://note.dswireman.cn/',
+      //   changeOrigin: true,
+      //   rewrite: (path) => path.replace(/^\/api\/jdmk/, '/api/jfx'),
+      // },
     }
   },
   build: {

@@ -1,12 +1,14 @@
+import type { App } from 'vue'
+import router from '@/router'
 import axios, { AxiosError } from 'axios'
 import type { AxiosResponse } from 'axios'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import router from '@/router'
 import { useUserStore } from '@/stores/user'
 import { ErrorType } from '@/types/error'
 import type { AppError, ErrorHandlerOptions } from '@/types/error'
 
 class ErrorHandler {
+  private app?: App
   private static instance: ErrorHandler
   private errorQueue: AppError[] = []
   private isRefreshing = false
@@ -20,9 +22,11 @@ class ErrorHandler {
   }
 
   // 初始化错误处理
-  init() {
+  init(app: App) {
+    this.app = app
     this.setupAxiosInterceptors()
     this.setupGlobalHandlers()
+    this.setupVueErrorHandler()
   }
 
   // 设置 Axios 拦截器
@@ -55,8 +59,10 @@ class ErrorHandler {
         message: message,
         details: data,
         timestamp: Date.now(),
-        url: response.config.url,
-        method: response.config.method
+        context: {
+          url: response.config.url,
+          method: response.config.method,
+        }
       }
 
       // 处理错误（显示提示等）
@@ -102,8 +108,10 @@ class ErrorHandler {
       code: error.code || 0,
       message: error.message || '未知错误',
       timestamp: Date.now(),
-      url: error.config?.url,
-      method: error.config?.method?.toUpperCase()
+      context: {
+        url: error.config?.url,
+        method: error.config?.method?.toUpperCase()
+      }
     }
 
     if (error.code === 'ECONNABORTED') {
@@ -157,57 +165,6 @@ class ErrorHandler {
       timestamp: Date.now(),
       stack: error.stack
     }
-  }
-
-  // 标准化错误
-  private normalizeError(error: AxiosError): AppError {
-    const appError: AppError = {
-      type: ErrorType.UNKNOWN,
-      code: error.code || 0,
-      message: error.message || '未知错误',
-      timestamp: Date.now(),
-      url: error.config?.url,
-      method: error.config?.method?.toUpperCase()
-    }
-
-    if (error.code === 'ECONNABORTED') {
-      appError.type = ErrorType.TIMEOUT
-      appError.message = '请求超时，请重试'
-    } else if (!error.response) {
-      appError.type = ErrorType.NETWORK
-      appError.message = '网络连接失败，请检查网络'
-    } else {
-      const status = error.response.status
-      switch (status) {
-        case 401:
-          appError.type = ErrorType.UNAUTHORIZED
-          appError.message = '登录已过期，请重新登录'
-          break
-        case 403:
-          appError.type = ErrorType.FORBIDDEN
-          appError.message = '没有权限执行此操作'
-          break
-        case 404:
-          appError.type = ErrorType.NOT_FOUND
-          appError.message = '请求的资源不存在'
-          break
-        case 422:
-          appError.type = ErrorType.VALIDATION
-          appError.message = '数据验证失败'
-          appError.details = error.response.data
-          break
-        case 500:
-        case 502:
-        case 503:
-          appError.type = ErrorType.SERVER
-          appError.message = '服务器繁忙，请稍后重试'
-          break
-        default:
-          appError.message = (error.response.data as any)?.message || `请求失败 (${status})`
-      }
-    }
-
-    return appError
   }
 
   // 根据错误类型获取处理选项
@@ -319,10 +276,11 @@ class ErrorHandler {
 
   // 重试请求
   private async retryRequest(error: AppError) {
+    const url = error?.context?.url
     // 实现请求重试逻辑
-    if (error.url) {
+    if (url) {
       try {
-        const response = await axios.get(error.url)
+        const response = await axios.get(url)
         return response
       } catch (retryError) {
         this.processError(this.normalizeError(retryError as AxiosError), {
@@ -333,13 +291,83 @@ class ErrorHandler {
     }
   }
 
+  // 标准化错误
+  private normalizeError(error: AxiosError): AppError {
+    const appError: AppError = {
+      type: ErrorType.UNKNOWN,
+      code: error.code || 0,
+      message: error.message || '未知错误',
+      timestamp: Date.now(),
+      context: {
+        url: error.config?.url,
+        method: error.config?.method?.toUpperCase()
+      }
+    }
+
+    if (error.code === 'ECONNABORTED') {
+      appError.type = ErrorType.TIMEOUT
+      appError.message = '请求超时，请重试'
+    } else if (!error.response) {
+      appError.type = ErrorType.NETWORK
+      appError.message = '网络连接失败，请检查网络'
+    } else {
+      const status = error.response.status
+      switch (status) {
+        case 401:
+          appError.type = ErrorType.UNAUTHORIZED
+          appError.message = '登录已过期，请重新登录'
+          break
+        case 403:
+          appError.type = ErrorType.FORBIDDEN
+          appError.message = '没有权限执行此操作'
+          break
+        case 404:
+          appError.type = ErrorType.NOT_FOUND
+          appError.message = '请求的资源不存在'
+          break
+        case 422:
+          appError.type = ErrorType.VALIDATION
+          appError.message = '数据验证失败'
+          appError.details = error.response.data
+          break
+        case 500:
+        case 502:
+        case 503:
+          appError.type = ErrorType.SERVER
+          appError.message = '服务器繁忙，请稍后重试'
+          break
+        default:
+          appError.message = (error.response.data as any)?.message || `请求失败 (${status})`
+      }
+    }
+
+    return appError
+  }
+
   // 上报错误到服务器
+  // private async reportErrorToServer(error: AppError) {
+  //   try {
+  //     await axios.post('/api/logs/error', {
+  //       ...error,
+  //       userAgent: navigator.userAgent,
+  //       url: window.location.href
+  //     })
+  //   } catch (e) {
+  //     console.error('上报错误失败:', e)
+  //   }
+  // }
+
+  // 原生 fetch 不走 axios 拦截器，不会无限循环
   private async reportErrorToServer(error: AppError) {
     try {
-      await axios.post('/api/logs/error', {
-        ...error,
-        userAgent: navigator.userAgent,
-        url: window.location.href
+      await fetch('/api/logs/error', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...error,
+          userAgent: navigator.userAgent,
+          url: window.location.href
+        })
       })
     } catch (e) {
       console.error('上报错误失败:', e)
@@ -379,6 +407,48 @@ class ErrorHandler {
         logToServer: true
       })
     })
+  }
+
+  private setupVueErrorHandler() {
+    this.app!.config.errorHandler = (err: any, vm: any, info: string) => {
+      console.error('Vue错误:', err)
+      console.log('组件:', vm?.$options.name)
+      console.log('信息:', info)
+      this.processError(
+        {
+          type: ErrorType.VUE,
+          code: 'VUE_ERROR',
+          message: err?.message || String(err),
+          timestamp: Date.now(),
+          stack: err?.stack,
+          context: {
+            component: vm?.$options?.name,
+            info,
+            route: vm?.$route?.fullPath,
+            userId: this.getUserId()
+          }
+        },
+        {
+          showToast: false,
+          logToConsole: true,
+          logToServer: true
+        }
+      )
+    }
+  }
+
+  private getRoute(): string | undefined {
+    // 方式1：从 router 拿（需要把 router 传进来或 import）
+    // return router.currentRoute.value.fullPath
+
+    // 方式2：直接从浏览器地址拿（最简单，无需依赖 router）
+    return window.location.pathname + window.location.search
+  }
+
+  // 从你的用户状态里拿（pinia / localStorage）
+  private getUserId(): string | undefined {
+    // return useUserStore().id
+    return localStorage.getItem('userId') || undefined
   }
 }
 

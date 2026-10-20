@@ -2,7 +2,7 @@ import axios from 'axios'
 import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import type { AppError } from '@/types/error'
 import type { ResponseData } from '@/types/api'
-// import { useUserStore } from '@/stores/user'
+import { useUserStore } from '@/stores/user'
 
 interface RequestConfig extends AxiosRequestConfig {
   showLoading?: boolean
@@ -18,18 +18,18 @@ class Request {
     // 请求拦截器
     this.instance.interceptors.request.use(
       (config) => {
-        // const userStore = useUserStore()
-        // if (userStore.token) {
-        //   config.headers.Authorization = `Bearer ${userStore.token}`
-        // }
-        const token = localStorage.getItem('token')
+        const userStore = useUserStore()
+        if (userStore.token) {
+          config.headers.Authorization = `Bearer ${userStore.token}`
+        }
+        // const token = localStorage.getItem('token')
 
         // 判断是否需要 token
         // const needAuth = !isPublicEndpoint(config.url || '')
 
-        if (/*needAuth &&*/ token) {
-          config.headers.Authorization = `Bearer ${token}`
-        }
+        // if (needAuth && token) {
+        //   config.headers.Authorization = `Bearer ${token}`
+        // }
 
         // 添加默认参数
         config.params = {
@@ -192,7 +192,7 @@ function isPublicEndpoint(url: string): boolean {
 
 export const http = new Request({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json'
   }

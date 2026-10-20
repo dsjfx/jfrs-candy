@@ -3,49 +3,81 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 // 按分类导入常用图标
 import {
-  faSearch,
-  faUser,
-  faHome,
-  faCog,
-  faBars,
-  faTimes,
   faArrowRight,
-  faPlus,
-  faEdit,
-  faTrash,
-  faDownload,
+  faBars,
+  faCog,
   faComment,
-  faHouse,
+  faCaretDown,
   faCaretUp,
-  faCaretDown
+  faDownload,
+  faEdit,
+  faEllipsis,
+  faEllipsisH,
+  faEllipsisV,
+  faEllipsisVertical,
+  faEyeSlash,
+  faFlag,
+  faGlobe,
+  faHome,
+  faHouse,
+  faPen,
+  faPenToSquare,
+  faPlus,
+  faRefresh,
+  faReply,
+  faSearch,
+  faThumbsUp,
+  faThumbsDown,
+  faTimes,
+  faTrash,
+  faTrashCan,
+  faUser,
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
-  faGithub,
-  faTwitter,
   faFacebook,
+  faGithub,
+  faQq,
+  faTwitter,
   faWeibo,
-  faQq
 } from '@fortawesome/free-brands-svg-icons'
 
 import {
-  faStar as farStar,
+  faBell as farBell,
+  faBookmark as farBookmark,
+  faCalendar as farCalendar,
+  faClock as farClock,
+  faComment as farComment,
+  faCommentAlt as farCommentAlt,
+  faCommentDots as farCommentDots,
+  faEnvelope as farEnvelope,
+  faEye as farEye,
+  faFile as farFile,
   faHeart as farHeart,
-  faBell as farBell
+  faImage as farImage,
+  faPaperPlane as farPaperPlane,
+  faStar as farStar,
+  faThumbsDown as farThumbsDown,
+  faThumbsUp as farThumbsUp,
+  faUser as farUser,
 } from '@fortawesome/free-regular-svg-icons'
 
 // 添加所有要用到的图标
 library.add(
   // solid
-  faSearch, faUser, faHome, faCog, faBars, faTimes,
-  faArrowRight, faPlus, faEdit, faTrash, faDownload,
-  faComment, faHouse, faCaretUp, faCaretDown,
+  faArrowRight, faBars, faCog, faComment, faCaretDown, faCaretUp,
+  faDownload, faEdit, faEllipsis, faEllipsisH, faEllipsisV,
+  faEllipsisVertical, faEyeSlash, faFlag, faGlobe, faHome, faHouse,
+  faPen, faPenToSquare, faPlus, faRefresh, faReply, faSearch, faThumbsUp,
+  faThumbsDown, faTimes, faTrash, faTrashCan, faUser,
 
   // brands
-  faGithub, faTwitter, faFacebook, faWeibo, faQq,
+  faFacebook, faGithub, faQq, faTwitter, faWeibo,
 
   // regular
-  farStar, farHeart, farBell
+  farBell, farBookmark, farCalendar, farClock, farComment, farCommentAlt,
+  farCommentDots, farEnvelope, farEye, farFile, farHeart,
+  farImage, farPaperPlane, farStar, farThumbsDown, farThumbsUp, farUser
 )
 
 export default {

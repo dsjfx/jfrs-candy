@@ -1,5 +1,6 @@
 import type { User } from './user'
 import type { Category, Tag, Article } from './article'
+import type { Comment, CommentUser } from './comment'
 
 // export interface Pagination<T> {
 //   data: T[]
@@ -23,4 +24,4 @@ export interface NavItem<T = any> {
   icon: T
 }
 
-export type { User, Category, Tag, Article }
+export type { User, Category, Tag, Article, Comment, CommentUser }

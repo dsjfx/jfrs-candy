@@ -108,15 +108,15 @@ const {
   isLoadingPage,
   hasError,
   error,
+  setError,
   startLoading,
   stopLoading
 } = useLoading()
 
 const articleTitle = import.meta.env.VITE_APP_ARTICLE_TITLE
 
-// 响应式数据
+// ~~~~~ Responsive Data
 
-const current = ref(searchStore.currentPage || DEFAULT_CURRENT)
 const pageSize = ref(searchStore.pageSize || DEFAULT_PAGESIZE)
 const searchQuery = ref<string>(searchStore.keyword || '')
 
@@ -127,44 +127,12 @@ const skeletonCount = ref(1)
 const showSpinner = ref(true)
 let spinnerTimer: number | null = null
 
-// 分类数据
-// const categories = ref([
-//   { name: '日记', count: 12 },
-//   { name: '生活', count: 8 },
-//   { name: '旅行', count: 6 },
-//   { name: '书评', count: 5 },
-//   { name: '随笔', count: 7 }
-// ])
-
-// 最近文章
-// const recentPosts = ref([
-//   { id: 1, title: '武汉新天地周末随记', date: '2026-01-20' },
-//   { id: 2, title: 'AI速记引发的隐私困惑', date: '2026-01-09' },
-//   { id: 3, title: '2025年最后一天', date: '2025-12-31' },
-//   { id: 4, title: '35岁生日在横店', date: '2025-12-13' },
-//   { id: 5, title: '苏州园林漫步', date: '2025-11-30' }
-// ])
-
-// 标签云
-// const tagCloud = ref([
-//   { name: '生活', size: 16 },
-//   { name: '读书', size: 14 },
-//   { name: '旅行', size: 18 },
-//   { name: '家庭', size: 15 },
-//   { name: '工作', size: 12 },
-//   { name: '科技', size: 13 },
-//   { name: '写作', size: 14 },
-//   { name: '感悟', size: 12 }
-// ])
-
-// 计算属性
-
-// const article = computed(() => articleStore.article)
-// const isLoading = computed(() => articleStore.isLoading)
+// ~~~~~ Computed Properties
 
 const pageData = computed(() => articleStore.pageData)
 const articles = computed(() => articleStore.articles)
-// const totalArticles = computed(() => articles.value?.length)
+const current = computed(() => searchStore.currentPage || DEFAULT_CURRENT)
+
 // const totalComments = computed(() => articles.value.reduce((sum, article) => sum + (article.comments || 0), 0))
 
 const isEmpty = computed(() => {
@@ -185,23 +153,12 @@ const loadingText = computed(() => {
   return '正在加载文章...'
 })
 
-// 
-const getCategoryColor = (category: string) => {
-  const colors: Record<string, string> = {
-    '日记': '#059669',
-    '生活': '#10B981',
-    '旅行': '#3B82F6',
-    '书评': '#8B5CF6',
-    '随笔': '#F59E0B'
-  }
-  return colors[category] || '#059669'
-}
-
 const fetchArticles = async () => {
   startLoading()
 
   // await cabinet.delay(2000)
-  // 设置延迟显示旋转加载器
+
+  // Set a timer to show the spinner after 2 seconds
   spinnerTimer = window.setTimeout(() => {
     showSpinner.value = true
   }, 2000)
@@ -212,6 +169,8 @@ const fetchArticles = async () => {
       size: pageSize.value,
       search: searchQuery.value || undefined
     })
+
+    // Update searchStore with the latest search parameters
     searchStore.updateSearchParams({
       keyword: searchQuery.value,
       currentPage: current.value,
@@ -220,8 +179,7 @@ const fetchArticles = async () => {
     console.log('文章列表数据:', res)
   } catch (err) {
     console.error('加载文章失败:', err)
-    // error.value = err instanceof Error ? err.message : '加载失败'
-    // hasError.value = true
+    setError(err instanceof Error ? err.message : '加载失败')
   } finally {
     stopLoading()
     showSpinner.value = false
@@ -238,14 +196,17 @@ const searchInputRef = ref<HTMLInputElement | null>(null)
 // when debounced search changes, perform search
 watch(debouncedSearch, async (val, oldVal) => {
   if (val !== oldVal) {
-    current.value = 1
+    // current.value = 1
+    searchStore.setPage(1)
     await fetchArticles()
   }
 })
 
 const handleSearch = () => {
   // input is bound to searchQuery; debounced watcher will call fetchArticles
-  current.value = 1
+  // current.value = 1
+  // searchStore.setKeyword(searchQuery.value)
+  // searchStore.setPage(1)
 }
 
 const handleTagClick = (tag: string) => {
@@ -278,11 +239,13 @@ const handleArticleClick = (article: Article) => {
 const handlePageChange = async (page: number) => {
   if (page >= 1 && page <= totalPages.value && page !== current.value) {
     // current.value = page
-    searchStore.setPage(page)
 
     // fetch considering search
     try {
-      await articleStore.fetchArticles({ current: page, size: pageSize.value, search: searchQuery.value })
+      searchStore.setPage(page)
+
+      // await articleStore.fetchArticles({ current: page, size: pageSize.value, search: searchQuery.value })
+      await fetchArticles()
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (err) {
       console.error('切换页失败', err)
@@ -588,8 +551,17 @@ $breakpoint-mobile: 768px;
   gap: 12px;
   margin-top: 24px;
 
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .paging {
     flex: 1;
+
+    @media (max-width: $breakpoint-mobile) {
+      width: 100%;
+    }
   }
 
   .search-pill {
@@ -615,6 +587,10 @@ $breakpoint-mobile: 768px;
     display: flex;
     align-items: center;
     gap: 8px;
+
+    @media (max-width: $breakpoint-mobile) {
+      margin-left: 15px;
+    }
 
     .tag {
       padding: 6px 10px;

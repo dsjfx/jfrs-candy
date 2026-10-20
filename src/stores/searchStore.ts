@@ -40,7 +40,6 @@ export const useSearchStore = defineStore('search', () => {
    */
   const setKeyword = (val: string): void => {
     keyword.value = val
-    currentPage.value = 1
   }
 
   /**

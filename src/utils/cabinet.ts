@@ -18,6 +18,22 @@ export async function markdownToHtml(markdown: string, options?: Config): Promis
   }
 }
 
+export function htmlToText(html: string): string {
+  if (!html) return ''
+  const div = document.createElement('div')
+  div.innerHTML = html
+
+  // 把 <br> 换成换行
+  div.querySelectorAll('br').forEach(el => el.replaceWith('\n'))
+
+  // 块级元素后面补一个换行，保留段落分隔
+  div.querySelectorAll('p, div, li, h1, h2, h3, h4, h5, h6').forEach(el => {
+    el.append('\n')
+  })
+
+  return (div.textContent || '').replace(/\n+$/, '')  // 去掉末尾多余换行
+}
+
 // 统计文字数量（不包括 HTML 标签）
 export function getDisplayWordCount(htmlContent: string): number {
   const plainText = getPlainText(htmlContent);
@@ -145,6 +161,27 @@ export const formatDate2 = (dateStr: string) => {
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
 }
 
+// 时间转换成人可读性
+export const formatTime = (dateStr: string) => {
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / (1000 * 60))
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60))
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+  if (diffMins < 1) return '刚刚'
+  if (diffMins < 60) return `${diffMins}分钟前`
+  if (diffHours < 24) return `${diffHours}小时前`
+  if (diffDays < 7) return `${diffDays}天前`
+
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
+
 const MAP_URL: Record<string, string> = {
   'BL': '/blog',
   'CO': '/comment',
@@ -178,10 +215,12 @@ export function isMobile() {
 export default {
   isDaily,
   isNote,
+
   delay,
   formatDate,
   formatDate2,
   markdownToHtml,
+  htmlToText,
   defaultAdjacent,
   defaultPageResult,
   defaultResponseData

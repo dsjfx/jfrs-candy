@@ -8,8 +8,18 @@ import {
   likeArticle,
   dislikeArticle,
 } from './articles'
-import { getSimpleUserinfo, getUser, login } from './auth'
-import { getComments } from './comments'
+import { getSimpleUserinfo, getUser, getUserByEmail, login, refreshCaptcha, validateCaptcha } from './auth'
+import {
+  createComment,
+  deleteComment,
+  getComments,
+  reportComment,
+  likeComment,
+  updateComment,
+  blockUser,
+  unblockUser,
+  fetchBlockedUsers,
+} from './comments'
 import api from './request'
 
 // 文章 API
@@ -55,7 +65,7 @@ export const tagApi = {
   },
 }
 
-// 用户相关API
+// 用户相关 API
 export const userApi = {
   getUserProfile: getUser,
 
@@ -63,9 +73,23 @@ export const userApi = {
 
   getSimpleUser: getSimpleUserinfo,
 
+  validateCaptcha: validateCaptcha,
+
+  refreshCaptcha: refreshCaptcha,
+
+  getUserByEmail: getUserByEmail,
+
 }
 
 // 评论相关 API
 export const commentApi = {
   getComments,
+  createComment,
+  updateComment,
+  deleteComment,
+  likeComment,
+  reportComment,
+  blockUser,
+  unblockUser,
+  fetchBlockedUsers,
 }
