@@ -9,6 +9,8 @@ import {
   faComment,
   faCaretDown,
   faCaretUp,
+  faCaretLeft,
+  faCaretRight,
   faDownload,
   faEdit,
   faEllipsis,
@@ -66,6 +68,7 @@ import {
 library.add(
   // solid
   faArrowRight, faBars, faCog, faComment, faCaretDown, faCaretUp,
+  faCaretLeft, faCaretRight,
   faDownload, faEdit, faEllipsis, faEllipsisH, faEllipsisV,
   faEllipsisVertical, faEyeSlash, faFlag, faGlobe, faHome, faHouse,
   faPen, faPenToSquare, faPlus, faRefresh, faReply, faSearch, faThumbsUp,

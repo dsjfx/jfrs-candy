@@ -5,6 +5,9 @@ import type { Comment, CommentForm, CommentParams, CommentUser, ReportReason } f
 import type { PageResult } from "@/types/api";
 import { defaultPageResult } from "@/utils/cabinet";
 import { useUserStore } from "./user";
+import { getAnonymousId } from "@/utils/anonymousId";
+import { LIKED_KEY } from "@/utils/constant";
+import { storage } from "@/utils/storage";
 
 export const useCommentStore = defineStore('coment', () => {
   const comments = ref<Comment[]>([])
@@ -19,8 +22,16 @@ export const useCommentStore = defineStore('coment', () => {
   const currentSort = ref<'newest' | 'oldest' | 'popular'>('newest')
   const currentArticleId = ref<string | number>('')
   const blockedUsers = ref<Set<string>>(new Set()) // 已屏蔽用户列表（本地缓存）
+  const totalWithReplies = ref<number>(0)
 
-  const commentsCount = readonly(total)
+  const commentsCount = computed(() => {
+    // 如果后端提供了完整总数，优先用
+    if (totalWithReplies.value > 0) {
+      return totalWithReplies.value
+    }
+    // 否则递归计算
+    return countAllComments(comments.value)
+  })
   const isEmpty = computed(() => !isLoading.value && comments.value.length === 0)
 
   // 排序后的评论（前端）
@@ -60,7 +71,7 @@ export const useCommentStore = defineStore('coment', () => {
       }
     }
 
-    const guest = JSON.parse(localStorage.getItem('guest_info') || 'null')
+    const guest = JSON.parse(storage.get('guest_info') || 'null')
     if (guest && guest.id) {
       return {
         id: guest.id,
@@ -72,6 +83,18 @@ export const useCommentStore = defineStore('coment', () => {
 
     return null
   })
+
+  // 递归统计（含所有回复）
+  const countAllComments = (list: Comment[]): number => {
+    let total = 0
+    for (const comment of list) {
+      total++
+      if (comment.replies?.length) {
+        total += countAllComments(comment.replies)
+      }
+    }
+    return total
+  }
 
   // 获取评论
   const fetchComments = async (
@@ -243,23 +266,64 @@ export const useCommentStore = defineStore('coment', () => {
     }
   }
 
+  // 本地已点赞的评论 ID 集合
+  const likedCommentIds = ref<Set<string>>(new Set())
+
+  // 初始化时加载
+  const loadLikedComments = () => {
+    try {
+      const saved = storage.get(LIKED_KEY)
+      if (saved) {
+        likedCommentIds.value = new Set(saved)
+      }
+    } catch (err) {
+      console.error('加载点赞记录失败:', err)
+    }
+  }
+
+  // 保存
+  const saveLikedComments = () => {
+    // localStorage.setItem(
+    //   LIKED_KEY,
+    //   JSON.stringify([...likedCommentIds.value])
+    // )
+    storage.set(LIKED_KEY, [...likedCommentIds.value])
+  }
+
+  // 判断是否已点赞
+  const isCommentLiked = (commentId: string): boolean => {
+    return likedCommentIds.value.has(commentId)
+  }
+
   // 点赞/取消点赞
   const toggleLike = async (commentId: string) => {
+    let anonymousId: string | null = null
+    let userId: string | null = null
+
+    if (currentUser.value && currentUser.value.id)
+      userId = `${currentUser.value.id}`
+    else
+      anonymousId = getAnonymousId()
+
     try {
-      await commentApi.likeComment(commentId)
+      const result = await commentApi.likeComment(commentId, userId, anonymousId)
 
       // 更新本地状态
+      if (result.liked) {
+        likedCommentIds.value.add(commentId)
+      } else {
+        likedCommentIds.value.delete(commentId)
+      }
+      saveLikedComments()
+
+      // 更新评论对象
       const comment = findComment(commentId)
       if (comment) {
-        if (comment.isLiked) {
-          comment.likes = Math.max(0, (comment.likes || 0) - 1)
-        } else {
-          comment.likes = (comment.likes || 0) + 1
-        }
-        comment.isLiked = !comment.isLiked
+        comment.isLiked = result.liked
+        comment.likes = result.likes
       }
 
-      return true
+      return result
     } catch (err) {
       error.value = err instanceof Error ? err.message : '点赞失败'
       throw err
@@ -539,6 +603,7 @@ export const useCommentStore = defineStore('coment', () => {
     blockedUsers,
     currentUser,
 
+    findComment,
     fetchComments,
     loadMoreComments,
     addComment,
@@ -558,5 +623,6 @@ export const useCommentStore = defineStore('coment', () => {
     refreshComments,
     clearComments,
     reset,
+    isCommentLiked,
   }
 });

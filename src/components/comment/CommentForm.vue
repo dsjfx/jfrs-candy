@@ -473,7 +473,7 @@ const createComment = async () => {
       email: guestEmail.value.trim(),
       website: guestWebsite.value.trim() || undefined,
     },
-    parentId: props.replyTo?.id,
+    replyToCommentId: props.replyTo?.id,
   }
 
   // Invoke the store's addComment method to create a new comment

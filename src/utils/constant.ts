@@ -19,3 +19,6 @@ export const DEFAULT_COLOR = [
 // 默认分页参数值
 export const DEFAULT_CURRENT = 1
 export const DEFAULT_PAGESIZE = 10
+
+// 点赞 key
+export const LIKED_KEY = 'liked_comments'

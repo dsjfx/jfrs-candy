@@ -1,8 +1,8 @@
 <template>
   <article class="comment-item" :class="{ 'is-reply': isReply, 'highlight': highlight }">
+
     <!-- 评论头部 Comment Header -->
     <div class="comment-header">
-
       <!-- 用户信息 User info -->
       <div class="comment-author">
         <img :src="avatar" :alt="comment.user.name" class="author-avatar" loading="lazy" />
@@ -36,7 +36,7 @@
             <font-awesome-icon :icon="['fas', 'ellipsis-vertical']" />
           </button>
           <!-- 下拉菜单 -->
-          <div v-if="moreActionsVisible" class="more-actions-menu" @click.stop>
+          <div v-if="showMoreMenu" class="more-actions-menu" @click.stop>
             <button class="menu-item" :disabled="comment.isReported" @click="openReportDialog">
               <FontAwesomeIcon :icon="['fas', 'flag']" />
               <span>{{ comment.isReported ? '已举报' : '举报' }}</span>
@@ -63,6 +63,7 @@
 
       <div class="comment-footer">
         <div class="comment-stats">
+          <!-- 点赞 -->
           <button class="like-btn" :class="{ 'liked': comment.isLiked }" @click="handleLike" :disabled="isLiking">
             <span class="like-icon">
               <FontAwesomeIcon :icon="['far', comment.isLiked ? 'thumbs-up' : 'thumbs-up']" />
@@ -70,6 +71,7 @@
             <span class="like-count">{{ comment.likes || 0 }}</span>
           </button>
 
+          <!-- 回复 -->
           <button class="reply-btn" @click="handleReply" v-if="canReply">
             <FontAwesomeIcon :icon="['fas', 'reply']" />
             <span>回复</span>
@@ -79,25 +81,29 @@
     </div>
 
     <!-- 回复表单 Reply form -->
-    <div v-if="showReplyForm" class="reply-form-container">
+    <div v-if="isReplying" class="reply-form-container">
       <CommentForm :article-id="articleId" :reply-to="comment" :auto-focus="true" @comment-added="handleReplySubmit"
-        @cancel-reply="cancelReply" />
+        @cancel-reply="handleCancelReply" />
     </div>
 
     <!-- 子回复 Sub replies -->
     <div v-if="hasReplies" class="comment-replies">
       <div class="replies-toggle" @click="toggleReplies">
-        <span class="toggle-icon">{{ showReplies ? '▼' : '▶' }}</span>
+        <span class="toggle-icon">
+          <FontAwesomeIcon v-if="showReplies" :icon="['fas', 'caret-down']" />
+          <FontAwesomeIcon v-else :icon="['fas', 'caret-right']" />
+        </span>
         <span class="toggle-text">
-          {{ showReplies ? '隐藏' : '显示' }} {{ comment.replies?.length }} 条回复
+          {{ showReplies ? '显示' : '隐藏' }} {{ comment.replies?.length }} 条回复
         </span>
       </div>
 
       <transition name="slide-fade">
         <div v-show="showReplies" class="replies-list">
           <CommentItem v-for="reply in comment.replies" :key="reply.id" :comment="reply" :article-id="articleId"
-            :is-reply="true" @reply="handleNestedReply" @like="handleNestedLike" @edit="handleNestedEdit"
-            @delete="handleNestedDelete" />
+            :is-reply="false" :active-reply-id="activeReplyId" @reply="handleNestedReply" @like="handleNestedLike"
+            @edit="handleNestedEdit" @delete="handleNestedDelete" @open-reply="$emit('open-reply', $event)"
+            @close-reply="$emit('close-reply')" />
         </div>
       </transition>
     </div>
@@ -169,30 +175,41 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick, watchEffect, watch } from 'vue'
 import { storeToRefs } from 'pinia'
-import { marked } from 'marked'
-import DOMPurify from 'dompurify'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useUserStore } from '@/stores/user.ts'
 import { useCommentStore } from '@/stores/comment'
 import CommentForm from './CommentForm.vue'
 import type { User } from '@/types/user'
-import type { Comment, CommentItemProps } from '@/types/comment'
+import type { Comment } from '@/types/comment'
 import { markdownToHtml, formatTime } from '@/utils/cabinet'
 
+interface Props {
+  articleId: string | number
+  comment: Comment
+  isReply?: boolean
+  highlight?: boolean
+  showMoreActions?: boolean
+  canEdit?: boolean
+  canDelete?: boolean
+  activeReplyId?: string | null
+}
 
-const props = withDefaults(defineProps<CommentItemProps>(), {
+const props = withDefaults(defineProps<Props>(), {
   isReply: false,
   highlight: false,
-  showMoreActions: true
+  showMoreActions: true,
+  activeReplyId: null
 })
 
 const emit = defineEmits<{
   'reply': [comment: Comment]
-  'like': [commentId: string | number]
+  'like': [liked: boolean]
   'edit': [comment: Comment]
   'deleted': [commentId: string | number]
   'report': [commentId: string | number]
   'block': [userId: string | number]
+  'open-reply': [commentId: string]
+  'close-reply': []
 }>()
 
 const userStore = useUserStore()
@@ -202,16 +219,13 @@ const commentStore = useCommentStore()
 const isEditing = ref(false)
 const showReplyForm = ref(false)
 const showReplies = ref(true)
-const moreActionsVisible = ref(false)
+const showMoreMenu = ref(false)
 const isLiking = ref(false)
 const renderedContent = ref('')
 const { blockedUsers, currentUser } = storeToRefs(commentStore)
 
 // 是否是管理员
 const isAdmin = ref<boolean>(false)
-
-// avatar url
-const avatarUrl = ref<string>('https://picsum.photos/200/200?random=10')
 
 const showReportDialog = ref(false)
 const selectedReason = ref<string>('')
@@ -227,15 +241,12 @@ const reportReasons = [
   { value: 'other', label: '其他', icon: '💬' }
 ]
 
-// 当前用户（实际应用中应该从store获取）
-// const currentUser = ref<{
-//   id?: string | number
-//   name: string
-//   email: string
-//   isAdmin: boolean
-// } | null>(null)
-
 // ^^^^计算属性 Computational attributes
+
+const isLiked = computed(() => {
+  // 优先用后端返回的状态，其次用本地记录
+  return props.comment.isLiked ?? commentStore.isCommentLiked(props.comment.id)
+})
 
 /**
  * 
@@ -252,11 +263,16 @@ const avatar = computed(() => {
   if (props.comment?.user?.avatar) {
     return props.comment.user.avatar
   }
-  return avatarUrl.value
+  return defaultAvatar(props.comment?.user?.id)
 })
 
 const hasReplies = computed(() => {
   return props.comment.replies && props.comment.replies.length > 0
+})
+
+// 是否正在回复：完全由 props.activeReplyId 决定
+const isReplying = computed(() => {
+  return props.activeReplyId === props.comment.id
 })
 
 /**
@@ -306,6 +322,11 @@ const canReply = computed(() => {
 
 // ^^^^方法 Method
 
+// 默认头像地址 default avatar url
+const defaultAvatar = (userId: string | number = 10): string => {
+  return `https://picsum.photos/200/200?random=${userId}`
+}
+
 // 判断当前操作人是否是该评论的作者
 // Determine whether the current operator is the author of this comment
 const isAuthor = (): boolean => {
@@ -315,20 +336,26 @@ const isAuthor = (): boolean => {
 }
 
 const handleReply = () => {
-  emit('reply', props.comment)
-  showReplyForm.value = true
-  showReplies.value = true // 显示回复时展开回复列表
+  if (isReplying.value) {
+    // 再次点击 → 取消
+    emit('close-reply')
+  } else {
+    // 打开回复
+    emit('open-reply', props.comment.id)
+  }
 }
 
 const handleLike = async () => {
   if (isLiking.value) return
-
   isLiking.value = true
+
   try {
-    emit('like', props.comment.id)
 
     // 模拟API调用延迟
-    await new Promise(resolve => setTimeout(resolve, 300))
+    // await new Promise(resolve => setTimeout(resolve, 300))
+    const { liked } = await commentStore.toggleLike(props.comment.id)
+
+    emit('like', liked)
 
   } catch (error) {
     console.error('点赞失败:', error)
@@ -386,12 +413,12 @@ const handleDelete = () => {
 }
 
 const toggleMoreActions = () => {
-  moreActionsVisible.value = !moreActionsVisible.value
+  showMoreMenu.value = !showMoreMenu.value
 }
 
 const openReportDialog = () => {
   if (props.comment.isReported) return
-  moreActionsVisible.value = false
+  showMoreMenu.value = false
   showReportDialog.value = true
   selectedReason.value = ''
   reportDescription.value = ''
@@ -434,7 +461,7 @@ const openBlockDialog = () => {
     return
   }
 
-  moreActionsVisible.value = false
+  showMoreMenu.value = false
   showBlockDialog.value = true
 }
 
@@ -479,7 +506,7 @@ const cancelEdit = () => {
 }
 
 const handleReplySubmit = (replyComment: Comment) => {
-  showReplyForm.value = false
+  emit('close-reply')
 
   // 如果是顶级评论，添加到回复列表
   if (!props.isReply) {
@@ -490,8 +517,8 @@ const handleReplySubmit = (replyComment: Comment) => {
   }
 }
 
-const cancelReply = () => {
-  showReplyForm.value = false
+const handleCancelReply = () => {
+  emit('close-reply')
 }
 
 const toggleReplies = () => {
@@ -502,8 +529,8 @@ const handleNestedReply = (comment: Comment) => {
   emit('reply', comment)
 }
 
-const handleNestedLike = (commentId: string | number) => {
-  emit('like', commentId)
+const handleNestedLike = (liked: boolean) => {
+  // emit('like', commentId)
 }
 
 const handleNestedEdit = (comment: Comment) => {
@@ -513,28 +540,6 @@ const handleNestedEdit = (comment: Comment) => {
 const handleNestedDelete = (commentId: string | number) => {
   emit('deleted', commentId)
 }
-
-// function initUser() {
-//   const user = userStore.userInfo
-//   if (user) {
-//     currentUser.value = {
-//       id: user.id,
-//       name: user.nickname,
-//       email: user.email,
-//       isAdmin: user.roles?.includes('admin') ?? false
-//     }
-//   } else {
-//     const guest = JSON.parse(localStorage.getItem('guest_info') || 'null')
-//     if (guest && guest.email) {
-//       currentUser.value = {
-//         id: guest.id,
-//         name: guest.name,
-//         email: guest.email,
-//         isAdmin: false,
-//       }
-//     }
-//   }
-// }
 
 // 跟踪用户，判断是否是管理员
 watch(
@@ -572,9 +577,9 @@ watchEffect(async () => {
 
 // 监听外部点击，关闭更多操作菜单
 const handleClickOutside = (event: MouseEvent) => {
-  if (moreActionsVisible.value &&
+  if (showMoreMenu.value &&
     !(event.target as Element).closest('.more-actions')) {
-    moreActionsVisible.value = false
+    showMoreMenu.value = false
   }
 }
 
@@ -907,6 +912,12 @@ onUnmounted(() => {
       background: #dbeafe;
       color: #1d4ed8;
       border-color: #bfdbfe;
+    }
+
+    &.active {
+      background: #059669;
+      color: #fff;
+      border-color: #059669;
     }
   }
 }

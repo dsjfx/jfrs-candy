@@ -15,8 +15,21 @@
     </div>
 
     <!-- 评论表单 -->
-    <CommentForm ref="commentFormRef" :article-id="articleId" :reply-to="replyTo" :comments-count="commentsCount"
-      :auto-focus="isCommenting" @comment-added="handleCommentAdded" @cancel-reply="cancelReply" />
+    <!-- <CommentForm ref="commentFormRef" :article-id="articleId" :reply-to="replyTo" :comments-count="commentsCount"
+      :auto-focus="isCommenting" @comment-added="handleCommentAdded" @cancel-reply="cancelReply" /> -->
+    <!-- 全局表单：只有没有回复表单打开时才显示 -->
+    <CommentForm v-if="!activeReplyId" ref="commentFormRef" :article-id="articleId" :reply-to="null"
+      :comments-count="commentsCount" @comment-added="handleCommentAdded" />
+    <!-- 有回复表单打开时，显示一条提示 -->
+    <div v-else class="reply-mode-tip">
+      <span>
+        <FontAwesomeIcon :icon="['far', 'comment-dots']" />
+        <span class="reply-header-title">正在回复某条评论</span>
+      </span>
+      <button class="cancel-reply-btn" @click="cancelActiveReply">
+        取消回复
+      </button>
+    </div>
 
     <!-- 总数和排序 -->
     <div v-if="!isEmpty" class="comments-footer">
@@ -49,7 +62,8 @@
     <!-- 评论列表 -->
     <div v-else class="comments-list">
       <CommentItem v-for="comment in comments" :key="comment.id" :comment="comment" :article-id="articleId"
-        @reply="handleReply" @like="handleLikeComment(comment.id)" @deleted="handleDeletedComment(comment.id)" />
+        :active-reply-id="activeReplyId" @reply="handleReply" @like="handleLikeComment"
+        @deleted="handleDeletedComment(comment.id)" @open-reply="handleOpenReply" @close-reply="handleCloseReply" />
     </div>
 
     <!-- 加载更多 -->
@@ -71,6 +85,7 @@ import CommentForm from './CommentForm.vue'
 import CommentItem from './CommentItem.vue'
 import CommentEmpty from './CommentEmpty.vue'
 import CommentSkeleton from './CommentSkeleton.vue'
+import { ElMessage } from 'element-plus'
 
 interface Props {
   articleId: string | number
@@ -99,8 +114,15 @@ const {
 } = storeToRefs(commentStore)
 
 // 本地状态
-const replyTo = ref<any>(null)
-const isCommenting = ref(false)
+const activeReplyId = ref<string | null>(null)
+// const replyTo = ref<any>(null)
+// const isCommenting = ref(false)
+const replyTo = computed(() => {
+  if (!activeReplyId.value) return null
+  return commentStore.findComment(activeReplyId.value)
+})
+
+const isCommenting = computed(() => !!activeReplyId.value)
 const commentFormRef = ref()
 
 // 排序选项
@@ -155,12 +177,35 @@ const changeSort = async (sort: string) => {
   await commentStore.changeSort(sort as any)
 }
 
+const handleOpenReply = (commentId: string) => {
+  // 如果点击的是同一条评论，则切换（收起）
+  if (activeReplyId.value === commentId) {
+    activeReplyId.value = null
+    return
+  }
+  activeReplyId.value = commentId
+
+  // 滚动到该评论
+  setTimeout(() => {
+    const el = document.getElementById(`comment-${commentId}`)
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.pageYOffset - 100
+      window.scrollTo({ top, behavior: 'smooth' })
+    }
+  }, 100)
+}
+
+const handleCloseReply = () => {
+  activeReplyId.value = null
+}
+
+const cancelActiveReply = () => {
+  activeReplyId.value = null
+}
+
 // 处理新评论
 const handleCommentAdded = (newComment: any) => {
-  // Store 已经在 addComment 中更新了列表
-  // 这里只需要处理UI状态
-  isCommenting.value = false
-  replyTo.value = null
+  activeReplyId.value = null
   emit('count-change', commentsCount.value)
 
   // 滚动到新评论
@@ -171,28 +216,22 @@ const handleCommentAdded = (newComment: any) => {
 
 // 处理回复
 const handleReply = (comment: any) => {
-  replyTo.value = comment
-  isCommenting.value = true
-
-  // 滚动到表单
-  setTimeout(() => {
-    const formEl = document.querySelector('.comment-form-container')
-    formEl?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }, 100)
+  handleOpenReply(comment.id)
 }
 
 // 取消回复
-const cancelReply = () => {
-  replyTo.value = null
-  isCommenting.value = false
-}
+// const cancelReply = () => {
+//   replyTo.value = null
+//   isCommenting.value = false
+// }
 
-// 点赞评论
-const handleLikeComment = async (commentId: string) => {
-  try {
-    await commentStore.toggleLike(commentId)
-  } catch (err) {
-    console.error('点赞失败:', err)
+// 更新评论点赞
+const handleLikeComment = async (liked: boolean) => {
+
+  if (liked) {
+    ElMessage.success('点赞成功')
+  } else {
+    ElMessage.success('取消点赞')
   }
 }
 
@@ -264,6 +303,40 @@ defineExpose({
       background: #059669;
       color: white;
       border-color: #059669;
+    }
+  }
+}
+
+.reply-mode-tip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(5, 150, 105, 0.08);
+  border: 1px solid rgba(5, 150, 105, 0.2);
+  border-left: 4px solid #059669;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+  color: #374151;
+
+  .reply-header-title {
+    margin-left: 10px;
+  }
+
+  .cancel-reply-btn {
+    background: none;
+    border: 1px solid #059669;
+    color: #059669;
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #059669;
+      color: #fff;
     }
   }
 }

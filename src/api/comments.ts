@@ -68,8 +68,8 @@ export const createComment = async (
     {
       content: data.content,
       ...data.user,
-      parentId: data.parentId,
-      replyToId: data.replyToId,
+      // parentId: data.parentId,
+      replyToCommentId: data.replyToCommentId,
       status: 'approved',   //先发后审
     }
   )
@@ -123,11 +123,6 @@ export const deleteComment = async (
   commentId: string, data: Record<string, string>
 ): Promise<void> => {
   await http.delete(makeUrl(`/delete/${commentId}`), data)
-}
-
-// 点赞/取消点赞评论
-export const likeComment = async (commentId: string): Promise<void> => {
-  await http.post(makeUrl(`/like/${commentId}`))
 }
 
 /**
@@ -209,6 +204,25 @@ export const fetchBlockedUsers = async (): Promise<string[]> => {
   const res = response.data
   if (!res || res.code !== 200) {
     throw new Error(res?.message || '获取屏蔽列表失败')
+  }
+  return res.data
+}
+
+// 点赞/取消点赞评论
+export const likeComment = async (
+  commentId: string,
+  userId: string | null,
+  anonymousId: string | null,
+): Promise<{ liked: boolean; likes: number }> => {
+  const response = await http.post(makeUrl(`/likes/toggle`), {
+    commentId: `${commentId}`,
+    userId,
+    anonymousId
+  })
+
+  const res = response.data
+  if (!res || res.code !== 200) {
+    throw new Error(res?.message || '点赞失败')
   }
   return res.data
 }

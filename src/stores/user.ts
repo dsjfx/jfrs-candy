@@ -185,6 +185,7 @@ export const useUserStore = defineStore('user', () => {
     isLogin,
     simpleUser,
 
+    getTokenKey,
     setToken,
     setUserInfo,
     getUserInfo,

@@ -53,32 +53,8 @@ export interface CommentForm {
   user: CommentUser
   parentId?: string
   replyToId?: string
+  replyToCommentId?: string | number
   status?: string
-}
-
-export interface CommoentFormProps {
-  articleId: string
-  isEdit?: boolean
-  initialContent?: string
-  replyTo?: Comment
-  placeholder?: string
-  autoFocus?: boolean
-  maxLength?: number
-}
-
-
-// CommentItemProps defines the properties for a comment item component. 
-// It includes the article ID, the comment object, and optional flags 
-// for reply status, highlighting, action visibility, and edit/delete 
-// permissions.
-export interface CommentItemProps {
-  articleId: string | number
-  comment: Comment
-  isReply?: boolean
-  highlight?: boolean
-  showMoreActions?: boolean
-  canEdit?: boolean
-  canDelete?: boolean
 }
 
 /**

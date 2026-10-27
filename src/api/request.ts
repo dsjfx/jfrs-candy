@@ -19,17 +19,19 @@ class Request {
     this.instance.interceptors.request.use(
       (config) => {
         const userStore = useUserStore()
-        if (userStore.token) {
-          config.headers.Authorization = `Bearer ${userStore.token}`
+        const { getTokenKey } = userStore
+
+        let token = localStorage.getItem(getTokenKey())
+        if (!token) {
+          token = userStore.token
         }
-        // const token = localStorage.getItem('token')
 
         // 判断是否需要 token
-        // const needAuth = !isPublicEndpoint(config.url || '')
+        const needAuth = isAuthEndpoint(config.url)
 
-        // if (needAuth && token) {
-        //   config.headers.Authorization = `Bearer ${token}`
-        // }
+        if (needAuth && token) {
+          config.headers.Authorization = `Bearer ${token}`
+        }
 
         // 添加默认参数
         config.params = {
@@ -178,16 +180,13 @@ class Request {
   }
 }
 
-// 判断是否是公开接口
-function isPublicEndpoint(url: string): boolean {
-  const publicEndpoints = [
-    '/api/posts',
-    '/api/comments',
-    '/auth/login',
-    '/auth/register'
+// 判断是否是需要权限接口
+function isAuthEndpoint(url: string = ''): boolean {
+  const authEndpoints: string[] = [
+    '/comment/blocks',
   ]
 
-  return publicEndpoints.some(endpoint => url.startsWith(endpoint))
+  return authEndpoints.some(endpoint => url.startsWith(endpoint))
 }
 
 export const http = new Request({
