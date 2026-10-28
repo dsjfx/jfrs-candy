@@ -135,6 +135,7 @@ export const useCommentStore = defineStore('coment', () => {
       currentPage.value = current
       pageSize.value = size
       total.value = response.data.pagination?.total || 0
+      totalWithReplies.value = response.data.pagination?.totalplus || total.value
       hasMore.value = response.data.pagination?.hasNext || false
       currentSort.value = sort
 

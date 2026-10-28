@@ -17,6 +17,7 @@ export interface Comment {
   updatedAt?: string
 
   // 附加属性
+  isAdmin?: boolean
   isLiked?: boolean
   isEdited?: boolean
   replies?: Comment[]

@@ -1,5 +1,6 @@
 <template>
-  <article class="comment-item" :class="{ 'is-reply': isReply, 'highlight': highlight }">
+  <article class="comment-item"
+    :class="{ 'is-reply': isReply, 'highlight': highlight, [`comment-${comment.id}`]: true }">
 
     <!-- 评论头部 Comment Header -->
     <div class="comment-header">
@@ -203,7 +204,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'reply': [comment: Comment]
-  'like': [liked: boolean]
+  'like': [likes: number]
   'edit': [comment: Comment]
   'deleted': [commentId: string | number]
   'report': [commentId: string | number]
@@ -224,9 +225,6 @@ const isLiking = ref(false)
 const renderedContent = ref('')
 const { blockedUsers, currentUser } = storeToRefs(commentStore)
 
-// 是否是管理员
-const isAdmin = ref<boolean>(false)
-
 const showReportDialog = ref(false)
 const selectedReason = ref<string>('')
 const reportDescription = ref('')
@@ -246,6 +244,11 @@ const reportReasons = [
 const isLiked = computed(() => {
   // 优先用后端返回的状态，其次用本地记录
   return props.comment.isLiked ?? commentStore.isCommentLiked(props.comment.id)
+})
+
+// 是否是管理员
+const isAdmin = computed(() => {
+  return props.comment.isAdmin ?? false
 })
 
 /**
@@ -353,9 +356,15 @@ const handleLike = async () => {
 
     // 模拟API调用延迟
     // await new Promise(resolve => setTimeout(resolve, 300))
-    const { liked } = await commentStore.toggleLike(props.comment.id)
+    const { liked, likes } = await commentStore.toggleLike(props.comment.id)
 
-    emit('like', liked)
+    if (liked) {
+      ElMessage.success('点赞成功')
+    } else {
+      ElMessage.success('取消点赞')
+    }
+
+    emit('like', likes)
 
   } catch (error) {
     console.error('点赞失败:', error)
@@ -529,8 +538,8 @@ const handleNestedReply = (comment: Comment) => {
   emit('reply', comment)
 }
 
-const handleNestedLike = (liked: boolean) => {
-  // emit('like', commentId)
+const handleNestedLike = (likes: number) => {
+  emit('like', likes)
 }
 
 const handleNestedEdit = (comment: Comment) => {
@@ -542,18 +551,18 @@ const handleNestedDelete = (commentId: string | number) => {
 }
 
 // 跟踪用户，判断是否是管理员
-watch(
-  () => props.comment?.user?.email,
-  async (email) => {
-    if (!email) {
-      isAdmin.value = false
-      return
-    }
-    const vuser = await userStore.getUserByEmail(email)
-    isAdmin.value = userStore.hasRole(vuser, 'admin')
-  },
-  { immediate: true }
-)
+// watch(
+//   () => props.comment?.user?.email,
+//   async (email) => {
+//     if (!email) {
+//       isAdmin.value = false
+//       return
+//     }
+//     const vuser = await userStore.getUserByEmail(email)
+//     isAdmin.value = userStore.hasRole(vuser, 'admin')
+//   },
+//   { immediate: true }
+// )
 
 // 生命周期
 onMounted(() => {

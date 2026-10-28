@@ -7,16 +7,14 @@
       </h2>
 
       <div class="comments-header-right">
-        <button class="refresh-btn" @click="refreshComments">
-          <faIcon :icon="['fas', 'refresh']" />
-          刷新
+        <button class="refresh-btn" :class="{ 'is-refreshing': isRefreshing }" :disabled="isRefreshing"
+          @click="refreshComments">
+          <faIcon class="refresh-icon" :icon="['fas', 'refresh']" />
+          {{ isRefreshing ? '刷新中' : '刷新' }}
         </button>
       </div>
     </div>
 
-    <!-- 评论表单 -->
-    <!-- <CommentForm ref="commentFormRef" :article-id="articleId" :reply-to="replyTo" :comments-count="commentsCount"
-      :auto-focus="isCommenting" @comment-added="handleCommentAdded" @cancel-reply="cancelReply" /> -->
     <!-- 全局表单：只有没有回复表单打开时才显示 -->
     <CommentForm v-if="!activeReplyId" ref="commentFormRef" :article-id="articleId" :reply-to="null"
       :comments-count="commentsCount" @comment-added="handleCommentAdded" />
@@ -85,7 +83,6 @@ import CommentForm from './CommentForm.vue'
 import CommentItem from './CommentItem.vue'
 import CommentEmpty from './CommentEmpty.vue'
 import CommentSkeleton from './CommentSkeleton.vue'
-import { ElMessage } from 'element-plus'
 
 interface Props {
   articleId: string | number
@@ -115,8 +112,7 @@ const {
 
 // 本地状态
 const activeReplyId = ref<string | null>(null)
-// const replyTo = ref<any>(null)
-// const isCommenting = ref(false)
+const isRefreshing = ref(false)
 const replyTo = computed(() => {
   if (!activeReplyId.value) return null
   return commentStore.findComment(activeReplyId.value)
@@ -158,8 +154,15 @@ const fetchComments = async () => {
 
 // 刷新评论
 const refreshComments = async () => {
-  await commentStore.refreshComments()
-  emit('count-change', commentsCount.value)
+  if (isRefreshing.value) return
+
+  isRefreshing.value = true
+  try {
+    await commentStore.refreshComments()
+    emit('count-change', commentsCount.value)
+  } finally {
+    isRefreshing.value = false
+  }
 }
 
 // 加载更多
@@ -219,20 +222,9 @@ const handleReply = (comment: any) => {
   handleOpenReply(comment.id)
 }
 
-// 取消回复
-// const cancelReply = () => {
-//   replyTo.value = null
-//   isCommenting.value = false
-// }
-
 // 更新评论点赞
-const handleLikeComment = async (liked: boolean) => {
+const handleLikeComment = async (likes: number) => {
 
-  if (liked) {
-    ElMessage.success('点赞成功')
-  } else {
-    ElMessage.success('取消点赞')
-  }
 }
 
 // 删除评论
@@ -260,6 +252,9 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
+$breakpoint-tablet: 1024px;
+$breakpoint-mobile: 768px;
+
 .comment-section {
   padding: 2rem;
   margin-bottom: 3rem;
@@ -267,6 +262,10 @@ defineExpose({
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: 0.5rem;
+  }
 }
 
 .comments-header {
@@ -299,11 +298,35 @@ defineExpose({
     cursor: pointer;
     transition: all 0.3s ease;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: #059669;
       color: white;
       border-color: #059669;
     }
+
+    &:disabled {
+      opacity: 0.8;
+      cursor: wait;
+    }
+
+    .refresh-icon {
+      display: inline-block;
+      transition: transform 0.3s ease;
+    }
+
+    &.is-refreshing .refresh-icon {
+      animation: refresh-spin 1s linear infinite;
+    }
+  }
+}
+
+@keyframes refresh-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }
 
@@ -437,20 +460,20 @@ defineExpose({
 }
 
 @media (max-width: 768px) {
-  .comment-section {
-    padding: 1.5rem;
-  }
+  // .comment-section {
+  //   padding: 1rem;
+  // }
 
-  .comments-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
+  // .comments-header {
+  //   flex-direction: column;
+  //   align-items: flex-start;
+  //   gap: 0.75rem;
+  // }
 
-  .comments-footer {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
-  }
+  // .comments-footer {
+  //   flex-direction: column;
+  //   align-items: flex-start;
+  //   gap: 0.75rem;
+  // }
 }
 </style>

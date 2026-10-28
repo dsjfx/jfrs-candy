@@ -1364,6 +1364,7 @@ $breakpoint-mobile: 768px;
 
   @media (max-width: $breakpoint-mobile) {
     max-width: 100vh;
+    padding: 1rem;
   }
 }
 

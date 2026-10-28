@@ -585,6 +585,9 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
+$breakpoint-tablet: 1024px;
+$breakpoint-mobile: 768px;
+
 $primary-color: #059669;
 $primary-dark: #047857;
 $text-primary: #1F2937;
@@ -601,6 +604,10 @@ $radius: 8px;
   padding: 1.5rem;
   border: 1px solid $border-color;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: 0.5rem;
+  }
 }
 
 // ========== 头部 ==========
@@ -684,24 +691,40 @@ $radius: 8px;
   padding: 1rem;
   margin-bottom: 1rem;
 
+  @media (max-width: $breakpoint-mobile) {
+    padding: 0.5rem;
+  }
+
   .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
     margin-bottom: 0.75rem;
 
-    @media (max-width: 640px) {
+    @media (max-width: $breakpoint-mobile) {
       grid-template-columns: 1fr;
       gap: 0.75rem;
     }
   }
 
   .form-group {
+    @media (max-width: $breakpoint-mobile) {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      vertical-align: middle;
+    }
+
     .form-label {
       display: block;
       margin-bottom: 0.25rem;
       font-size: 0.85rem;
       color: $text-secondary;
+
+      @media (max-width: $breakpoint-mobile) {
+        text-align: right;
+        margin-right: 10px;
+        padding-top: 8px;
+      }
 
       .label-icon {
         margin-right: 0.25rem;
@@ -746,6 +769,10 @@ $radius: 8px;
   }
 
   .form-options {
+    @media (max-width: $breakpoint-mobile) {
+      margin-left: 100px;
+    }
+
     .remember-checkbox {
       display: flex;
       align-items: center;
@@ -768,6 +795,10 @@ $radius: 8px;
 .comment-editor {
   // position: relative;
   padding: 1rem;
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: 0.5rem;
+  }
 }
 
 .active-editor {
@@ -789,6 +820,10 @@ $radius: 8px;
   resize: vertical;
   transition: border-color 0.3s ease;
   font-family: inherit;
+
+  @media (max-width: $breakpoint-mobile) {
+    padding: 0.5rem;
+  }
 
   &:focus {
     border-color: $primary-color;
@@ -1125,9 +1160,9 @@ $radius: 8px;
 
 // ========== 响应式 ==========
 @media (max-width: 640px) {
-  .comment-form-container {
-    padding: 1rem;
-  }
+  // .comment-form-container {
+  //   padding: 1rem;
+  // }
 
   .comment-form-header {
     flex-direction: column;

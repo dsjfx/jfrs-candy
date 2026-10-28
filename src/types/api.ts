@@ -31,6 +31,7 @@ export interface Pagination {
   current: number
   size: number
   total: number
+  totalplus: number
   pages?: number
   hasNext?: boolean
   hasPrev?: boolean
