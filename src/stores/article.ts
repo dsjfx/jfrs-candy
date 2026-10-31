@@ -5,6 +5,8 @@ import mockArticle from '@/mock/mockArticle';
 import type { Adjacent, PageResult } from '@/types/api';
 import type { ArchiveYear, Article, Category } from '@/types/article'
 import { defaultAdjacent, defaultPageResult } from '@/utils/cabinet';
+import { useUserStore } from '@/stores/user'
+import { BLOG_LIKED_KEY } from '@/utils/constant';
 
 export const useArticleStore = defineStore('article', () => {
   // 初始状态
@@ -100,11 +102,15 @@ export const useArticleStore = defineStore('article', () => {
       if (search) params.search = search
       if (status) params.status = status
 
-      const data = await articleApi.getArticles(params)
+      const userStore = useUserStore()
+      const userData = userStore.acquireUserOrAnonyId(BLOG_LIKED_KEY)
+      Object.assign(params, userData)
 
-      if (data && data.data) {
-        pageData.value = data.data
-        articles.value = data.data.records
+      const response = await articleApi.getArticles(params)
+      console.log(response)
+      if (response && response.data) {
+        pageData.value = response.data
+        articles.value = response.data.records
       } /*else {
         article.value = mockArticle.getArticles(1, 10)
       }*/
@@ -159,35 +165,35 @@ export const useArticleStore = defineStore('article', () => {
   }
 
   // Like / dislike actions (simple local update or API call if available)
-  const likeArticle = async (payload: { id: number }) => {
-    try {
-      // try calling API if available
-      if (articleApi && typeof articleApi.likeArticle === 'function') {
-        await articleApi.likeArticle(payload)
-      }
-    } catch (err) {
-      console.warn('likeArticle api failed or not implemented', err)
-    }
+  // const likeArticle = async (payload: { id: number }) => {
+  //   try {
+  //     // try calling API if available
+  //     if (articleApi && typeof articleApi.likeArticle === 'function') {
+  //       await articleApi.likeArticle(payload)
+  //     }
+  //   } catch (err) {
+  //     console.warn('likeArticle api failed or not implemented', err)
+  //   }
 
-    // optimistic local update if the current article matches
-    if (article.value && (article.value as any).id === payload.id) {
-      ; (article.value as any).likes = ((article.value as any).likes || 0) + 1
-    }
-  }
+  //   // optimistic local update if the current article matches
+  //   if (article.value && (article.value as any).id === payload.id) {
+  //     ; (article.value as any).likes = ((article.value as any).likes || 0) + 1
+  //   }
+  // }
 
-  const dislikeArticle = async (payload: { id: number }) => {
-    try {
-      if (articleApi && typeof articleApi.dislikeArticle === 'function') {
-        await articleApi.dislikeArticle(payload)
-      }
-    } catch (err) {
-      console.warn('dislikeArticle api failed or not implemented', err)
-    }
+  // const dislikeArticle = async (payload: { id: number }) => {
+  //   try {
+  //     if (articleApi && typeof articleApi.dislikeArticle === 'function') {
+  //       await articleApi.dislikeArticle(payload)
+  //     }
+  //   } catch (err) {
+  //     console.warn('dislikeArticle api failed or not implemented', err)
+  //   }
 
-    if (article.value && (article.value as any).id === payload.id) {
-      ; (article.value as any).dislikes = ((article.value as any).dislikes || 0) + 1
-    }
-  }
+  //   if (article.value && (article.value as any).id === payload.id) {
+  //     ; (article.value as any).dislikes = ((article.value as any).dislikes || 0) + 1
+  //   }
+  // }
 
   return {
     pageData,
@@ -199,8 +205,8 @@ export const useArticleStore = defineStore('article', () => {
     fetchArticleById,
     fetchRelatedArticles,
     fetchAdjacentArticles,
-    likeArticle,
-    dislikeArticle,
+    // likeArticle,
+    // dislikeArticle,
 
     archiveYears,
     archiveLoading,

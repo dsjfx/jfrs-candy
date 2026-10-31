@@ -16,6 +16,8 @@ export interface PageParams {
   current?: number
   size?: number
   sort?: string
+  userId: string | null
+  anonymousId: string | null
 }
 
 /**

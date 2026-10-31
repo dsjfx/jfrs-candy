@@ -5,8 +5,7 @@ import {
   getBlogs,
   getBolgById,
   getRelatedBlogs,
-  likeArticle,
-  dislikeArticle,
+  reactionArticle,
 } from './articles'
 import { getSimpleUserinfo, getUser, getUserByEmail, login, refreshCaptcha, validateCaptcha } from './auth'
 import {
@@ -36,9 +35,7 @@ export const articleApi = {
 
   getArticleArchiveMore: getArchiveMore,
 
-  likeArticle: likeArticle,
-
-  dislikeArticle: dislikeArticle,
+  reactionArticle,
 
   // createArticle(data: any) {
   //   return api.post('/articles', data)

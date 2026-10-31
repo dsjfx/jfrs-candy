@@ -115,7 +115,8 @@ export function defaultPageResult<T = any>(): PageResult<T> {
     pagination: {
       total: 1,
       size: 10,
-      current: 1
+      current: 1,
+      totalplus: 0
     }
   }
   return result
@@ -210,6 +211,13 @@ export function isMobile() {
   const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
   return mobileRegex.test(ua) || (isSmallScreen && isTouch);
+}
+
+
+export function reactionTranslate(reaction: number) {
+  if (reaction === 1) return 'like'
+  else if (reaction === -1) return 'dislike'
+  else return 'none'
 }
 
 export default {

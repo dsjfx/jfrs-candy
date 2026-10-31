@@ -15,6 +15,7 @@ export interface Article {
   views?: number | 0
   likeCount?: number | 0
   dislikeCount?: number | 0
+  reaction: 1 | -1 | 0
   comments?: number | 0
   likes?: number[] | []
   dislikes?: number[] | []
@@ -39,50 +40,6 @@ export interface Article {
   // featuredImage?: string | ''
   imageCaption?: string | '',
   // enableReward?: boolean | false
-}
-
-// 文章封装
-export interface ArticleCardProps {
-  // 必需参数
-  article: Article
-
-  // 可选参数
-  showCategory?: boolean
-  showComments?: boolean
-  showTime?: boolean
-  showTags?: boolean
-  maxTags?: number
-  maxLength?: number
-  customClass?: string
-  isFeatured?: boolean
-
-  // 对象参数
-  categoryColors?: Record<string, string>
-}
-
-// 文章详情页面元素属性
-export interface ArticleDetailProps {
-  showBreadcrumb?: boolean
-  showAuthor?: boolean
-  showTime?: boolean
-  showView?: boolean
-  showComments?: boolean
-  showCategory?: boolean
-  showTag?: boolean
-  showAction?: boolean
-  showLike?: boolean
-  showShare?: boolean
-  showCollect?: boolean
-  showFooter?: boolean
-  showCopyright?: boolean
-  showNavigate?: boolean
-  showReward?: boolean
-  showRelated?: boolean
-  showCatalog?: boolean
-  showComment?: boolean
-
-  // 对象参数
-  categoryColors?: Record<string, string>
 }
 
 // 分类
@@ -153,4 +110,13 @@ export interface ladyArticleParams {
   endYear?: number; // 结束年份
   limit?: number; // 加载的年份数量
   status?: string; // 文章状态（如 published、draft 等）
+}
+
+export type actionType = 'like' | 'dislike' | 'none'
+
+export interface ReactionResponse {
+  reaction: 0 | 1 | -1;
+  likeCount: number;
+  dislikeCount: number;
+  reactionType: actionType
 }

@@ -114,6 +114,7 @@
             <!-- <SafeHtmlRenderer :html="article?.content" ref="contentRef" /> -->
             <SafeHtmlPrism :html="article?.content" ref="contentRef" />
 
+            <ArticleReaction :article-id="blogId" :likes="likes" :dislikes="dislikes" :type="reactionType" />
           </article>
 
           <div class="article-end">
@@ -263,9 +264,10 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLoading } from '@/composables/useLoading'
-import ArticleDetailSkeleton from '@/components/core/ArticleDetailSkeleton.vue'
+import ArticleDetailSkeleton from '@/components/articles/ArticleDetailSkeleton.vue'
 import ErrorDisplay from '@/components/core/ErrorDisplay.vue'
 import LoadingSpinner from '@/components/core/LoadingSpinner.vue'
+import ArticleReaction from '@/components/articles/ArticleReaction.vue'
 import RelatedArticleCard from '@/components/articles/RelatedArticleCard.vue'
 import CommentSection from '@/components/comment/CommentSection.vue'
 import CommentForm from '@/components/comment/CommentForm.vue'
@@ -275,8 +277,8 @@ import ShareMenu from '@/components/articles/ShareMenu.vue'
 import SafeHtmlPrism from '@/components/core/SafeHtmlPrism.vue'
 import { useUserStore } from '@/stores/user'
 import { useArticleStore } from '@/stores/article'
-import type { Article, ArticleDetailProps, Category } from '@/types/article'
-import { formatDate, isMobile, tagColorRgb } from '@/utils/cabinet'
+import type { Article, Category } from '@/types/article'
+import { formatDate, isMobile, reactionTranslate, tagColorRgb } from '@/utils/cabinet'
 import { ElMessage } from 'element-plus'
 
 // 路由和状态
@@ -288,8 +290,32 @@ const articleStore = useArticleStore()
 // 加载状态
 const { isLoading, hasError, error, setError, withLoading } = useLoading()
 
+interface Props {
+  showBreadcrumb?: boolean
+  showAuthor?: boolean
+  showTime?: boolean
+  showView?: boolean
+  showComments?: boolean
+  showCategory?: boolean
+  showTag?: boolean
+  showAction?: boolean
+  showLike?: boolean
+  showShare?: boolean
+  showCollect?: boolean
+  showFooter?: boolean
+  showCopyright?: boolean
+  showNavigate?: boolean
+  showReward?: boolean
+  showRelated?: boolean
+  showCatalog?: boolean
+  showComment?: boolean
+
+  // 对象参数
+  categoryColors?: Record<string, string>
+}
+
 // 接收props并设置默认值
-const props = withDefaults(defineProps<ArticleDetailProps>(), {
+const props = withDefaults(defineProps<Props>(), {
   showBreadcrumb: false,
   showAuthor: false,
   showTime: true,
@@ -359,6 +385,23 @@ const categoryColor = computed(() => {
     return props.categoryColors[category.name]
   }
   return '#059669'
+})
+
+const blogId = computed(() => {
+  return article?.value?.id ?? -1
+})
+
+const likes = computed(() => {
+  return article?.value?.likeCount ?? 0
+})
+
+const dislikes = computed(() => {
+  return article?.value?.dislikeCount ?? 0
+})
+
+const reactionType = computed(() => {
+  const reaction = article?.value?.reaction ?? 0
+  return reactionTranslate(reaction)
 })
 
 // ^^^^生命周期

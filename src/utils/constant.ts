@@ -22,3 +22,5 @@ export const DEFAULT_PAGESIZE = 10
 
 // 点赞 key
 export const LIKED_KEY = 'liked_comments'
+
+export const BLOG_LIKED_KEY = 'blog_anonymous_id'

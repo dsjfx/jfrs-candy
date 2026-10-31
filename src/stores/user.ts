@@ -6,6 +6,7 @@ import type {
   CaptchaResponse, CaptchaParam, LoginParams
 } from '@/types/user'
 import type { ResponseData } from '@/types/api'
+import { getAnonymousId } from '@/utils/anonymousId'
 
 export const useUserStore = defineStore('user', () => {
   const subect: string = import.meta.env.VITE_APP_SUBJECT
@@ -178,6 +179,25 @@ export const useUserStore = defineStore('user', () => {
     return userInfo.value?.id === postAuthorId /**|| hasRole('admin')*/
   }
 
+  const acquireUserOrAnonyId = (key: string): {
+    userId: string | null,
+    anonymousId: string | null
+  } => {
+    let userId: string | null = null
+    let anonymousId: string | null = null
+
+    const user = userInfo.value
+    if (user && user.id) {
+      userId = `${user.id}`
+    } else {
+      anonymousId = getAnonymousId(key)
+    }
+
+    return {
+      userId, anonymousId
+    }
+  }
+
   return {
     token,
     user,
@@ -195,6 +215,7 @@ export const useUserStore = defineStore('user', () => {
     logout,
     init,
     refreshCaptcha,
-    hasRole
+    hasRole,
+    acquireUserOrAnonyId
   }
 })

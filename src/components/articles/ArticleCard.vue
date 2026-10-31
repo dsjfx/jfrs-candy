@@ -78,12 +78,30 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { faComment } from '@fortawesome/free-regular-svg-icons'
-import type { Article, ArticleCardProps } from '@/types/article'
+import type { Article } from '@/types/article'
 import { DEFAULT_COLOR } from '@/utils/constant';
 import { tagColorRgb } from '@/utils/cabinet';
 
+interface Props {
+  // 必需参数
+  article: Article
+
+  // 可选参数
+  showCategory?: boolean
+  showComments?: boolean
+  showTime?: boolean
+  showTags?: boolean
+  maxTags?: number
+  maxLength?: number
+  customClass?: string
+  isFeatured?: boolean
+
+  // 对象参数
+  categoryColors?: Record<string, string>
+}
+
 // 接收props并设置默认值
-const props = withDefaults(defineProps<ArticleCardProps>(), {
+const props = withDefaults(defineProps<Props>(), {
   showCategory: true,
   showComments: true,
   showTime: true,

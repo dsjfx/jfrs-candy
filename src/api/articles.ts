@@ -1,9 +1,9 @@
 import http from './request'
-import type { ArchiveResponse, Article, ladyArticleParams } from '@/types/article'
+import type { ArchiveResponse, Article, ladyArticleParams, ReactionResponse } from '@/types/article'
 import type { Adjacent, PageParams, PageResult, ResponseData } from '@/types/api'
 import mockArticle, { getArticleDetail } from '@/mock/mockArticle'
 import ResponseFactory from '@/utils/responseFactory'
-import { accessUrl } from '@/utils/cabinet'
+import { accessUrl, reactionTranslate } from '@/utils/cabinet'
 
 function makeUrl(url: string) {
   return accessUrl('BL', url)
@@ -14,7 +14,9 @@ export const getBlogs = async (
   page: PageParams = {
     current: 1,
     size: 10,
-    sort: 'createAt'
+    sort: 'createAt',
+    userId: null,
+    anonymousId: null
   }): Promise<ResponseData<PageResult<Article>>> => {
   let result = ResponseFactory.page<Article>()
 
@@ -26,7 +28,7 @@ export const getBlogs = async (
   if (response.data) {
     result = response.data as ResponseData<PageResult<Article>>
   }
-
+  console.log(result)
   return result
 }
 
@@ -96,24 +98,29 @@ export const getArchiveMore = async (
   return result
 }
 
-export const likeArticle = async ({ id }: { id: number }): Promise<ResponseData<null>> => {
-  let result = ResponseFactory.success<null>(null)
-
-  const response = await http.post(makeUrl(`/like`), { id })
-  if (response.data) {
-    result = response.data as ResponseData<null>
+export const reactionArticle = async (id: string, payload:
+  {
+    type: 1 | -1 | 0,
+    userId: string | null,
+    anonymousId: string | null
   }
+): Promise<ReactionResponse> => {
+
+  const response = await http.post(makeUrl(`/reactions/toggle`),
+    {
+      blogId: id,
+      ...payload
+    }
+  )
+
+  const res = response.data
+  if (!res || res.code !== 200) {
+    throw new Error(res?.message || `${payload.type === 1 ? '点赞' : '踩踏'}失败`)
+  }
+
+  const result = res.data as ReactionResponse
+  result['reactionType'] = reactionTranslate(result.reaction)
 
   return result
 }
 
-export const dislikeArticle = async ({ id }: { id: number }): Promise<ResponseData<null>> => {
-  let result = ResponseFactory.success<null>(null)
-
-  const response = await http.post(makeUrl(`/dislike`), { id })
-  if (response.data) {
-    result = response.data as ResponseData<null>
-  }
-
-  return result
-}
