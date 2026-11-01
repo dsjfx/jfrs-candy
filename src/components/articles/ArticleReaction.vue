@@ -163,7 +163,7 @@ $breakpoint-mobile: 768px;
 
     &.like-btn {
       &.active {
-        color: var(--color-primary)
+        color: var(--color-secondary)
       }
 
       &:hover {

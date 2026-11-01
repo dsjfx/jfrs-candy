@@ -114,7 +114,6 @@
             <!-- <SafeHtmlRenderer :html="article?.content" ref="contentRef" /> -->
             <SafeHtmlPrism :html="article?.content" ref="contentRef" />
 
-            <ArticleReaction :article-id="blogId" :likes="likes" :dislikes="dislikes" :type="reactionType" />
           </article>
 
           <div class="article-end">
@@ -140,6 +139,7 @@
 
           <!-- 文章脚部 Article Footer -->
           <footer class="article-footer">
+            <ArticleReaction :article-id="blogId" :likes="likes" :dislikes="dislikes" :type="reactionType" />
             <!-- 版权声明 Copyright Notice -->
             <div v-if="showCopyright" class="copyright">
               <p>本文作者：{{ article.author?.nickname || '佚名' }}</p>

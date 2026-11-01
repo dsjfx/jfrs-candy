@@ -28,15 +28,23 @@ export const getBlogs = async (
   if (response.data) {
     result = response.data as ResponseData<PageResult<Article>>
   }
-  console.log(result)
+
   return result
 }
 
 // 获取文章详情
-export const getBolgById = async (id: string): Promise<ResponseData<Article>> => {
+export const getBolgById = async (
+  id: string,
+  userId: string | null,
+  anonymousId: string | null
+): Promise<ResponseData<Article>> => {
   let result = ResponseFactory.success<Article>({} as Article)
 
-  const response = await http.get(makeUrl(`/view/${id}`))
+  const response = await http.get(makeUrl(`/view/${id}`),
+    {
+      userId, anonymousId
+    }
+  )
 
   if (response.data) {
     result = response.data as ResponseData<Article>

@@ -107,7 +107,7 @@ export const useArticleStore = defineStore('article', () => {
       Object.assign(params, userData)
 
       const response = await articleApi.getArticles(params)
-      console.log(response)
+
       if (response && response.data) {
         pageData.value = response.data
         articles.value = response.data.records
@@ -127,7 +127,10 @@ export const useArticleStore = defineStore('article', () => {
   const fetchArticleById = async (payload = { id: '' }) => {
     const id: string = payload.id
     try {
-      const data = await articleApi.getArticleById(id)
+      const userStore = useUserStore()
+      const userData = userStore.acquireUserOrAnonyId(BLOG_LIKED_KEY)
+
+      const data = await articleApi.getArticleById(id, userData.userId, userData.anonymousId)
       if (data && data.data) {
         article.value = data.data
       }
