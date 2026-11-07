@@ -93,18 +93,20 @@ export const useTagStore = defineStore('tag', () => {
 
   const fetchTagArticles = async (
     id: number | string,
-    page: { current: number; size: number } = {
-      current: 1,
-      size: 10
-    }
+    page: { current?: number; size?: number } = {}
   ) => {
     loading.value = true
     error.value = null
 
+    const {
+      current = 1,
+      size = 10
+    } = page
+
     try {
       const response = await apiFetchTagBlogs(id,
         {
-          ...page,
+          current, size
         }
       )
       articles.value = response.data?.records || response.data || []

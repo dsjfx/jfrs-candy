@@ -52,21 +52,31 @@ import ArticleCard from '@/components/articles/ArticleCard.vue'
 import EmptyState from '@/components/core/EmptyState.vue'
 import LoadingSpinner from '@/components/core/LoadingSpinner.vue'
 import { useArticleStore } from '@/stores/article'
+import { useCategoryStore } from '@/stores/category'
 import type { Article, Category } from '@/types/article'
 
 const route = useRoute()
 const router = useRouter()
 const articleStore = useArticleStore()
+const categoryStore = useCategoryStore()
 
 const isLoading = ref(false)
 const error = ref('')
 
-const routeValue = computed(() => {
-  const raw = String(route.params.slug || route.query.category || route.query.slug || '')
-  return raw ? decodeURIComponent(raw) : ''
-})
+// const routeValue = computed(() => {
+//   const raw = String(route.params.slug || route.query.category || route.query.slug || '')
+//   return raw ? decodeURIComponent(raw) : ''
+// })
 
-const categorySlug = computed(() => routeValue.value)
+const categorySlug = computed(() => categoryStore.category?.slug)
+
+const catId = computed(() => {
+  const id = Number(route.params.id)
+  if (Number.isNaN(id)) {
+    // ...
+  }
+  return id
+})
 
 const availableCategories = computed(() => {
   const unique = new Map<string, Category>()
@@ -93,14 +103,15 @@ const categoryName = computed(() => {
 })
 
 const filteredArticles = computed(() => {
-  const slug = categorySlug.value
-  if (!slug) return articleStore.articles
+  // const slug = categorySlug.value
+  // if (!slug) return articleStore.articles
 
-  return articleStore.articles.filter((article) => {
-    const category = article.category
-    if (!category) return false
-    return [category.slug, category.name, String(category.id)].includes(slug)
-  })
+  // return articleStore.articles.filter((article) => {
+  //   const category = article.category
+  //   if (!category) return false
+  //   return [category.slug, category.name, String(category.id)].includes(slug)
+  // })
+  return articleStore.articles
 })
 
 const loadArticles = async () => {
@@ -110,9 +121,9 @@ const loadArticles = async () => {
   try {
     await articleStore.fetchArticles({
       current: 1,
-      size: 200,
+      size: 10,
       status: 'published',
-      category: categorySlug.value || undefined,
+      categoryId: categoryStore?.category?.id || undefined,
     })
   } catch (err) {
     error.value = err instanceof Error ? err.message : '加载文章失败'
@@ -154,7 +165,9 @@ watch(
   { immediate: true }
 )
 
-onMounted(() => {
+onMounted(async () => {
+  await categoryStore.fetchCategoryDetail(catId.value)
+
   loadArticles()
 })
 </script>

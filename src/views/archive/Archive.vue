@@ -81,7 +81,7 @@
             </h3>
             <ul class="category-nav">
               <li v-for="cat in categories" :key="cat.id">
-                <router-link :to="`/archive/categories/${cat.slug}`" class="category-nav-item">
+                <router-link :to="`/archive/categories/${cat.id}`" class="category-nav-item">
                   <span class="nav-name">{{ cat.name }}</span>
                   <span class="nav-count">{{ cat.articleCount }}</span>
                 </router-link>
@@ -96,7 +96,7 @@
               <router-link to="/archive/tags" class="title-link">标签</router-link>
             </h3>
             <div class="tag-cloud">
-              <router-link v-for="tag in tags" :key="tag.id" :to="`/archive/tags/${tag.slug}`" class="tag-item"
+              <router-link v-for="tag in tags" :key="tag.id" :to="`/archive/tags/${tag.id}`" class="tag-item"
                 :style="{ fontSize: getTagFontSize(tag.articleCount) }">
                 #{{ tag.name }}
               </router-link>

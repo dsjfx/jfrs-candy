@@ -57,7 +57,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/archive/CategoryArticles.vue'),
       },
       {
-        path: 'categories/:slug',
+        path: 'categories/:id',
         name: 'CategoryArticles',
         component: () => import('@/views/archive/CategoryArticles.vue'),
       },
@@ -67,7 +67,7 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/archive/TagArticles.vue'),
       },
       {
-        path: 'tags/:slug',
+        path: 'tags/:id',
         name: 'TagArticles',
         component: () => import('@/views/archive/TagArticles.vue'),
       },

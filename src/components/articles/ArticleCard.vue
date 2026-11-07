@@ -59,7 +59,7 @@
         <div v-if="showTags && limitedTags" class="article-tags">
           <span v-for="tag in limitedTags" class="tag" :key="tag.id" @click="emitTagClick(tag.name)"
             :style="{ '--tag-color': tag.color || '', '--tag-color-rgb': tagColorRgb(tag.color) }">
-            <router-link v-if="hasTagLinks" :to="`/archive/tags/${tag.slug}`" class="title-link">
+            <router-link v-if="hasTagLinks" :to="`/archive/tags/${tag.id}`" class="title-link">
               #{{ tag.name }}
             </router-link>
             <span v-else>#{{ tag.name }}</span>

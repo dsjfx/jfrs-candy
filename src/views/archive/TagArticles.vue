@@ -52,21 +52,31 @@ import ArticleCard from '@/components/articles/ArticleCard.vue'
 import EmptyState from '@/components/core/EmptyState.vue'
 import LoadingSpinner from '@/components/core/LoadingSpinner.vue'
 import { useArticleStore } from '@/stores/article'
+import { useTagStore } from '@/stores/tag'
 import type { Article, Tag } from '@/types/article'
 
 const route = useRoute()
 const router = useRouter()
 const articleStore = useArticleStore()
+const tagStore = useTagStore()
 
 const isLoading = ref(false)
 const error = ref('')
 
-const routeValue = computed(() => {
-  const raw = String(route.params.slug || route.query.tag || route.query.slug || '')
-  return raw ? decodeURIComponent(raw) : ''
-})
+// const routeValue = computed(() => {
+//   const raw = String(route.params.slug || route.query.tag || route.query.slug || '')
+//   return raw ? decodeURIComponent(raw) : ''
+// })
 
-const tagSlug = computed(() => routeValue.value)
+const tagSlug = computed(() => tagStore.tag?.slug)
+
+const tagId = computed(() => {
+  const id = Number(route.params.id)
+  if (Number.isNaN(id)) {
+    // ...
+  }
+  return id
+})
 
 const availableTags = computed(() => {
   const unique = new Map<string, Tag>()
@@ -81,25 +91,21 @@ const availableTags = computed(() => {
 })
 
 const tagName = computed(() => {
-  const slug = tagSlug.value
-  if (!slug) return '全部标签'
+  const currTag = tagStore.tag
+  if (!currTag) return '全部标签'
 
-  const matched = articleStore.articles.find((article) => {
-    const tags = article.tags || []
-    return tags.some((tag) => [tag.slug, tag.name, String(tag.id)].includes(slug))
-  })
-
-  return matched?.tags?.find((tag) => [tag.slug, tag.name, String(tag.id)].includes(slug))?.name || slug
+  return currTag.name
 })
 
 const filteredArticles = computed(() => {
-  const slug = tagSlug.value
-  if (!slug) return articleStore.articles
+  // const slug = tagSlug.value
+  // if (!slug) return articleStore.articles
 
-  return articleStore.articles.filter((article) => {
-    const tags = article.tags || []
-    return tags.some((tag) => [tag.slug, tag.name, String(tag.id)].includes(slug))
-  })
+  // return articleStore.articles.filter((article) => {
+  //   const tags = article.tags || []
+  //   return tags.some((tag) => [tag.slug, tag.name, String(tag.id)].includes(slug))
+  // })
+  return articleStore.articles
 })
 
 const loadArticles = async () => {
@@ -111,8 +117,9 @@ const loadArticles = async () => {
       current: 1,
       size: 20,
       status: 'published',
-      tagId: tagSlug.value || undefined,
+      tagId: tagStore?.tag?.id || undefined,
     })
+    // await tagStore.fetchTagArticles(tagId.value)
   } catch (err) {
     error.value = err instanceof Error ? err.message : '加载文章失败'
   } finally {
@@ -146,14 +153,16 @@ const goBack = () => {
 }
 
 watch(
-  () => route.params.slug,
+  () => route.params.id,
   () => {
     loadArticles()
   },
   { immediate: true }
 )
 
-onMounted(() => {
+onMounted(async () => {
+  await tagStore.fetchTagDetail(tagId.value)
+
   loadArticles()
 })
 </script>

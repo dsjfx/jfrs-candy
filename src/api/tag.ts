@@ -72,10 +72,7 @@ export const fetchTagById = async (id: number | string): Promise<ResponseData<Ta
  */
 export const fetchTagBlogs = async (
   id: number | string,
-  page: { current: number, size: number } = {
-    current: 1,
-    size: 10
-  }
+  page: { current: number, size: number }
 ): Promise<ResponseData<PageResult<Article>>> => {
   const res = await http.get(jMake(`/${id}/blogs`),
     {
