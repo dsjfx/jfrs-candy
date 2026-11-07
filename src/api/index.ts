@@ -1,13 +1,15 @@
 import {
   getAdjacentBlogs,
-  getArchive,
-  getArchiveMore,
   getBlogs,
   getBolgById,
   getRelatedBlogs,
   reactionArticle,
 } from './articles'
-import { getSimpleUserinfo, getUser, getUserByEmail, login, refreshCaptcha, validateCaptcha } from './auth'
+import {
+  getSimpleUserinfo, getUser,
+  getUserByEmail, login, refreshCaptcha,
+  validateCaptcha
+} from './auth'
 import {
   createComment,
   deleteComment,
@@ -19,6 +21,10 @@ import {
   unblockUser,
   fetchBlockedUsers,
 } from './comments'
+import {
+  getArchive,
+  getArchiveMore
+} from './archive'
 import api from './request'
 
 // 文章 API
@@ -31,34 +37,28 @@ export const articleApi = {
 
   getAdjacentArticles: getAdjacentBlogs,
 
+  reactionArticle,
+
+}
+
+export const archiveApi = {
+
   getArticleArchive: getArchive,
 
   getArticleArchiveMore: getArchiveMore,
-
-  reactionArticle,
-
-  // createArticle(data: any) {
-  //   return api.post('/articles', data)
-  // },
-  // updateArticle(id: string | number, data: any) {
-  //   return api.put(`/articles/${id}`, data)
-  // },
-  // deleteArticle(id: string | number) {
-  //   return api.delete(`/articles/${id}`)
-  // },
 }
 
 // 分类相关API
 export const categoryApi = {
   getCategories() {
-    return api.get('/categories')
+    return api.get('/archive/categories')
   },
 }
 
 // 标签相关API
 export const tagApi = {
   getTags() {
-    return api.get('/tags')
+    return api.get('/archive/tags')
   },
 }
 

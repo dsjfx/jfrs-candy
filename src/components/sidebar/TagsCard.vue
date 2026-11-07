@@ -3,27 +3,23 @@
     <template #header>
       <div class="card-header">
         <h3 class="card-title">标签云</h3>
-        <router-link to="/tags" class="see-all">
+        <router-link to="/archive/tags" class="see-all">
           查看全部
-          <el-icon><ArrowRight /></el-icon>
+          <el-icon>
+            <ArrowRight />
+          </el-icon>
         </router-link>
       </div>
     </template>
-    
+
     <div class="tags-cloud">
-      <el-tag
-        v-for="tag in tags"
-        :key="tag.id"
-        class="tag-item"
-        :type="getTagType(tag.id)"
-        effect="plain"
-        @click="goToTag(tag)"
-      >
+      <el-tag v-for="tag in tags" :key="tag.id" class="tag-item" :type="getTagType(tag.id)" effect="plain"
+        @click="goToTag(tag)">
         {{ tag.name }}
         <span class="tag-count">{{ tag.articleCount }}</span>
       </el-tag>
     </div>
-    
+
     <div v-if="tags.length === 0" class="empty-state">
       <el-empty description="暂无标签" />
     </div>
@@ -48,8 +44,8 @@ const getTagType = (id: number): string => {
 
 const goToTag = (tag: any) => {
   router.push({
-    path: '/articles',
-    query: { tag: tag.id }
+    name: 'TagArticles',
+    params: { slug: encodeURIComponent(tag.slug || tag.name || tag.id) }
   })
 }
 
@@ -66,14 +62,14 @@ onMounted(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
     .card-title {
       margin: 0;
       font-size: 1.125rem;
       font-weight: 600;
       color: var(--color-text);
     }
-    
+
     .see-all {
       display: flex;
       align-items: center;
@@ -82,11 +78,11 @@ onMounted(() => {
       color: var(--color-text-secondary);
       text-decoration: none;
       transition: color 0.3s;
-      
+
       &:hover {
         color: var(--color-primary);
       }
-      
+
       .el-icon {
         font-size: 0.75rem;
       }
@@ -98,16 +94,16 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  
+
   .tag-item {
     cursor: pointer;
     transition: all 0.3s;
-    
+
     &:hover {
       transform: translateY(-2px);
       box-shadow: var(--shadow-sm);
     }
-    
+
     .tag-count {
       font-size: 0.75rem;
       opacity: 0.8;

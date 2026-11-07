@@ -41,7 +41,7 @@
       <!-- 文章项 -->
       <div class="articles-center">
         <ArticleCard v-for="article in articles" :key="article.id" :article="article" :show-time="true" :max-tags="2"
-          @tag-click="handleTagClick" @read-more="handleReadMore" @click="handleArticleClick" />
+          :hasTagLinks="true" @tag-click="handleTagClick" @read-more="handleReadMore" @click="handleArticleClick" />
       </div>
 
       <div class="articles-right"></div>

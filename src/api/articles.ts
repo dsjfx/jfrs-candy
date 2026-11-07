@@ -1,32 +1,38 @@
 import http from './request'
-import type { ArchiveResponse, Article, ladyArticleParams, ReactionResponse } from '@/types/article'
+import type { Article, ReactionResponse } from '@/types/article'
 import type { Adjacent, PageParams, PageResult, ResponseData } from '@/types/api'
 import mockArticle, { getArticleDetail } from '@/mock/mockArticle'
 import ResponseFactory from '@/utils/responseFactory'
-import { accessUrl, reactionTranslate } from '@/utils/cabinet'
+import { jAccess, reactionTranslate } from '@/utils/cabinet'
 
-function makeUrl(url: string) {
-  return accessUrl('BL', url)
-}
+const jMake = jAccess('BL')
 
-// 获取文章列表
+/**
+ * 获取文章列表
+ * @param page 
+ * @returns 
+ */
 export const getBlogs = async (
-  page: PageParams = {
-    current: 1,
-    size: 10,
-    sort: 'createAt',
-    userId: null,
-    anonymousId: null
-  }): Promise<ResponseData<PageResult<Article>>> => {
-  let result = ResponseFactory.page<Article>()
+  page: PageParams = {} as PageParams): Promise<ResponseData<PageResult<Article>>> => {
+  const {
+    current = 1,
+    size = 10,
+    sort = 'createAt',
+    userId = null,
+    anonymousId = null,
+    tagId = null,
+    categoryId = null
+  } = page;
 
-  const response = await http.get(makeUrl(`/list`),
+  const response = await http.get(jMake(`/list`),
     {
-      ...page
-    })
+      current, size, sort, userId, anonymousId, tagId, categoryId
+    }
+  )
 
-  if (response.data) {
-    result = response.data as ResponseData<PageResult<Article>>
+  const result = response.data as ResponseData<PageResult<Article>>
+  if (result.code !== 200) {
+    throw new Error(result.message || '获取文章列表失败')
   }
 
   return result
@@ -40,7 +46,7 @@ export const getBolgById = async (
 ): Promise<ResponseData<Article>> => {
   let result = ResponseFactory.success<Article>({} as Article)
 
-  const response = await http.get(makeUrl(`/view/${id}`),
+  const response = await http.get(jMake(`/view/${id}`),
     {
       userId, anonymousId
     }
@@ -57,7 +63,7 @@ export const getBolgById = async (
 export const getRelatedBlogs = async (articleId: string): Promise<ResponseData<Article[]>> => {
   let result = ResponseFactory.success<Article[]>([] as Article[])
 
-  const response = await http.get(makeUrl(`/related/${articleId}`))
+  const response = await http.get(jMake(`/related/${articleId}`))
   if (response.data) {
     result = response.data as ResponseData<Article[]>
   }
@@ -69,38 +75,9 @@ export const getRelatedBlogs = async (articleId: string): Promise<ResponseData<A
 export const getAdjacentBlogs = async (articleId: string): Promise<ResponseData<Adjacent<Article>>> => {
   let result = ResponseFactory.success<Adjacent<Article>>({} as Adjacent<Article>)
 
-  const response = await http.get(makeUrl(`/adjacent/${articleId}`))
+  const response = await http.get(jMake(`/adjacent/${articleId}`))
   if (response.data) {
     result = response.data as ResponseData<Adjacent<Article>>
-  }
-
-  return result
-}
-
-export const getArchive = async ({ year, month, limit = 5 }:
-  { year?: number; month?: number, limit?: number }): Promise<ResponseData<ArchiveResponse>> => {
-  let result = ResponseFactory.success<ArchiveResponse>({} as ArchiveResponse)
-
-  const response = await http.get(makeUrl(`/archive`), { year, month, limit })
-  if (response.data) {
-    result = response.data as ResponseData<ArchiveResponse>
-  }
-
-  return result
-}
-
-export const getArchiveMore = async (
-  {
-    years,
-    startYear,
-    endYear,
-    limit = 5
-  }: ladyArticleParams): Promise<ResponseData<ArchiveResponse>> => {
-  let result = ResponseFactory.success<ArchiveResponse>({} as ArchiveResponse)
-
-  const response = await http.get(makeUrl(`/archive/more`), { years, startYear, endYear, limit })
-  if (response.data) {
-    result = response.data as ResponseData<ArchiveResponse>
   }
 
   return result
@@ -114,7 +91,7 @@ export const reactionArticle = async (id: string, payload:
   }
 ): Promise<ReactionResponse> => {
 
-  const response = await http.post(makeUrl(`/reactions/toggle`),
+  const response = await http.post(jMake(`/reactions/toggle`),
     {
       blogId: id,
       ...payload

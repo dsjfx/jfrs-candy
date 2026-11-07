@@ -59,7 +59,10 @@
         <div v-if="showTags && limitedTags" class="article-tags">
           <span v-for="tag in limitedTags" class="tag" :key="tag.id" @click="emitTagClick(tag.name)"
             :style="{ '--tag-color': tag.color || '', '--tag-color-rgb': tagColorRgb(tag.color) }">
-            #{{ tag.name }}
+            <router-link v-if="hasTagLinks" :to="`/archive/tags/${tag.slug}`" class="title-link">
+              #{{ tag.name }}
+            </router-link>
+            <span v-else>#{{ tag.name }}</span>
           </span>
           <span v-if="hasMoreTags" class="tag-more">...</span>
         </div>
@@ -95,6 +98,7 @@ interface Props {
   maxLength?: number
   customClass?: string
   isFeatured?: boolean
+  hasTagLinks?: boolean
 
   // 对象参数
   categoryColors?: Record<string, string>
@@ -110,6 +114,7 @@ const props = withDefaults(defineProps<Props>(), {
   maxLength: 200,
   customClass: '',
   isFeatured: false,
+  hasTagLinks: false,
   categoryColors: () => ({
     '日记': '#059669',
     '生活': '#10B981',

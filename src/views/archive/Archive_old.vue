@@ -89,14 +89,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick, onUnmounted } from 'vue'
-import { useArticleStore } from '@/stores/article'
+import { useArchiveStore } from '@/stores/archive'
 import LoadingSpinner from '@/components/core/LoadingSpinner.vue'
-import type { ArchiveResponse, ArchiveYear } from '@/types/article'
+import type { ArchiveYear } from '@/types'
 import type { TimelineProps } from 'element-plus'
 
-const articleStore = useArticleStore()
-const isLoading = articleStore.archiveLoading
-const years = computed(() => (articleStore.archiveYears || []) as ArchiveYear[])
+const archiveStore = useArchiveStore()
+const isLoading = archiveStore.archiveLoading
+const years = computed(() => (archiveStore.archiveYears || []) as ArchiveYear[])
 const timeColor = ref<string>('#059669')
 
 // UI state
@@ -117,8 +117,8 @@ let loadingMore = false
 
 const fetchArchive = async () => {
   // reset archive flags (do not clear loaded years by default)
-  articleStore.resetArchiveState({ clearYears: false })
-  await articleStore.fetchArchive({ year: undefined, month: undefined, limit: INITIAL_YEARS })
+  archiveStore.resetArchiveState({ clearYears: false })
+  await archiveStore.fetchArchive({ year: undefined, month: undefined, limit: INITIAL_YEARS })
   // initialize expanded states
   years.value.forEach((y, yi) => {
     if (typeof y.expanded === 'undefined') y.expanded = yi < INITIAL_YEARS
@@ -136,9 +136,9 @@ const setupObserver = () => {
   if (observer) observer.disconnect()
   observer = new IntersectionObserver((entries) => {
     for (const e of entries) {
-      if (e.isIntersecting && !loadingMore && !articleStore.archiveNoMore) {
+      if (e.isIntersecting && !loadingMore && !archiveStore.archiveNoMore) {
         const lastYear = years.value.length ? years.value[years.value.length - 1]?.year : undefined
-        const prevLen = (articleStore.archiveYears as any[]).length
+        const prevLen = (archiveStore.archiveYears as any[]).length
 
         loadingMore = true
 
@@ -148,11 +148,11 @@ const setupObserver = () => {
           return
         }
 
-        articleStore.loadMoreArchiveYears({ startYear, limit: (INITIAL_YEARS - 1) }).then(() => {
-          const newLen = (articleStore.archiveYears as any[]).length
+        archiveStore.loadMoreArchiveYears({ startYear, limit: (INITIAL_YEARS - 1) }).then(() => {
+          const newLen = (archiveStore.archiveYears as any[]).length
           const added = Math.max(0, newLen - prevLen)
           if (added > 0) {
-            visibleCount.value = Math.min((articleStore.archiveYears as any[]).length, visibleCount.value + added)
+            visibleCount.value = Math.min((archiveStore.archiveYears as any[]).length, visibleCount.value + added)
           }
         }).catch(() => {
           // ignore
@@ -166,7 +166,7 @@ const setupObserver = () => {
   observer.observe(sentinelRef.value)
 }
 
-// loadMore handled by store: articleStore.loadMoreArchiveYears
+// loadMore handled by store: archiveStore.loadMoreArchiveYears
 
 onUnmounted(() => {
   if (observer) observer.disconnect()

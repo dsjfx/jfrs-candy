@@ -12,16 +12,6 @@ const routes: RouteRecordRaw[] = [
         name: 'Home',
         component: () => import('@/views/Home.vue'),
       },
-      // {
-      //   path: 'categories',
-      //   name: 'Categories',
-      //   component: () => import('@/views/article/CategoriesPage.vue'),
-      // },
-      // {
-      //   path: 'tags',
-      //   name: 'Tags',
-      //   component: () => import('@/views/article/TagsPage.vue'),
-      // },
     ],
   },
   {
@@ -59,8 +49,28 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'Archive',
-        component: () => import('@/views/article/Archive.vue'),
-      }
+        component: () => import('@/views/archive/Archive.vue'),
+      },
+      {
+        path: 'categories',
+        name: 'Categories',
+        component: () => import('@/views/archive/CategoryArticles.vue'),
+      },
+      {
+        path: 'categories/:slug',
+        name: 'CategoryArticles',
+        component: () => import('@/views/archive/CategoryArticles.vue'),
+      },
+      {
+        path: 'tags',
+        name: 'Tags',
+        component: () => import('@/views/archive/TagArticles.vue'),
+      },
+      {
+        path: 'tags/:slug',
+        name: 'TagArticles',
+        component: () => import('@/views/archive/TagArticles.vue'),
+      },
     ]
   },
   {

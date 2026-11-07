@@ -2,10 +2,10 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { articleApi } from '@/api/';
 import mockArticle from '@/mock/mockArticle';
-import type { Adjacent, PageResult } from '@/types/api';
-import type { ArchiveYear, Article, Category } from '@/types/article'
-import { defaultAdjacent, defaultPageResult } from '@/utils/cabinet';
+import type { Adjacent, PageParams, PageResult } from '@/types/api';
+import type { Article, Category, ArchiveYear } from '@/types'
 import { useUserStore } from '@/stores/user'
+import { defaultAdjacent, defaultPageResult } from '@/utils/cabinet';
 import { BLOG_LIKED_KEY } from '@/utils/constant';
 
 export const useArticleStore = defineStore('article', () => {
@@ -15,65 +15,6 @@ export const useArticleStore = defineStore('article', () => {
   const article = ref<Article>({} as Article)
   const relatedArticles = ref<Article[]>([] as Article[])
   const adjacentArticle = ref<Adjacent<Article>>(defaultAdjacent<Article>())
-
-  // Archive related state
-  const archiveYears = ref([] as ArchiveYear[])
-  const archiveLoading = ref(false)
-  const archiveNoMore = ref(false)
-
-  const fetchArchive = async (opts = { year: undefined as number | undefined, month: undefined as number | undefined, limit: 3 }) => {
-    // reset no-more flag on initial fetch so lazy-loading can proceed after reloads
-    archiveNoMore.value = false
-    archiveLoading.value = true
-    try {
-      const data = await articleApi.getArticleArchive(opts)
-      if (data && data.data) {
-        // ensure years sorted desc
-        archiveYears.value = (data.data.years || []).sort((a: any, b: any) => b.year - a.year)
-      }
-    } catch (err) {
-      console.error('fetchArchive error', err)
-      throw new Error('获取归档失败')
-    } finally {
-      archiveLoading.value = false
-    }
-  }
-
-  /**
-   * Reset archive related state.
-   * @param options.clearYears - whether to clear the currently loaded years array (default false)
-   */
-  const resetArchiveState = (options: { clearYears?: boolean } = {}) => {
-    archiveNoMore.value = false
-    archiveLoading.value = false
-    if (options.clearYears) {
-      archiveYears.value = []
-    }
-  }
-
-  const loadMoreArchiveYears = async ({ startYear, limit = 2 }: { startYear?: number; limit?: number } = {}) => {
-    if (archiveLoading.value || archiveNoMore.value) return
-    archiveLoading.value = true
-    try {
-      const data = await articleApi.getArticleArchiveMore({ startYear, limit })
-      if (data && data.data && data.data.years && data.data.years.length) {
-        const returned = (data.data.years || []).sort((a: any, b: any) => b.year - a.year)
-        // dedupe by year to avoid duplicates when backend returns overlapping ranges
-        const existing = new Set(archiveYears.value.map((y: any) => y.year))
-        const toAdd = returned.filter((y: any) => !existing.has(y.year))
-        if (toAdd.length) {
-          archiveYears.value = archiveYears.value.concat(toAdd)
-        }
-      } else {
-        archiveNoMore.value = true
-      }
-    } catch (err) {
-      console.error('loadMoreArchiveYears error', err)
-      throw new Error('加载更多归档失败')
-    } finally {
-      archiveLoading.value = false
-    }
-  }
 
   /**
    * 获取分页博客数据
@@ -85,6 +26,8 @@ export const useArticleStore = defineStore('article', () => {
       size?: number;
       search?: string;
       status?: string;
+      categoryId?: string | number;
+      tagId?: string | number;
     } =
     {
       current: 1,
@@ -96,11 +39,15 @@ export const useArticleStore = defineStore('article', () => {
     const size: number = payload.size ?? 10
     const search: string | undefined = payload.search
     const status: string | undefined = payload.status || 'published'
+    const categoryId: string | number | undefined = payload.categoryId
+    const tagId: string | number | undefined = payload.tagId
 
     try {
-      const params: any = { current, size }
+      const params: PageParams = { current, size }
       if (search) params.search = search
       if (status) params.status = status
+      if (categoryId !== undefined && categoryId !== '') params.categoryId = categoryId
+      if (tagId !== undefined && tagId !== '') params.tagId = tagId
 
       const userStore = useUserStore()
       const userData = userStore.acquireUserOrAnonyId(BLOG_LIKED_KEY)
@@ -167,63 +114,16 @@ export const useArticleStore = defineStore('article', () => {
     }
   }
 
-  // Like / dislike actions (simple local update or API call if available)
-  // const likeArticle = async (payload: { id: number }) => {
-  //   try {
-  //     // try calling API if available
-  //     if (articleApi && typeof articleApi.likeArticle === 'function') {
-  //       await articleApi.likeArticle(payload)
-  //     }
-  //   } catch (err) {
-  //     console.warn('likeArticle api failed or not implemented', err)
-  //   }
-
-  //   // optimistic local update if the current article matches
-  //   if (article.value && (article.value as any).id === payload.id) {
-  //     ; (article.value as any).likes = ((article.value as any).likes || 0) + 1
-  //   }
-  // }
-
-  // const dislikeArticle = async (payload: { id: number }) => {
-  //   try {
-  //     if (articleApi && typeof articleApi.dislikeArticle === 'function') {
-  //       await articleApi.dislikeArticle(payload)
-  //     }
-  //   } catch (err) {
-  //     console.warn('dislikeArticle api failed or not implemented', err)
-  //   }
-
-  //   if (article.value && (article.value as any).id === payload.id) {
-  //     ; (article.value as any).dislikes = ((article.value as any).dislikes || 0) + 1
-  //   }
-  // }
-
   return {
     pageData,
     articles,
     article,
     relatedArticles,
     adjacentArticle,
+
     fetchArticles,
     fetchArticleById,
     fetchRelatedArticles,
     fetchAdjacentArticles,
-    // likeArticle,
-    // dislikeArticle,
-
-    archiveYears,
-    archiveLoading,
-    archiveNoMore,
-    fetchArchive,
-    loadMoreArchiveYears,
-    resetArchiveState,
-  }
-});
-
-export const useCategoriesStore = defineStore('category', () => {
-  const categories: Category[] = []
-
-  return {
-    categories
   }
 });

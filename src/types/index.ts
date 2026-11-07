@@ -1,20 +1,21 @@
 import type { User } from './user'
 import type { Category, Tag, Article } from './article'
 import type { Comment, CommentUser } from './comment'
+import type { ArchiveYear, ArchiveResponse } from './archive'
 
-// export interface Pagination<T> {
-//   data: T[]
-//   total: number
-//   page: number
-//   pageSize: number
-//   totalPages: number
-// }
+export interface Pagination<T> {
+  data: T[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
 
-// export interface ApiResponse<T = any> {
-//   code: number
-//   message: string
-//   data: T
-// }
+export interface ApiResponse<T = any> {
+  code: number
+  message: string
+  data: T
+}
 
 export interface NavItem<T = any> {
   path: string
@@ -24,4 +25,4 @@ export interface NavItem<T = any> {
   icon: T
 }
 
-export type { User, Category, Tag, Article, Comment, CommentUser }
+export type { User, Category, Tag, Article, Comment, CommentUser, ArchiveYear, ArchiveResponse }

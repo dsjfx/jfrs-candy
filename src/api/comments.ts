@@ -8,11 +8,9 @@ import type {
   ReportParams,
 } from '@/types/comment'
 import ResponseFactory from '@/utils/responseFactory'
-import { accessUrl } from '@/utils/cabinet'
+import { jAccess } from '@/utils/cabinet'
 
-function makeUrl(url: string = '') {
-  return accessUrl('CO', url)
-}
+const jMake = jAccess('CO')
 
 /**
  * 获取评论列表
@@ -36,7 +34,7 @@ export const getComments = async (
 ): Promise<ResponseData<PageResult<Comment>>> => {
   let result = ResponseFactory.page<Comment>()
 
-  const response = await http.get(makeUrl(`/list`), {
+  const response = await http.get(jMake(`/list`), {
     blogId: articleId,
     current,
     size,
@@ -64,7 +62,7 @@ export const createComment = async (
   data: CommentForm
 ): Promise<Comment> => {
   const response = await http.post(
-    makeUrl(`/add/${articleId}`),
+    jMake(`/add/${articleId}`),
     {
       content: data.content,
       ...data.user,
@@ -96,7 +94,7 @@ export const updateComment = async (
   commentId: string,
   data: Pick<CommentForm, 'content'>
 ): Promise<Comment> => {
-  const response = await http.put(makeUrl(`/update/${commentId}`), data)
+  const response = await http.put(jMake(`/update/${commentId}`), data)
   const res = response.data
 
   if (!res) {
@@ -122,7 +120,7 @@ export const updateComment = async (
 export const deleteComment = async (
   commentId: string, data: Record<string, string>
 ): Promise<void> => {
-  await http.delete(makeUrl(`/delete/${commentId}`), data)
+  await http.delete(jMake(`/delete/${commentId}`), data)
 }
 
 /**
@@ -133,7 +131,7 @@ export const reportComment = async (
   params: ReportParams
 ): Promise<void> => {
   const response = await http.post(
-    makeUrl(`/reports`),
+    jMake(`/reports`),
     { commentId: params.commentId, reason: params.reason, description: params.description }
   )
 
@@ -152,7 +150,7 @@ export const blockUser = async (
   blockedId: string
 ): Promise<void> => {
   const response = await http.post(
-    makeUrl(`/blocks/personal`),
+    jMake(`/blocks/personal`),
     { blockerId, blockedId, reason: '个人屏蔽用户' }
   )
 
@@ -170,7 +168,7 @@ export const blockUser0 = async (
   email: string
 ): Promise<void> => {
   const response = await http.post(
-    makeUrl(`/blocks`),
+    jMake(`/blocks`),
     { type: 'email', value: email, reason: '屏蔽用户' }
   )
 
@@ -187,7 +185,7 @@ export const blockUser0 = async (
 export const unblockUser = async (
   blockId: string
 ): Promise<void> => {
-  const response = await http.delete(makeUrl(`/blocks/${blockId}`))
+  const response = await http.delete(jMake(`/blocks/${blockId}`))
 
   const res = response.data
   if (!res || res.code !== 200) {
@@ -214,7 +212,7 @@ export const likeComment = async (
   userId: string | null,
   anonymousId: string | null,
 ): Promise<{ liked: boolean; likes: number }> => {
-  const response = await http.post(makeUrl(`/likes/toggle`), {
+  const response = await http.post(jMake(`/likes/toggle`), {
     commentId: `${commentId}`,
     userId,
     anonymousId

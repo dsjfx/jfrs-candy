@@ -157,10 +157,16 @@ export const formatDate = (dateStr: string) => {
   return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`
 }
 
-export const formatDate2 = (dateStr: string) => {
+export const formatDateDash = (dateStr: string) => {
   const date = new Date(dateStr)
   return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
 }
+
+export const formatDateNoYear = (dateStr: string) => {
+  const d = new Date(dateStr)
+  return `${d.getMonth() + 1} 月 ${d.getDate()} 日`
+}
+
 
 // 时间转换成人可读性
 export const formatTime = (dateStr: string) => {
@@ -187,11 +193,23 @@ const MAP_URL: Record<string, string> = {
   'BL': '/blog',
   'CO': '/comment',
   'AU': '/auth',
-}
+  'AR': '/archive',
+  'CA': '/category',
+  'TA': '/tag',
+} as const
 
 export function accessUrl(code: string, url: string) {
   return `${MAP_URL[code]}${url}`
 }
+
+type MapCode = keyof typeof MAP_URL
+// 用模板字符串类型约束 url 必须 / 开头
+type TPath = `/${string}`
+
+export const jAccess =
+  (code: MapCode) =>
+    (url: TPath) =>
+      `${MAP_URL[code]}${url}`
 
 const subject = import.meta.env.VITE_APP_SUBJECT || ''
 // daily app
@@ -226,7 +244,8 @@ export default {
 
   delay,
   formatDate,
-  formatDate2,
+  formatDateDash,
+  formatDateNoYear,
   markdownToHtml,
   htmlToText,
   defaultAdjacent,

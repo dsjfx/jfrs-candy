@@ -30,7 +30,8 @@ class ResponseFactory {
         total: 1,
         size: 10,
         current: 1,
-        ...pageData
+        ...pageData,
+        totalplus: 0,
       }
     })
   }

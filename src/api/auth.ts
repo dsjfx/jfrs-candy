@@ -1,13 +1,11 @@
 import { http } from "./request"
 import type { ResponseData } from "@/types/api"
 import type { CaptchaParam, CaptchaResponse, CaptchaValid, LoginParams, LoginResponse, SimpleUser, User, UserInfo, UserParam } from "@/types/user"
-import { accessUrl } from "@/utils/cabinet"
+import { jAccess } from "@/utils/cabinet"
 import ResponseFactory from "@/utils/responseFactory"
 
 
-function makeUrl(url: string) {
-  return accessUrl('AU', url)
-}
+const jMake = jAccess('AU')
 
 // export function loginApi(username: string, password: string) {
 //   const token = ''
@@ -34,7 +32,7 @@ function makeUrl(url: string) {
 export async function getUser(param: UserParam = { id: 10 }): Promise<ResponseData<User>> {
   let result = ResponseFactory.success<User>({} as User)
 
-  const response = await http.get(makeUrl(`/profile/simple`), param)
+  const response = await http.get(jMake(`/profile/simple`), param)
   if (response.data) {
     result = response.data as ResponseData<User>
   }
@@ -50,7 +48,7 @@ export async function getUser(param: UserParam = { id: 10 }): Promise<ResponseDa
 export async function login(param: LoginParams): Promise<ResponseData<LoginResponse>> {
   let result = ResponseFactory.success<LoginResponse>({} as LoginResponse)
 
-  const response = await http.post(makeUrl(`/login`), param)
+  const response = await http.post(jMake(`/login`), param)
   if (response.data) {
     result = response.data as ResponseData<LoginResponse>
   }
@@ -94,7 +92,7 @@ export async function getSimpleUserinfo(param: UserParam):
   Promise<ResponseData<SimpleUser>> {
   let data = ResponseFactory.success<SimpleUser>({} as SimpleUser)
 
-  const response = await http.get(makeUrl(`/sys-avatar`), param)
+  const response = await http.get(jMake(`/sys-avatar`), param)
   if (response.data) {
     data = response.data as ResponseData<SimpleUser>
   }
@@ -110,7 +108,7 @@ export async function getSimpleUserinfo(param: UserParam):
 export async function getUserByEmail(email: string): Promise<ResponseData<UserInfo>> {
   let data = ResponseFactory.success<UserInfo>({} as UserInfo)
 
-  const response = await http.get(makeUrl('/email'), { email })
+  const response = await http.get(jMake('/email'), { email })
   if (response.data) {
     data = response.data as ResponseData<UserInfo>
   }
