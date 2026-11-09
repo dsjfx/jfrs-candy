@@ -186,14 +186,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const subject = import.meta.env.VITE_APP_SUBJECT || ''
 const author = ref<User>({} as User)
-const email = ref<string>('hello@example.com')
-const github = ref<string>('https://github.com')
 
-
-const emailUrl = computed(() => `mailto:${email.value}`)
-const githubUrl = computed(() => github.value)
-const zhihuUrl = computed(() => 'https://www.zhihu.com/people/yourname')
-const weiboUrl = computed(() => 'https://weibo.com/yourname')
+const emailUrl = computed(() => `mailto:${author.value.email || 'hello@example.com'}`)
+const githubUrl = computed(() => author.value.github || 'https://github.com')
+const zhihuUrl = computed(() => author.value.zhihu || 'https://www.zhihu.com/people/yourname')
+const weiboUrl = computed(() => author.value.weibo || 'https://weibo.com/yourname')
 
 const nickname = computed(() => author.value.nickname || 'Jfx')
 const job = computed(() => author.value.job || '前端工程师 / 内容创作者')

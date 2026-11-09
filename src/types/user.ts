@@ -15,6 +15,18 @@ export interface User {
   job?: string
   hobbies?: string[]
   social?: SocialLinks
+  github?: string
+  zhihu?: string
+  weibo?: string
+  qq?: string
+  twitter?: string
+  wechat?: string
+  linkedin?: string
+  emailAddress?: string
+  homepage?: string
+  icpLicense?: string
+  publicSecurityLicense?: string
+  [key: string]: any
 }
 
 
