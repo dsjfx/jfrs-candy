@@ -1,10 +1,14 @@
 <template>
   <div class="article-page">
+    <button class="page-back-top" type="button" @click="goBack">
+      返回
+    </button>
+
     <div class="page-header">
       <div class="header-content">
         <p class="eyebrow">标签筛选</p>
         <h1>#{{ tagName }}</h1>
-        <p class="summary">共 {{ filteredArticles.length }} 篇文章</p>
+        <p class="summary">共 {{ total }} 篇文章</p>
       </div>
 
       <div class="header-actions">
@@ -42,15 +46,22 @@
       <ArticleCard v-for="article in filteredArticles" :key="article.id" :article="article" :show-time="true"
         :max-tags="2" @tag-click="handleTagClick" @read-more="handleReadMore" @click="handleArticleClick" />
     </div>
+
+    <div v-if="!isLoading && total > 0" class="pagination-wrap">
+      <Paging :current="currentPage" :page-size="pageSize" :total="total" :show-icons="true" :show-text="true"
+        :show-page-size="false" :show-info="true" :show-jump="false" @page-change="handlePageChange"
+        @page-size-change="handlePageSizeChange" />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ArticleCard from '@/components/articles/ArticleCard.vue'
 import EmptyState from '@/components/core/EmptyState.vue'
 import LoadingSpinner from '@/components/core/LoadingSpinner.vue'
+import Paging from '@/components/page/Paging.vue'
 import { useArticleStore } from '@/stores/article'
 import { useTagStore } from '@/stores/tag'
 import type { Article, Tag } from '@/types/article'
@@ -62,21 +73,15 @@ const tagStore = useTagStore()
 
 const isLoading = ref(false)
 const error = ref('')
+const currentPage = ref(1)
+const pageSize = ref(10)
+const pageResult = ref<{ total?: number; current?: number; size?: number } | null>(null)
 
-// const routeValue = computed(() => {
-//   const raw = String(route.params.slug || route.query.tag || route.query.slug || '')
-//   return raw ? decodeURIComponent(raw) : ''
-// })
+const total = computed(() => Number(pageResult.value?.total ?? articleStore.articles.length ?? 0))
 
+const tagId = computed(() => Number(route.params.id))
+const tagName = computed(() => tagStore.tag?.name || '全部标签')
 const tagSlug = computed(() => tagStore.tag?.slug)
-
-const tagId = computed(() => {
-  const id = Number(route.params.id)
-  if (Number.isNaN(id)) {
-    // ...
-  }
-  return id
-})
 
 const availableTags = computed(() => {
   const unique = new Map<string, Tag>()
@@ -90,23 +95,7 @@ const availableTags = computed(() => {
   return Array.from(unique.values())
 })
 
-const tagName = computed(() => {
-  const currTag = tagStore.tag
-  if (!currTag) return '全部标签'
-
-  return currTag.name
-})
-
-const filteredArticles = computed(() => {
-  // const slug = tagSlug.value
-  // if (!slug) return articleStore.articles
-
-  // return articleStore.articles.filter((article) => {
-  //   const tags = article.tags || []
-  //   return tags.some((tag) => [tag.slug, tag.name, String(tag.id)].includes(slug))
-  // })
-  return articleStore.articles
-})
+const filteredArticles = computed(() => articleStore.articles)
 
 const loadArticles = async () => {
   isLoading.value = true
@@ -114,12 +103,13 @@ const loadArticles = async () => {
 
   try {
     await articleStore.fetchArticles({
-      current: 1,
-      size: 20,
+      current: currentPage.value,
+      size: pageSize.value,
       status: 'published',
-      tagId: tagStore?.tag?.id || undefined,
+      tagId: tagId.value || undefined,
     })
-    // await tagStore.fetchTagArticles(tagId.value)
+
+    pageResult.value = articleStore.pageData?.pagination || null
   } catch (err) {
     error.value = err instanceof Error ? err.message : '加载文章失败'
   } finally {
@@ -128,12 +118,12 @@ const loadArticles = async () => {
 }
 
 const navigateToTag = (tag: Tag) => {
-  const target = tag.slug || tag.name || String(tag.id)
-  router.push({ name: 'TagArticles', params: { slug: encodeURIComponent(target) } })
+  const target = String(tag.id)
+  router.push({ name: 'TagArticles', params: { id: encodeURIComponent(target) } })
 }
 
 const handleTagClick = (tagNameValue: string) => {
-  router.push({ name: 'TagArticles', params: { slug: encodeURIComponent(tagNameValue) } })
+  // router.push({ name: 'TagArticles', params: { id: encodeURIComponent(tagNameValue) } })
 }
 
 const handleReadMore = (article: Article) => {
@@ -144,27 +134,48 @@ const handleArticleClick = (article: Article) => {
   router.push(`/articles/${article.id}`)
 }
 
+const handlePageChange = async (page: number) => {
+  if (page < 1) return
+  currentPage.value = page
+  await loadArticles()
+}
+
+const handlePageSizeChange = async (size: number) => {
+  if (size < 1) return
+  pageSize.value = size
+  currentPage.value = 1
+  await loadArticles()
+}
+
 const goToAllArticles = () => {
-  router.push({ name: 'Articles' })
+  tagStore.reset()
+  router.push({ name: 'Archive' })
 }
 
 const goBack = () => {
-  router.push({ name: 'Articles' })
+  tagStore.reset()
+
+  if (window.history.length > 1) {
+    router.back()
+  } else {
+    router.push({ name: 'Archive' })
+  }
 }
 
 watch(
   () => route.params.id,
-  () => {
-    loadArticles()
+  async (id) => {
+    const tagValue = Number(id)
+    if (Number.isNaN(tagValue)) {
+      return
+    }
+
+    currentPage.value = 1
+    await tagStore.fetchTagDetail(tagValue)
+    await loadArticles()
   },
   { immediate: true }
 )
-
-onMounted(async () => {
-  await tagStore.fetchTagDetail(tagId.value)
-
-  loadArticles()
-})
 </script>
 
 <style scoped lang="scss">
@@ -172,6 +183,27 @@ onMounted(async () => {
   width: min(1200px, calc(100% - 32px));
   margin: 0 auto;
   padding: 2rem 0 4rem;
+}
+
+.page-back-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.4rem 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.4;
+  border: 1px solid rgba(5, 150, 105, 0.2);
+  border-radius: 1rem;
+  background: #ffffff;
+  color: #065f46;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f0fdf4;
+  }
 }
 
 .page-header {

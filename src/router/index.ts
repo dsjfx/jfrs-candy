@@ -80,7 +80,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'About',
-        component: () => import('@/views/about/About.vue'),
+        component: () => import('@/views/about/AboutMe.vue'),
       },
     ],
   },

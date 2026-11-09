@@ -164,6 +164,16 @@ import {
 
 // mock data (mockLatestArticles, mockCatalog, mockTags) imported from mockHome
 
+// --- data fetching for homepage ---
+const articleStore = useArticleStore()
+const heroArticle = ref<Article | null>(null)
+const latestArticles = ref<Article[]>([])
+const searchInputRef = ref<HTMLInputElement | null>(null)
+const searchLoading = ref(false)
+const searchQuery = ref('')
+const debouncedSearch = useDebouncedRef(searchQuery, DEBOUNCED_INPUT_DELAY)
+const router = useRouter()
+
 const tags = ref<Tag[]>([])
 const wordCount = ref<number>(DEFAULT_WORD_COUNT)
 const readTime = ref<string>(DEFAULT_READ_TIME)
@@ -191,64 +201,13 @@ const reactionType = computed(() => {
   return reactionTranslate(reaction)
 })
 
-// 事件处理
-// const handleLike = async () => {
-//   if (heroArticle.value?.id) {
-//     try {
-//       await articleStore.likeArticle({ id: heroArticle.value.id })
-//     } catch (err) {
-//       console.warn('like failed', err)
-//     }
-//     // optimistic local update so UI shows incremented value
-//     if (typeof heroArticle.value.likeCount === 'number') {
-//       heroArticle.value = { ...heroArticle.value, likeCount: (heroArticle.value.likeCount || 0) + 1 }
-//     } else {
-//       heroArticle.value = { ...heroArticle.value, likeCount: 1 }
-//     }
-//     // trigger bump animation
-//     likeBump.value = true
-//     setTimeout(() => (likeBump.value = false), 350)
-//   }
-//   ElMessage.success('感谢点赞！')
-// }
-
-// const handleDislike = async () => {
-//   if (heroArticle.value?.id) {
-//     try {
-//       await articleStore.dislikeArticle({ id: heroArticle.value.id })
-//     } catch (err) {
-//       console.warn('dislike failed', err)
-//     }
-//     if (typeof heroArticle.value.dislikeCount === 'number') {
-//       heroArticle.value = { ...heroArticle.value, dislikeCount: (heroArticle.value.dislikeCount || 0) + 1 }
-//     } else {
-//       heroArticle.value = { ...heroArticle.value, dislikeCount: 1 }
-//     }
-//     // trigger bump animation
-//     dislikeBump.value = true
-//     setTimeout(() => (dislikeBump.value = false), 350)
-//   }
-//   ElMessage.info('感谢反馈！')
-// }
-
 const handleSharePlatform = (platform: string) => {
   ElMessage.info(`${platform} 正在开发中`)
 }
 
 const filterByTag = (tag: number) => {
-  ElMessage.info(`正在筛选标签: ${tag}`)
-  // 这里可以添加实际的筛选逻辑
+  router.push({ name: 'TagArticles', params: { id: encodeURIComponent(String(tag)) } })
 }
-
-// --- data fetching for homepage ---
-const articleStore = useArticleStore()
-const heroArticle = ref<Article | null>(null)
-const latestArticles = ref<Article[]>([])
-const searchInputRef = ref<HTMLInputElement | null>(null)
-const searchLoading = ref(false)
-const searchQuery = ref('')
-const debouncedSearch = useDebouncedRef(searchQuery, DEBOUNCED_INPUT_DELAY)
-const router = useRouter()
 
 const loadHomeArticles = async (search?: string) => {
   searchLoading.value = true
