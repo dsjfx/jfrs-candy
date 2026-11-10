@@ -21,12 +21,14 @@ export const getBlogs = async (
     userId = null,
     anonymousId = null,
     tagId = null,
-    categoryId = null
+    categoryId = null,
+    status = 'published',
+    search = ''
   } = page;
-
+  console.log('page:', page)
   const response = await http.get(jMake(`/list`),
     {
-      current, size, sort, userId, anonymousId, tagId, categoryId
+      current, size, sort, userId, anonymousId, tagId, categoryId, status, search
     }
   )
 

@@ -84,13 +84,14 @@
 
         <!-- 标签 -->
         <div v-if="showTag" class="article-tags">
-          <!-- <router-link v-for="tag in article.tags" :key="tag.id" :to="`/tag/${tag.id}`" class="article-tag">
-            #{{ tag.name }}
-          </router-link> -->
-          <div v-for="tag in article.tags" :key="tag.id" class="article-tag"
+          <router-link v-for="tag in article.tags" :key="tag.id" :to="`/archive/tags/${tag.id}`" class="article-tag"
             :style="{ '--tag-color-rgb': tagColorRgb(tag.color) }">
             #{{ tag.name }}
-          </div>
+          </router-link>
+          <!-- <div v-for="tag in article.tags" :key="tag.id" class="article-tag"
+            :style="{ '--tag-color-rgb': tagColorRgb(tag.color) }">
+            #{{ tag.name }}
+          </div> -->
         </div>
 
         <!-- 特色图片 Featured Image -->
