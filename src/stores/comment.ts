@@ -109,7 +109,7 @@ export const useCommentStore = defineStore('coment', () => {
       size = 10,
       sort = currentSort.value,
       reset = true,
-      status = 'approved',
+      // status = 'approved',
       viewerId, viewerEmail
     } = payload
 
@@ -121,7 +121,7 @@ export const useCommentStore = defineStore('coment', () => {
 
     try {
       const response = await commentApi.getComments(articleId, current, size,
-        { viewerId, viewerEmail }, sort, status)
+        { viewerId, viewerEmail }, sort)
 
       if (response && response.data) {
         result.value = response.data

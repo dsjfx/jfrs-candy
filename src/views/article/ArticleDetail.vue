@@ -70,7 +70,7 @@
               <span title="评论" class="meta-icon">
                 <FaIcon :icon="['far', 'comment']" />
               </span>
-              {{ article.comments || '5' }}
+              {{ article.comments || '0' }}
             </span>
           </div>
 
@@ -88,10 +88,6 @@
             :style="{ '--tag-color-rgb': tagColorRgb(tag.color) }">
             #{{ tag.name }}
           </router-link>
-          <!-- <div v-for="tag in article.tags" :key="tag.id" class="article-tag"
-            :style="{ '--tag-color-rgb': tagColorRgb(tag.color) }">
-            #{{ tag.name }}
-          </div> -->
         </div>
 
         <!-- 特色图片 Featured Image -->

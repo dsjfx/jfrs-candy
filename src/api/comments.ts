@@ -30,7 +30,7 @@ export const getComments = async (
     viewerEmail?: string
   } = {},
   sort: 'newest' | 'oldest' | 'popular' = 'newest',
-  status: CommentStatus = 'approved',
+  // status: CommentStatus = 'approved',
 ): Promise<ResponseData<PageResult<Comment>>> => {
   let result = ResponseFactory.page<Comment>()
 
